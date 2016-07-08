@@ -7,7 +7,6 @@
  */
 class Editor extends User {
     public function view(){
-        echo "123";
         return 'editor';
     }
     /**

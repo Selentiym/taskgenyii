@@ -5,7 +5,6 @@
  * Date: 05.07.2016
  * Time: 10:50
  */
-echo "editor";
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js',CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js',CClientScript::POS_BEGIN);
 Yii::app() -> getClientScript() -> registerScript('structure','
@@ -33,6 +32,9 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     });
 ',CClientScript::POS_READY);
 ?>
+ЛКМ => закрыть/открыть список одветок<br/>
+Ctrl + ЛКМ => открыть в новой вкладке таблицу ключевых слов<br/>
+Shift + ЛКМ => открыть в новом окне окошко создания нового ТЗ в качестве дочернего к выбранной ветке дерева<br/>
 <div id="TreeContainer">
 
 </div>

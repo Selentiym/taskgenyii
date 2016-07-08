@@ -7,7 +7,8 @@
  */
 class Admin extends User {
     public function view(){
-        return 'admin';
+        //return 'admin';
+        return 'editor';
     }
     /**
      * Returns the static model of the specified AR class.

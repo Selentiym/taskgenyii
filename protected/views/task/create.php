@@ -124,6 +124,10 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
     });
 </script>
 <div id="phrasesWrapper">
+    Чтобы посмотреть список фраз, в которых используется слово, нажмите Alt + ЛКМ на строке со словом в правой части<br/>
+    Чтобы удалить слово совсем, нажмите Shift + ЛКМ на слове<br/>
+    Чтобы скрыть слово, которое не нужно, но может потом пригодиться, нажмите Ctrl + ЛКМ<br/>
+    Слова из правой части можно перетаскивать в форму слева простым удерживанием ЛКМ<br/>
     <form method="post" id="phrasesCont">
         <div class="well">
             <input type="text" name="Task[name]" placeholder="Название"/>
