@@ -7,3 +7,4 @@
  */
 echo 'admin!';
 var_dump(Yii::app() -> UrlHelper -> paths());
+var_dump($model);

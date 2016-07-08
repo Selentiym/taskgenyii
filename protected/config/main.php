@@ -16,6 +16,7 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.models.users.*',
+		'application.models.strings.*',
 		'application.components.*',
 	),
 
@@ -49,17 +50,21 @@ return array(
 			'urlFormat'=>'path',
 			'showScriptName' => false,
 			'rules'=>array(
+				'' => 'cabinet/index',
+				'stem' => 'site/stem',
 				'logout' => 'login/logout',
+				'<action:(TaskCreate|TextCreate)>/parent/<parentId:\d+>' => 'cabinet/<action>',
 				'<action:(TaskCreate|TextCreate)>' => 'cabinet/<action>',
 				'cabinet' => 'cabinet/index',
 				'loadKeywords' => 'cabinet/loadKeywords',
+				'loadKeywords/parent/<parentId:\d+>' => 'cabinet/loadKeywords',
 				//'cabinet/<arg:\w+>' => 'cabinet/index',
 				/*array(
 						'class' => 'application.components.UserTypeUrlRule',
 						'connectionID' => 'db'
 				),*/
-				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
-				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
+				'<controller:\w+>/<arg:\d+>'=>'<controller>/view',
+				'<controller:\w+>/<action:\w+>/<arg:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),

@@ -50,7 +50,7 @@ class FileViewAction extends UAction {
                     if (!$this->partial){
                         $this->controller->render($this->view, array('get' => $_GET));
                     } else {
-                        $this->controller->renderPartial($this->view, array('get' => $_GET), true, $this -> showScripts);
+                        $this->controller->renderPartial($this->view, array('get' => $_GET), false, $this -> showScripts);
                     }
                 } else {
                     $this -> controller -> render('//accessDenied');

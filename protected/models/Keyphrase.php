@@ -29,7 +29,7 @@ class Keyphrase extends UModel
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-				array('id, id_task', 'required'),
+				array('id_task, phrase', 'required'),
 				array('id, id_task, direct, morph', 'numerical', 'integerOnly'=>true),
 				array('phrase', 'length', 'max'=>256),
 				// The following rule is used by search().

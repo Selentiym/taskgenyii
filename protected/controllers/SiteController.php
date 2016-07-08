@@ -18,6 +18,13 @@ class SiteController extends Controller
 			'page'=>array(
 				'class'=>'CViewAction',
 			),
+			'stem' => array(
+				'class' => 'application.controllers.actions.FileViewAction',
+				'view' => '//site/morph',
+				'ignore' => true,
+				'access' => true,
+				'partial' => true
+			),
 		);
 	}
 

@@ -7,13 +7,15 @@
  */
 class LoginController extends Controller
 {
+    public $loginFormClass = 'ULoginForm';
     public $defaultAction = 'login';
     /**
      * Displays the login page
      */
     public function actionLogin()
     {
-        $model=new LoginForm;
+        $modelClass = $this -> loginFormClass;
+        $model=new $modelClass();
 
         // if it is ajax validation request
         if(isset($_POST['ajax']) && $_POST['ajax']==='loginForm')
@@ -22,12 +24,12 @@ class LoginController extends Controller
             Yii::app()->end();
         }
         if (!Yii::app() -> user -> isGuest) {
-            $this -> redirect('site');
+            $this -> redirect(Yii::app()->baseUrl);
         }
         // collect user input data
-        if(isset($_POST['LoginForm']))
+        if(isset($_POST[get_class($model)]))
         {
-            $model->attributes=$_POST['LoginForm'];
+            $model->attributes=$_POST[get_class($model)];
             // validate user input and redirect to the previous page if valid
             if($model->validate() && $model->login())
                 $this->redirect(Yii::app()->baseUrl);

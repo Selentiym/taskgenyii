@@ -19,7 +19,8 @@ class CabinetController extends Controller {
                 'class' => 'application.controllers.actions.ModelViewAction',
                 'modelClass' => 'User',
                 'scenario' => 'cabinet',
-                'view' => function($user){return $user -> view();}
+                'view' => function($user){return $user -> view();},
+                'layout' => 'cabinet'
             ),
 
             'TaskCreate' => array(
@@ -31,6 +32,7 @@ class CabinetController extends Controller {
             'loadKeywords' => array(
                 'class' => 'application.controllers.actions.FileViewAction',
                 'view' => '//task/keyform',
+                'ignore' => true,
                 'access' => true
             ),
         );

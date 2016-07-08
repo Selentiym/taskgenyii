@@ -5,8 +5,6 @@
  * Date: 06.07.2016
  * Time: 10:02
  */
-
-require_once('classes/arrayString.php');
 $data = $_POST;
 
 //Получили список поисковых фраз
@@ -91,20 +89,17 @@ while ($word -> num ) {
     $wordArr = next($keywords);
     $word = $wordArr['obj'];
 }
-//var_dump($keywords);
-//var_dump($cluster);
-
-/*$phr = array_map(function($el) {
-    $temp = trim($el);
-    return array_map('trim', explode('\t',$el));
-},explode('\r',$data['phrases']));*/
-//var_dump($phr);
+Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js', CClientScript::POS_BEGIN);
+Yii::app() -> clientScript -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
+Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js', CClientScript::POS_END);
+Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/taskCreate.css');
 ?>
-<link rel="stylesheet" href="css/usergen.css"/>
+<!--<link rel="stylesheet" href="css/usergen.css"/>
 <script src="js/jquery.min.js"></script>
 <script src="js/underscore.js"></script>
-<script src="js/Classes.js"></script>
+<script src="js/Classes.js"></script>-->
 <script>
+
     $(document).ready(function(){
         Word.prototype.container = $("#wordsCont");
         Phrase.prototype.container = $("#phrasesCont");
@@ -112,7 +107,14 @@ while ($word -> num ) {
             foreach($keywords as $obj) {
                 $obj = $obj['obj'];
                 $stems = json_encode($obj -> stems, JSON_PRETTY_PRINT);
+                $obj -> num = $obj -> num ? $obj -> num : 0;
                 echo "new Word('{$obj -> initial}',{stems:$stems,num:{$obj -> num}});".PHP_EOL;
+            }
+            foreach ($phr as $p) {
+                $stems = json_encode($p -> stems,JSON_PRETTY_PRINT);
+                $freq = $p -> num;
+                echo "new Phrase('$p->initial',{stems:$stems, initial:true, freq:'$freq'})".PHP_EOL;
+                //break;
             }
             foreach ($used as $p) {
                 $stems = json_encode($p -> stems,JSON_PRETTY_PRINT);
@@ -121,11 +123,32 @@ while ($word -> num ) {
         ?>
     });
 </script>
-<form method="post" action="tasklist.php" id="phrasesCont">
-
-    <input type="submit" value="Составить ТЗ"/>
-</form>
-
+<div id="phrasesWrapper">
+    <form method="post" id="phrasesCont">
+        <div class="well">
+            <input type="text" name="Task[name]" placeholder="Название"/>
+        </div>
+        <div class="well">
+            Автор:
+        <?php
+            UHtml::activeDropDownListChosen2(Task::model(), 'id_author',
+                UHtml::listData(User::model() -> author() -> findAll(),'id','username'),
+                array('empty_line' => true,'style' => 'width:300px'),array(),json_encode(array('placeholder' => 'Автор не выбран','allowClear' => true, 'multiple' => false)));
+        ?>
+        </div>
+        <div class="well">
+            Шаблон:
+        <?php
+            UHtml::activeDropDownListChosen2(Task::model(), 'id_pattern',
+                UHtml::listData(TaskPattern::model() -> findAll(),'id','name'),
+                array('style' => 'width:300px'),array(),json_encode(array('placeholder' => 'Шаблон')));
+        ?>
+        </div>
+        <input type="submit" value="Составить ТЗ"/>
+        <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
+        <input type="button" onClick="Word.prototype.showAll()" value="Ппоказать все слова" />
+    </form>
+</div>
 <table id="keywords">
     <thead>
     <tr><td>Слово</td><td>Псевдокорень</td><td>Количество</td><td>Важность</td></tr>

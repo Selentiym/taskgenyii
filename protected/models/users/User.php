@@ -92,7 +92,11 @@ class User extends UModel
 			'criteria'=>$criteria,
 		));
 	}
-
+	public function scopes() {
+		return array(
+			'author' => array('condition' => 'id_type = 3'),
+		);
+	}
 	/**
 	 * @return string name og the view to be used to show the user
 	 */
@@ -105,7 +109,7 @@ class User extends UModel
 	 * @return User
 	 */
 	public function customFind($arg = false){
-		if ($this -> scenario == 'cabinet') {
+		if (($this -> scenario == 'cabinet')&&($arg)) {
 			$user = self::findByUsername($arg);
 			if (is_a($user,'User')) {
 				return $user;
@@ -113,7 +117,7 @@ class User extends UModel
 				return self::logged();
 			}
 		} else {
-			return parent::customFind();
+			return $this -> findByPk(Yii::app() -> user -> getId());
 		}
 	}
 	/**

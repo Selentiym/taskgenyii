@@ -16,7 +16,7 @@ $data = $_POST;
         margin-right:40px;
     }
 </style>
-<form action="<?php echo Yii::app() -> urlManager -> createUrl('cabinet/TaskCreate'); ?>" method="post">
+<form action="<?php echo Yii::app() -> urlManager -> createUrl('cabinet/TaskCreate', array_filter(['parentId' => $_GET['parentId']])); ?>" method="post">
     <textarea name="phrases"><?php echo $data['phrases']; ?></textarea>
     <textarea name="cluster"><?php echo $data['cluster']; ?></textarea>
     <input type="submit" value="Составить"/>

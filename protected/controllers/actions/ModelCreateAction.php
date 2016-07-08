@@ -63,7 +63,7 @@ class ModelCreateAction extends UAction {
                         $created = true;
                         //echo "Saved!!!!";
                     } else {
-                        //print_r($model -> getErrors());
+                        print_r($model -> getErrors());
                         $model -> explainErrors();
                     }//*/
                 }

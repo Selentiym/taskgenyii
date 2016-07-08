@@ -8,14 +8,22 @@
  * @property integer $id_author
  * @property integer $id_editor
  * @property integer $id_pattern
+ * @property integer $id_parent
  * @property string $created
  * @property integer $id_text
  *
  * The followings are the available model relations:
  * @property Keyphrase[] $keyphrases
  * @property Text[] $texts
+ * @property Task $parent
+ * @property Task[] $children
+ * @property Pattern $pattern
  */
 class Task extends Commentable {
+	/**
+	 * @var array[] $phrases массив ключевых фраз при создании/изменении модели
+	 */
+	public $phrases = array();
 	/**
 	 * @return string the associated database table name
 	 */
@@ -30,11 +38,12 @@ class Task extends Commentable {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, id_author, id_editor, id_pattern, created', 'required'),
+			array('id_editor, id_pattern, name', 'required'),
 			array('id, id_author, id_editor, id_pattern, id_text', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_author, id_editor, id_pattern, created, id_text', 'safe', 'on'=>'search'),
+			array('id, id_author, id_editor, id_pattern, created, id_text, name', 'safe', 'on'=>'search'),
+			array('id_author, id_pattern, phrases, name', 'safe', 'on'=>'create'),
 		);
 	}
 
@@ -53,6 +62,9 @@ class Task extends Commentable {
 		return array(
 			'keyphrases' => array(self::HAS_MANY, 'Keyphrase', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task'),
+			'parent' => array(self::BELONGS_TO, 'Task', 'id_parent'),
+			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
+			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
 		) + parent::relations();
 		//Строчка +parent::relations() делает эту модель комментируемой.
 	}
@@ -115,5 +127,44 @@ class Task extends Commentable {
 	 */
 	public function checkCreateAccess() {
 		return (parent::checkCreateAccess() && (Yii::app() -> user -> checkAccess('editor')));
+	}
+	/**
+	 * @inherit
+	 */
+	public function readData($data){
+		//Создает задание тот, кто сейчас залогинен
+		$this -> id_editor = Yii::app() -> user -> getId();
+		//В дальнейшем будет древовидная структура
+		$this -> id_parent = $data['parentId'];
+    }
+	public function scopes(){
+		return array(
+			'root' => array('condition' => 'id_parent = 0'),
+			'uncategorized' => array('condition' => 'id_parent IS NULL'),
+		);
+	}
+	protected function afterSave(){
+		//Пока что только при создании, при обновлении такого нет.
+		foreach ($this -> phrases['text'] as $key => $phr) {
+			$kp = new Keyphrase();
+			$kp -> id_task = $this -> id;
+			$kp -> phrase = $phr;
+			$kp -> direct = $this -> phrases ['strict'][$key];
+			$kp -> morph = $this -> phrases ['morph'][$key];
+			if ($kp -> save()) {
+
+			} else {
+				$temp = $kp -> getErrors();
+			}
+		}
+		return parent::afterSave();
+	}
+	public function customFind($arg = false) {
+		if ($arg) {
+			if ($this->scenario == 'view') {
+				return $this -> findByPk($arg);
+			}
+		}
+		return false;
 	}
 }
