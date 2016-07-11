@@ -1,0 +1,58 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "01244b0e7ef3454ff91c22adaf1eb29d",
+    "content-hash": "7afbea5ecc89529762d8459ef640f21b",
+    "packages": [
+        {
+            "name": "umisoft/phpmorphy",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Umisoft/phpmorphy.git",
+                "reference": "91e13dbbdb439fee62f31890de27e88b1d432087"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Umisoft/phpmorphy/zipball/91e13dbbdb439fee62f31890de27e88b1d432087",
+                "reference": "91e13dbbdb439fee62f31890de27e88b1d432087",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "phpMorphy": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GNU GPL 2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Kamaev Vladimir",
+                    "email": "heromantor@users.sourceforge.net"
+                }
+            ],
+            "description": "phpMorphy - morphological analyzer library for Russisan, English and German languages",
+            "homepage": "http://phpmorphy.sourceforge.net/",
+            "keywords": [
+                "phpmorphy"
+            ],
+            "time": "2014-07-21 15:22:40"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.6"
+    },
+    "platform-dev": []
+}

@@ -1,0 +1,66 @@
+#phrasesWrapper {
+    position:fixed;
+    display:inline-block;
+    width:45%;
+    vertical-align: top;
+    overflow:auto;
+    height:100%;
+}
+#phrasesCont div input {
+    width: 80%;
+    margin-top:10px;
+    border-radius:5px;
+    padding:3px;
+}
+#phrasesCont div input.strict, #phrasesCont div input.morph {
+    width:30px;
+}
+
+#keywords {
+    position:absolute;
+    left:45%;
+    top:0;
+    display: inline-block;
+    width:45%;
+    vertical-align: top;
+}
+#keywords td {
+    padding:5px;
+    text-align: center;
+    vertical-align: middle;
+}
+#keywords td.counter span{
+    padding:0 3px;
+}
+#keywords td.counter .someLeft{
+    background: #67d700;
+}
+#keywords td.counter .ranOut{
+    background: #d74e00;
+}
+#keywords td.counter{
+    width:20%;
+}
+#keywords td.stem {
+    width:30%;
+}
+#keywords td.fulltext {
+    width: 40%;
+}
+#keywords td.fulltext .keywordText{
+    cursor:pointer;
+}
+
+.wordPopup {
+    padding:5px;
+    width:300px;
+    max-height:300px;
+    overflow:auto;
+    background:lightgreen;
+}
+.phraseShortCut {
+    margin-bottom:3px;
+}
+.phraseShortCut.initial{
+    background:lightgoldenrodyellow;
+}

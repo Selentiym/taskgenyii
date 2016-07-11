@@ -8,9 +8,10 @@
  * @property integer $id_task
  * @property integer $length
  * @property string $text
+ * @property bool $handedIn
  *
  * The followings are the available model relations:
- * @property Task $idTask
+ * @property Task $task
  */
 class Text extends Commentable {
 	/**
@@ -27,7 +28,7 @@ class Text extends Commentable {
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-				array('id, id_task', 'required'),
+				array('id_task', 'required'),
 				array('id, id_task, length', 'numerical', 'integerOnly'=>true),
 				array('text', 'safe'),
 				// The following rule is used by search().
@@ -49,7 +50,7 @@ class Text extends Commentable {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-				'idTask' => array(self::BELONGS_TO, 'Task', 'id_task'),
+				'task' => array(self::BELONGS_TO, 'Task', 'id_task'),
 			) + parent::relations();
 	}
 
@@ -100,5 +101,27 @@ class Text extends Commentable {
 	 */
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
+	}
+	public function CustomFind($arg){
+		if ($this -> scenario == 'write') {
+			return $this -> findByPk($arg);
+		}
+		return $this -> findByPk($arg);
+	}
+
+	/**
+	 * Основная функция интерфейса для авторов.
+	 * Считает ключевые слова, получает разные статистики из api, проверяет уникальность.
+	 * Попутно сохраняет временные изменения в тексте вместе с некоторыми параметрами.
+	 *
+	 * Весь вывод идет в виде json-объекта.
+	 * @var mixed[] $post
+	 */
+	public function analyze($post){
+		$rez = array();
+		$text = $post['text'];
+		$this -> text = $text;
+		$rez['text'] = strip_tags($text);
+		echo json_encode($rez, JSON_PRETTY_PRINT);
 	}
 }

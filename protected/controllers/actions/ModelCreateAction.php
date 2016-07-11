@@ -24,7 +24,7 @@ class ModelCreateAction extends UAction {
      */
     public $redirectUrl = array('/cabinet');
     /**
-     * @param $arg string  - the argument of customFind
+     * @param $arg bool|string  - the argument of customFind
      * @throws CHttpException
      */
     public function run($arg = false)

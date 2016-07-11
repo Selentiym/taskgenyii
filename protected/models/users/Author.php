@@ -19,4 +19,9 @@ class Author extends User {
     {
         return parent::model($className);
     }
+    public function relations(){
+        return parent::relations() + array(
+            'tasks' => array(self::HAS_MANY, 'Task', 'id_author'),
+        );
+    }
 }

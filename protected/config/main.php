@@ -18,6 +18,7 @@ return array(
 		'application.models.users.*',
 		'application.models.strings.*',
 		'application.components.*',
+		'application.extensions.tinymce.*',
 	),
 
 	'modules'=>array(

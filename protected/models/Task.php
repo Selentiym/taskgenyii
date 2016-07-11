@@ -5,6 +5,7 @@
  *
  * The followings are the available columns in table '{{task}}':
  * @property integer $id
+ * @property string $name
  * @property integer $id_author
  * @property integer $id_editor
  * @property integer $id_pattern
@@ -15,15 +16,18 @@
  * The followings are the available model relations:
  * @property Keyphrase[] $keyphrases
  * @property Text[] $texts
+ * @property Text $currentText
  * @property Task $parent
  * @property Task[] $children
  * @property Pattern $pattern
+ * @property Author $author
  */
 class Task extends Commentable {
 	/**
 	 * @var array[] $phrases массив ключевых фраз при создании/изменении модели
 	 */
 	public $phrases = array();
+	public $toTextRedirect;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -62,9 +66,11 @@ class Task extends Commentable {
 		return array(
 			'keyphrases' => array(self::HAS_MANY, 'Keyphrase', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task'),
+			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 0'),
 			'parent' => array(self::BELONGS_TO, 'Task', 'id_parent'),
 			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
+			'author' => array(self::BELONGS_TO, 'Author', 'id_author'),
 		) + parent::relations();
 		//Строчка +parent::relations() делает эту модель комментируемой.
 	}
@@ -161,10 +167,43 @@ class Task extends Commentable {
 	}
 	public function customFind($arg = false) {
 		if ($arg) {
-			if ($this->scenario == 'view') {
+			if (($this->scenario == 'view')||($this -> scenario == 'make')) {
 				return $this -> findByPk($arg);
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Creates a text and saves its id to redirect afterwards
+	 */
+	public function lastText(){
+		$id = false;
+		if (!$this -> currentText) {
+			$text = new Text;
+			$text->id_task = $this->id;
+			if ($text->save()) {
+				$id = $text->id;
+			}
+		} else {
+			$text = $this -> currentText;
+			$id = $this -> currentText -> id;
+		}
+		if ($id) {
+			$this->toTextRedirect = Yii::app()->createUrl('text/write', array('arg' => $id));
+		}
+		return $text;
+	}
+
+	/**
+	 * @param $url - initial url to be redirected to
+	 * @return string|array - redirect path
+	 */
+	public function redirectAfterTextCreate($url){
+		if ($this -> toTextRedirect) {
+			return $this->toTextRedirect;
+		} else {
+			return $url;
+		}
 	}
 }
