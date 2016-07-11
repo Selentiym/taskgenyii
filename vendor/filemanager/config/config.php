@@ -68,7 +68,7 @@ $config = array(
 	| with start and final /
 	|
 	*/
-	'upload_dir' => '/public_html/images/filemanager/',
+	'upload_dir' => '/images/filemanager/',
 
 	/*
 	|--------------------------------------------------------------------------
