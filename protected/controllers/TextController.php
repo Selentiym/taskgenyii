@@ -18,7 +18,7 @@ class TextController extends Controller {
                 'layout' => 'cabinet'
             ),
             'analyze' => array(
-                'class' => 'application.controllers.actions.classMethodAction',
+                'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'Text',
                 'method' => 'analyze',
                 'access' => true,
