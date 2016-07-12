@@ -121,7 +121,96 @@ class Text extends Commentable {
 		$rez = array();
 		$text = $post['text'];
 		$this -> text = $text;
-		$rez['text'] = strip_tags($text);
+		$text = new textString(strip_tags($text));
+
+		$i = -1;
+		foreach($this -> task -> keyphrases as $phr){
+			if ($phr -> direct > 0) {
+				++$i;
+				$rez['phrs']['direct'][] = $text->lookForLiteral($phr -> phrase);
+			}
+		}
+		$i = -1;
+		foreach($this -> task -> keyphrases as $phr){
+			if ($phr -> morph > 0) {
+				++$i;
+				$rez['phrs']['morph'][] = $text->lookForSentenced(new wordSet($phr->phrase, $i));
+			}
+		}
+		$rez['text'] = $text -> getToPrint();
+
+
+		echo json_encode($rez, JSON_PRETTY_PRINT);
+	}
+	/**
+	 * Основная функция интерфейса для авторов.
+	 * Считает ключевые слова, получает разные статистики из api, проверяет уникальность.
+	 * Попутно сохраняет временные изменения в тексте вместе с некоторыми параметрами.
+	 *
+	 * Весь вывод идет в виде json-объекта.
+	 * @var mixed[] $post
+	 */
+	public function analyzeOld($post){
+		$rez = array();
+		$text = $post['text'];
+		$this -> text = $text;
+		$text = new sentenceString(strip_tags($text));
+		$i = -1;
+		foreach($this -> task -> keyphrases as $phr){
+			//++ $i;
+			$rez['phrs'][] = $text -> lookFor(new arrayString($phr -> phrase));
+		}
+
+
+
+		echo json_encode($rez, JSON_PRETTY_PRINT);
+	}
+
+	/**
+	 * Возвращает параметры текста, которые нужно контролировать по ТЗ.
+	 * Академическая тошнота, первая строка в семантическом ядре и словах.
+	 */
+	public function seoStat($post){
+		$out = '';
+		//Обращаемся на advego/text/seo/ с просьбой проанализировать текст
+		if ($curl = curl_init()) {
+			curl_setopt($curl, CURLOPT_URL, 'http://advego.ru/text/seo/');
+			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($curl, CURLOPT_POST, true);
+			$query = http_build_query(array(
+					'job_text' => $post['text']
+			));
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
+			$out = curl_exec($curl);
+			curl_close($curl);
+		}
+		//Удаляем кучу лишнего и делаем то, что осталось, валидным
+		$out = substr($out, strpos($out, 'text_check_results'));
+		$out = substr($out, strpos($out, '>') + 1);
+		$out = substr($out, 0, strpos($out, 'job_desc'));
+		$out = substr($out, 0, strrpos($out, '<'));
+		$out = substr($out, 0, strrpos($out, '>') + 1);
+
+		$out = '<xml>' . $out;
+		$out .= '</xml>';
+
+		//Создали xml структуру, которую теперь можно рапарсить
+		$xml = new SimpleXMLElement($out);
+
+		//Тошнотность
+		$temp = $xml->table->tr[10]->td[1];
+		$rez['sick'] = preg_replace('/[^\d\.\,]/', '', $temp);
+		if ($xml->div[0]->table->tr[1]) {
+			//Первый показатель в семнатическом ядре
+			$rez['first_nucl_num'] = preg_replace('/[^\d\.\,]/', '', $xml->div[0]->table->tr[1]->td[2]);
+			$rez['first_nucl'] = "<table>" . $xml->div[0]->table->tr[1]->asXML() . "</table>";
+		}
+		if ($xml->div[1]->table->tr[1]) {
+			//Первый показатель в словах
+			$rez['first_word_num'] = preg_replace('/[^\d\.\,]/', '', $xml->div[1]->table->tr[1]->td[2]);
+			$rez['first_word'] = "<table>" . $xml->div[1]->table->tr[1]->asXML() . "</table>";
+		}
+		//Выводим результат
 		echo json_encode($rez, JSON_PRETTY_PRINT);
 	}
 }

@@ -46,4 +46,7 @@ class CabinetController extends Controller {
     public function actionBack(){
         $this -> back();
     }
+    public function actionCheck() {
+        echo 'check';
+    }
 }

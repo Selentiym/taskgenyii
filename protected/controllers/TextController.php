@@ -27,6 +27,16 @@ class TextController extends Controller {
                 'ignore' => true,
                 'scenario' => 'analyze'
             ),
+            'seoStat' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'seoStat',
+                'access' => true,
+                'args' => $_POST,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'analyze'
+            ),
         );
     }
 }

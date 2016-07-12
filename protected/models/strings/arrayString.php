@@ -47,9 +47,10 @@ class arrayString {
     public function __construct($string){
         $this -> initial = $string;
         $this -> text = $string;
-
     }
     public function removeRubbish(){
+        //Чтобы санкт-петербург не сливался в одно слово
+        $this -> text = str_replace('-',' ',$this -> text);
         //Оставляем только буквы и пробелы
         $this -> text = preg_replace('/[^\s\w]/u', '', $this -> text);
         //Удаляем лишние пробелы и переносы строк
@@ -92,6 +93,11 @@ class arrayString {
         $this -> prepare();
         $needle -> prepare();
         return (int) (count(array_intersect($this ->stems, $needle -> stems)) == count($needle -> stems));
+    }
+    public function lookForUnorderedHighlight(arrayString $needle){
+        $this -> prepare();
+        $needle -> prepare();
+
     }
     public function dist(arrayString $s){
         $this -> prepare();

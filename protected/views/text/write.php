@@ -10,11 +10,9 @@
  * @type Text $text - alias for $model
  */
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/write.js', CClientScript::POS_END);
+Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js', CClientScript::POS_BEGIN);
 Yii::app() -> getClientScript() -> registerScript('check',"
-    $('#check').click(function(){
-
-        analyze(".$model->id.", tinyMCE.activeEditor.getContent(), $('#rezultDiv'));
-    });
+    new text(".$model->id.");
     var timerId = setInterval(function(){
     }, 1000);
 
@@ -33,5 +31,11 @@ $text = $model;
         ));
     ?>
     </div>
-    <div style="width:39%; display:inline-block;vertical-align:top" id="rezultDiv">Текст без тегов: <br/></div>
+    <div style="width:39%; display:inline-block;vertical-align:top">
+        <div id="seoData"></div>
+        <div id="rezultDiv">Текст без тегов: <br/></div>
+        <div>
+            <?php $this -> renderPartial('//pattern/keys', array('data' => $model -> task -> keyphrases)); ?>
+        </div>
+    </div>
 </div>

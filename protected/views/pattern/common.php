@@ -46,18 +46,7 @@ mso-bidi-font-family:&quot;Times New Roman&quot;;color:#006100;mso-fareast-langu
 
 <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
 
-<table border="1">
-    <tr><td>Фраза</td><td>Прямое</td><td>Морфология</td></tr>
-    <?php
-    foreach ($data as $phrase) {
-        $strict = $phrase -> direct ? $phrase -> direct : '';
-        $morph = $phrase -> morph ? $phrase -> morph : '';
-        $phrase_text = $phrase -> phrase;
-        $trstyle = ($phrase -> direct > 0) ? 'background:green' : '' ;
-        echo "<tr><td style='padding:5px;vertical-align:middle;text-align:left;$trstyle'>$phrase_text</td><td style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$strict</td><td style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$morph</td></tr>";
-    }
-    ?>
-</table>
+<?php $this -> renderPartial('//pattern/keys', array('data' => $data)); ?>
 
 <p class="MsoNormal"><o:p>&nbsp;</o:p></p>
 
