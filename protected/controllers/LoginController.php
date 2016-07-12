@@ -32,7 +32,7 @@ class LoginController extends Controller
             $model->attributes=$_POST[get_class($model)];
             // validate user input and redirect to the previous page if valid
             if($model->validate() && $model->login())
-                $this->redirect(Yii::app()->baseUrl);
+                $this->redirect(Yii::app()->baseUrl.'/');
         }
         // display the login form
         $this->renderPartial('login',array('model'=>$model));

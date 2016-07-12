@@ -5,7 +5,6 @@
 function text(id) {
     var me = {};
     me.id = id;
-    alert(me.id);
     me.seoInfo = $("#seoData");
     me.rez = $('#rezultDiv');
     me.check = $("#check");
