@@ -19,6 +19,7 @@ Yii::app() -> getClientScript() -> registerScript('check',"
 ", CClientScript::POS_READY);
 
 $text = $model;
+$this -> renderPartial('//_navBar');
 ?>
 <input type="button" value="Проверить" id="check"/>
 <input type="button" value="Уникальность" id="uniqueButton"/>
@@ -33,7 +34,10 @@ $text = $model;
                 'setup' => 'js:function(ed) {
                 ed.on("change", function(ed) {
                     textObj.contentChanged(); // get actual content
-                })}'
+                })}',
+                'oninit' => 'js:function(){
+                textObj.analyze();
+                }'
             )
         ));
     ?>
