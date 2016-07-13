@@ -244,7 +244,7 @@ class Text extends Commentable {
 		if (($post['text'])) {
 			$this -> text = $post['text'];
 		}
-		$rez = TextRuApiHelper::addPost($this -> text, Yii::app() -> createAbsoluteUrl('text/uniqueResult',array('id' => $this -> id)));
+		$rez = TextRuApiHelper::addPost($this -> text, Yii::app() -> createAbsoluteUrl('text/uniqueResult',array('arg' => $this -> id)));
 		if ($rez['text_uid']) {
 			$this -> uid = $rez['text_uid'];
 			$this -> uniquePercent = new CDbExpression('NULL');

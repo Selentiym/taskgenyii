@@ -57,7 +57,7 @@ class CabinetController extends Controller {
             $check = TextRuApiHelper::getResultPost($uid);
         }
     }
-    public function actionLog(){
+    public static function actionLog(){
         ob_start();
         var_dump($_GET);
         var_dump($_POST);
