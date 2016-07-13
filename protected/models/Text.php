@@ -10,7 +10,7 @@
  * @property string $text
  * @property bool $handedIn
  * @property string $uid
- * @property float $unique
+ * @property float $uniquePercent
  *
  * The followings are the available model relations:
  * @property Task $task
@@ -247,7 +247,7 @@ class Text extends Commentable {
 		$rez = TextRuApiHelper::addPost($this -> text, Yii::app() -> createAbsoluteUrl('text/uniqueResult',array('id' => $this -> id)));
 		if ($rez['text_uid']) {
 			$this -> uid = $rez['text_uid'];
-			$this -> unique = new CDbExpression('NULL');
+			$this -> uniquePercent = new CDbExpression('NULL');
 			$this -> save(true, array('uid','unique','text'));
 		}
 		if ($return) {
@@ -266,14 +266,14 @@ class Text extends Commentable {
 		if ($print) {
 			echo json_encode(array(
 				'uid' => $this -> uid,
-				'unique' => $this -> unique
+				'unique' => $this -> uniquePercent
 			));
 		}
-		return $this -> unique;
+		return $this -> uniquePercent;
 	}
 	public function uniqueResult($post){
 		$this -> uid = $post['uid'];
-		$this -> unique = $post['text_unique'];
+		$this -> uniquePercent = $post['text_unique'];
 		$this -> save();
 		echo 'ok';
 	}
