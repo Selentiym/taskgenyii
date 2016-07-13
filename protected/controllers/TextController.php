@@ -37,6 +37,36 @@ class TextController extends Controller {
                 'ignore' => true,
                 'scenario' => 'analyze'
             ),
+            'uniqueCheck' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'addUnique',
+                'access' => true,
+                'args' => $_POST,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'analyze'
+            ),
+            'giveUnique' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'giveUnique',
+                'access' => true,
+                'args' => true,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'analyze'
+            ),
+            'uniqueResult' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'uniqueResult',
+                'guest' => true,
+                'args' => $_POST,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'analyze'
+            ),
         );
     }
 }

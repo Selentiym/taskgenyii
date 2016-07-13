@@ -9,6 +9,8 @@
  * @property integer $length
  * @property string $text
  * @property bool $handedIn
+ * @property string $uid
+ * @property float $unique
  *
  * The followings are the available model relations:
  * @property Task $task
@@ -116,11 +118,17 @@ class Text extends Commentable {
 	 *
 	 * Весь вывод идет в виде json-объекта.
 	 * @var mixed[] $post
+	 * @var bool $return - whether to print json or return resulting array
+	 * @return mixed[]
 	 */
-	public function analyze($post){
+	public function analyze($post, $return = false){
 		$rez = array();
 		$text = $post['text'];
 		$this -> text = $text;
+		//Сохраняем только текст
+		if (!$post['not_save']) {
+			$this -> save(false, array('text'));
+		}
 		$text = new textString(strip_tags($text));
 
 		$i = -1;
@@ -139,8 +147,11 @@ class Text extends Commentable {
 		}
 		$rez['text'] = $text -> getToPrint();
 
-
+		if ($return) {
+			return $rez;
+		}
 		echo json_encode($rez, JSON_PRETTY_PRINT);
+		return $rez;
 	}
 	/**
 	 * Основная функция интерфейса для авторов.
@@ -149,8 +160,9 @@ class Text extends Commentable {
 	 *
 	 * Весь вывод идет в виде json-объекта.
 	 * @var mixed[] $post
+	 * @var bool $return - whether to print json or return resulting array
 	 */
-	public function analyzeOld($post){
+	public function analyzeOld($post, $return = false){
 		$rez = array();
 		$text = $post['text'];
 		$this -> text = $text;
@@ -162,15 +174,20 @@ class Text extends Commentable {
 		}
 
 
-
+		if ($return) {
+			return $rez;
+		}
 		echo json_encode($rez, JSON_PRETTY_PRINT);
+		return $rez;
 	}
 
 	/**
 	 * Возвращает параметры текста, которые нужно контролировать по ТЗ.
 	 * Академическая тошнота, первая строка в семантическом ядре и словах.
+	 * @param mixed[] $post
+	 * @param bool $return
 	 */
-	public function seoStat($post){
+	public function seoStat($post, $return = false){
 		$out = '';
 		//Обращаемся на advego/text/seo/ с просьбой проанализировать текст
 		if ($curl = curl_init()) {
@@ -210,7 +227,54 @@ class Text extends Commentable {
 			$rez['first_word_num'] = preg_replace('/[^\d\.\,]/', '', $xml->div[1]->table->tr[1]->td[2]);
 			$rez['first_word'] = "<table>" . $xml->div[1]->table->tr[1]->asXML() . "</table>";
 		}
+		if ($return) {
+			return $rez;
+		}
 		//Выводим результат
 		echo json_encode($rez, JSON_PRETTY_PRINT);
+		return $rez;
+	}
+
+	/**
+	 * @param mixed[] $post
+	 * @param bool $return
+	 * @return mixed[]
+	 */
+	public function addUnique($post = array(), $return = false){
+		if (($post['text'])) {
+			$this -> text = $post['text'];
+		}
+		$rez = TextRuApiHelper::addPost($this -> text, Yii::app() -> createAbsoluteUrl('text/uniqueResult',array('id' => $this -> id)));
+		if ($rez['text_uid']) {
+			$this -> uid = $rez['text_uid'];
+			$this -> unique = new CDbExpression('NULL');
+			$this -> save(true, array('uid','unique','text'));
+		}
+		if ($return) {
+			return $rez;
+		}
+		echo json_encode($rez, JSON_PRETTY_PRINT);
+		return $rez;
+	}
+
+	/**
+	 * @param bool $print
+	 * @return float
+	 */
+	public function giveUnique($print = false) {
+		// Выводим результат.
+		if ($print) {
+			echo json_encode(array(
+				'uid' => $this -> uid,
+				'unique' => $this -> unique
+			));
+		}
+		return $this -> unique;
+	}
+	public function uniqueResult($post){
+		$this -> uid = $post['uid'];
+		$this -> unique = $post['text_unique'];
+		$this -> save();
+		echo 'ok';
 	}
 }

@@ -30,3 +30,6 @@ protected/log.txt
 protected/store.txt
 #file that contains registration info for the google doc api
 configFile.php
+
+#all files that contain passwords
+*.pss.php

@@ -18,6 +18,10 @@
 		 */
 		public $access = false;
 		/**
+		 * @var bool/callable guest - whether a guest is allowed to open the page
+		 */
+		public $guest = false;
+		/**
 		 * @var bool $ajax - whether this method has to be invoked by an ajax request.
 		 */
 		public $ajax = false;
@@ -47,7 +51,7 @@
 		 */
 		public function run($arg = false)
 		{
-			if (!Yii::app() -> user -> isGuest) {
+			if ((!Yii::app() -> user -> isGuest)&&(!$this -> guest)) {
 				//Ищем объект.
 				$modelClass = $this -> modelClass;
 				$method = $this -> method;

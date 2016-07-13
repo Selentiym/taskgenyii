@@ -47,6 +47,14 @@ class CabinetController extends Controller {
         $this -> back();
     }
     public function actionCheck() {
-        echo 'check';
+        $uid = TextRuApiHelper::addPost(
+            'МРТ в Красносельском районе СПБ можно пройти в нескольких клиниках, нужно только выбрать ту, которая будет удобней в каждом конкретном случае – каждая из них имеет свои преимущества перед другими. В данном районе города располагаются в основном государственные медцентры, оказывающие подобные услуги (в отличие от других, к примеру, Кировского района), что имеет как свои плюсы, так и минусы.'
+        );
+        $uid = '5786014f8c660';
+        if ($uid) {
+            $check = TextRuApiHelper::getResultPost($uid);
+            sleep(10);
+            $check = TextRuApiHelper::getResultPost($uid);
+        }
     }
 }
