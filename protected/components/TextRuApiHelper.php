@@ -45,7 +45,8 @@ class TextRuApiHelper {
         $postQuery = http_build_query($postQuery, '', '&');
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'http://api.text.ru/post');
+        //curl_setopt($ch, CURLOPT_URL, 'http://api.text.ru/post');
+        curl_setopt($ch, CURLOPT_URL, Yii::app() -> createUrl('cabinet/log'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postQuery);
@@ -101,7 +102,8 @@ class TextRuApiHelper {
         $postQuery = http_build_query($postQuery, '', '&');
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'http://api.text.ru/post');
+        //curl_setopt($ch, CURLOPT_URL, 'http://api.text.ru/post');
+        curl_setopt($ch, CURLOPT_URL, Yii::app() -> createAbsoluteUrl('cabinet/log'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postQuery);

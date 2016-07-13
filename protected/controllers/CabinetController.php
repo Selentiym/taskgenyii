@@ -57,4 +57,23 @@ class CabinetController extends Controller {
             $check = TextRuApiHelper::getResultPost($uid);
         }
     }
+    public function actionLog(){
+        ob_start();
+        var_dump($_GET);
+        var_dump($_POST);
+        var_dump($_REQUEST);
+        $out = ob_get_contents();
+        ob_end_clean();
+        $f = fopen(Yii::getPathOfAlias('application'). DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . "log.txt",'w');
+        fwrite($f, $out.'<br/><br/>'.PHP_EOL);
+        fclose($f);
+    }
+    public function actionviewLog(){
+        $filename = Yii::getPathOfAlias('application'). DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . "log.txt";
+        if (file_exists($filename)) {
+            echo file_get_contents($filename);
+        } else {
+            echo "No log for today yet.";
+        }
+    }
 }
