@@ -149,10 +149,15 @@ function text(id) {
             }, "JSON").done(function (data) { console.log(data);
                 if (data.text_uid) {
                     me.uid = data.text_uid;
+                    me.once = false;
                     me.obtainUnique();
                 }
             });
         }
+    };
+    me.obtainUniqueOnce = function(){
+        me.once = true;
+        me.obtainUnique();
     };
     //Проверяет, есть ли ответ
     me.obtainUnique = function(){
@@ -161,15 +166,17 @@ function text(id) {
         }, "JSON").done(function (data) {
             if (!data) {data = {};}
             if (data.unique) {
-                if (data.uid != me.uid) {
-                    alert('Идентификаторы проверок не совпадают. Данные уникальности могут быть неверными.');
+                if (!me.once) {
+                    if (data.uid != me.uid) {
+                        alert('Идентификаторы проверок не совпадают. Данные по уникальности могут быть неверными.');
+                    }
                 }
                 me.unique = data.unique;
                 me.uid = data.uid;
                 me.renderUnique();
             } else {
                 me.counter ++;
-                if (me.counter < 20) {
+                if ((me.counter < 20)&&(!me.once)) {
                     me.obtainInterval = setTimeout(function () {
                         me.obtainUnique();
                     }, 10000);
@@ -190,5 +197,7 @@ function text(id) {
             me.uniqueCont.html('Проверка на уникальность не проводилась или завершена с ошибкой.');
         }
     };
+    //А вдруг уже есть сохраненная уникальность с самого начала.
+    me.obtainUniqueOnce();
     return me;
 }

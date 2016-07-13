@@ -262,7 +262,17 @@ class Text extends Commentable {
 	 * @return float
 	 */
 	public function giveUnique($print = false) {
-		// Выводим результат.
+		//Если нет процента, пытаемся его получить.
+		if (!$this -> uniquePercent) {
+			$answer = [];
+			if ($this->uid) {
+				$answer = TextRuApiHelper::getResultPost($this->uid);
+			}
+			if ($answer['text_unique']) {
+				$this->uniquePercent = $answer['text_unique'];
+				$this->save(false, array('uniquePercent', 'uid'));
+			}
+		}
 		if ($print) {
 			echo json_encode(array(
 				'uid' => $this -> uid,
