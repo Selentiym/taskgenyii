@@ -13,11 +13,14 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         if (!e) {
             return false;
         } else {
-            if (e.shiftKey) {
-                this.link.attr("href",baseUrl + "/loadKeywords/parent/"+this.id);
+            if ((e.ctrlKey)&&(e.shiftKey)) {
+                this.link.attr("href",baseUrl + "/task/edit/"+this.id);
+                return false;
+            } else if ((e.shiftKey)) {
+                this.link.attr("href",baseUrl + "/TaskCreate/parent/"+this.id);
                 return false;
             } else if (e.ctrlKey) {
-                this.link.attr("href",baseUrl + "/task/"+this.id);
+                this.link.attr("href",baseUrl + "/loadKeywords/"+this.id);
                 return false;
             }
             e.preventDefault();
@@ -26,15 +29,16 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     },
     toHref: function(){
         if (this.id) {
-            return baseUrl + "/loadKeywords/parent/"+this.id;
+            return baseUrl + "/loadKeywords/"+this.id;
         }
     }
     });
 ',CClientScript::POS_READY);
 ?>
 ЛКМ => закрыть/открыть список одветок<br/>
-Ctrl + ЛКМ => открыть в новой вкладке таблицу ключевых слов<br/>
+Shift + Ctrl + ЛКМ => открыть в новой вкладке таблицу ключевых слов<br/>
 Shift + ЛКМ => открыть в новом окне окошко создания нового ТЗ в качестве дочернего к выбранной ветке дерева<br/>
+Ctrl + ЛКМ => добавить поисковые фразы к заданию из KeyCollector'а
 <div id="TreeContainer">
 
 </div>

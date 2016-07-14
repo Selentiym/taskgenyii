@@ -15,6 +15,8 @@
  *
  * The followings are the available model relations:
  * @property Keyphrase[] $keyphrases
+ * @property SearchPhrase[] $searchphrases
+ * @property Keyword[] $keywords
  * @property Text[] $texts
  * @property Text $currentText
  * @property Task $parent
@@ -27,6 +29,14 @@ class Task extends Commentable {
 	 * @var array[] $phrases массив ключевых фраз при создании/изменении модели
 	 */
 	public $phrases = array();
+	/**
+	 * @var string $input_search - данные из textarea при добавлении ключевых фраз
+	 */
+	public $input_search;
+	/**
+	 * @var string $input_search - данные из textarea по кластеру
+	 */
+	public $keystring;
 	public $toTextRedirect;
 	/**
 	 * @return string the associated database table name
@@ -48,6 +58,7 @@ class Task extends Commentable {
 			// @todo Please remove those attributes that should not be searched.
 			array('id, id_author, id_editor, id_pattern, created, id_text, name', 'safe', 'on'=>'search'),
 			array('id_author, id_pattern, phrases, name', 'safe', 'on'=>'create'),
+			array('input_search, keystring', 'safe', 'on'=>'addKeywords'),
 		);
 	}
 
@@ -65,8 +76,10 @@ class Task extends Commentable {
 		// class name for the relations automatically generated below.
 		return array(
 			'keyphrases' => array(self::HAS_MANY, 'Keyphrase', 'id_task'),
+			'searchphrases' => array(self::HAS_MANY, 'SearchPhrase', 'id_task'),
+			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task'),
-			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 0'),
+			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1'),
 			'parent' => array(self::BELONGS_TO, 'Task', 'id_parent'),
 			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
@@ -150,19 +163,52 @@ class Task extends Commentable {
 		);
 	}
 	protected function afterSave(){
-		//Пока что только при создании, при обновлении такого нет.
-		foreach ($this -> phrases['text'] as $key => $phr) {
-			$kp = new Keyphrase();
-			$kp -> id_task = $this -> id;
-			$kp -> phrase = $phr;
-			$kp -> direct = $this -> phrases ['strict'][$key];
-			$kp -> morph = $this -> phrases ['morph'][$key];
-			if ($kp -> save()) {
-
-			} else {
-				$temp = $kp -> getErrors();
+		if (!empty($this -> phrases['text'])) {
+			//Пока что только при создании, при обновлении такого нет.
+			foreach ($this->phrases['text'] as $key => $phr) {
+				$kp = new Keyphrase();
+				$kp->id_task = $this->id;
+				$kp->phrase = $phr;
+				$kp->direct = $this->phrases ['strict'][$key];
+				$kp->morph = $this->phrases ['morph'][$key];
+				if (!$kp->save()) {
+					$temp = $kp->getErrors();
+				}
 			}
 		}
+		/**
+		 * Добавление поисковых фраз из textarea
+		 */
+		array_map(function($el){
+			$temp = array_map('trim',preg_split("/\t/",trim($el)));
+			if ($temp[0]) {
+				$phr = new SearchPhrase('create');
+				$phr -> attributes = array(
+						'phrase' => $temp[0],
+						'baseFreq' => $temp[3],
+						'phraseFreq' => $temp[4],
+						'directFreq' => $temp[5],
+						'id_task' => $this -> id
+				);
+				 if ($phr -> save()) {
+
+				 } else {
+					 $err = $phr -> getErrors();
+				 }
+			}
+			return false;
+		},preg_split("/\r\n/", $this -> input_search));
+		/**
+		 * Добавление "библиотеки" ключевых слов, тоже из textarea
+		 */
+		//Получили список кластеризованных слов.
+		array_map(function($el){
+			$temp = array_map('trim',preg_split("/\t/",trim($el)));
+			$key = new Keyword();
+			$key -> num = $temp[1];
+			$key -> word = $temp[0];
+			$this -> addKey($key);
+		},array_map('trim',preg_split("/\r\n/",$this -> keystring)));
 		return parent::afterSave();
 	}
 	public function customFind($arg = false) {
@@ -171,7 +217,7 @@ class Task extends Commentable {
 				return $this -> findByPk($arg);
 			}
 		}
-		return false;
+		return $this -> findByPk($arg);
 	}
 
 	/**
@@ -205,5 +251,26 @@ class Task extends Commentable {
 		} else {
 			return $url;
 		}
+	}
+
+	/**
+	 * @param Keyword $key
+	 * добавляет ключ, если нет уже такого, проводит поиск
+	 * посредством приведения к стандартной форме.
+	 * @return bool - получилось ли сохранить ключевик
+	 */
+	public function addKey(Keyword $key){
+		foreach ($this -> keywords as $has) {
+			if ($has -> giveLemma() == $key -> giveLemma()) {
+				$has -> num += $key -> num;
+				return $has -> save();
+				//Значит мы нашли нужную строку
+				//preg_match('/(^|, )'.$.'($|, )/', $has -> word);
+				//попытка дописывать формы, но зачем?
+			}
+		}
+		//Если этого слова пока нет, то ничего страшного, просто добавляем его
+		$key -> id_task = $this -> id;
+		return $key -> save();
 	}
 }

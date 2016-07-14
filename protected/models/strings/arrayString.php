@@ -112,4 +112,11 @@ class arrayString {
         if (!$max) {$max = 1;}
         return ($max - count(array_intersect($bigger -> stems, $smaller -> stems)))/$max;
     }
+
+    /**
+     * @return string - the standard form of the first word
+     */
+    public function lemma(){
+        return Stemmer::getInstance() -> lemmatize(current(array_filter(array_map('trim',explode(' ',$this -> initial)))));
+    }
 }

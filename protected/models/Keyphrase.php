@@ -13,8 +13,7 @@
  * The followings are the available model relations:
  * @property Task $idTask
  */
-class Keyphrase extends UModel
- {
+class Keyphrase extends StringModel {
 	/**
 	 * @return string the associated database table name
 	 */
@@ -98,5 +97,12 @@ class Keyphrase extends UModel
 	 */
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
+	}
+
+	/**
+	 * @return string - name of the attribute
+	 */
+	public function stringAttribute() {
+		return 'phrase';
 	}
 }

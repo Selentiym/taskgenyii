@@ -57,8 +57,8 @@ return array(
 				'<action:(TaskCreate|TextCreate)>/parent/<parentId:\d+>' => 'cabinet/<action>',
 				'<action:(TaskCreate|TextCreate)>' => 'cabinet/<action>',
 				'cabinet' => 'cabinet/index',
-				'loadKeywords' => 'cabinet/loadKeywords',
-				'loadKeywords/parent/<parentId:\d+>' => 'cabinet/loadKeywords',
+				'loadKeywords/<arg:\d+>' => 'cabinet/loadKeywords',
+				//'loadKeywords/parent/<parentId:\d+>' => 'cabinet/loadKeywords',
 				//'cabinet/<arg:\w+>' => 'cabinet/index',
 				/*array(
 						'class' => 'application.components.UserTypeUrlRule',

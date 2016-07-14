@@ -104,11 +104,13 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
         Word.prototype.container = $("#wordsCont");
         Phrase.prototype.container = $("#phrasesCont");
         <?php
-            foreach($keywords as $obj) {
-                $obj = $obj['obj'];
-                $stems = json_encode($obj -> stems, JSON_PRETTY_PRINT);
-                $obj -> num = $obj -> num ? $obj -> num : 0;
-                echo "new Word('{$obj -> initial}',{stems:$stems,num:{$obj -> num}});".PHP_EOL;
+            foreach($keywords as $key) {
+                /**
+                * @type Keyword $key
+                */
+                $stems = json_encode($key -> giveStems(), JSON_PRETTY_PRINT);
+                $key -> num = $key -> num ? $key -> num : 0;
+                echo "new Word('{$key -> giveShortcut()}',{stems:$stems,num:{$key -> num}});".PHP_EOL;
             }
             foreach ($phr as $p) {
                 $stems = json_encode($p -> stems,JSON_PRETTY_PRINT);

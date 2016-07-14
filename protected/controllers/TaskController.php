@@ -6,6 +6,7 @@
  * Time: 18:02
  */
 class TaskController extends Controller {
+    public $layout = 'cabinet';
     public function actions(){
         return array(
             'view' => array(
@@ -26,6 +27,22 @@ class TaskController extends Controller {
                 'access' => function($task){
                     return ($task -> author == User::logged());
                 }
+            ),
+            'edit' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Task',
+                'scenario' => 'generate',
+                'view' => '//task/_form',
+                'redirectUrl' => function($model){
+                    /*if ($_POST['editTask']) {
+                        return Yii::app() -> createUrl('task/edit',['arg' => $model -> id]);
+                    } else {
+                        return Yii::app() -> createUrl('cabinet/index');
+                    }*/
+                    return Yii::app() -> createUrl('cabinet/index');
+                },
+                'redirect' => false,
+                'ignore' => false
             ),
         );
     }

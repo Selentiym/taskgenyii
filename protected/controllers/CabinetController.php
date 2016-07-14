@@ -26,14 +26,23 @@ class CabinetController extends Controller {
             'TaskCreate' => array(
                 'class' => 'application.controllers.actions.ModelCreateAction',
                 'modelClass' => 'Task',
-                'view' => '//task/create',
+                'view' => '//task/_form',
                 'scenario' => 'create'
             ),
             'loadKeywords' => array(
-                'class' => 'application.controllers.actions.FileViewAction',
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Task',
+                'scenario' => 'addKeywords',
                 'view' => '//task/keyform',
-                'ignore' => true,
-                'access' => true
+                'redirectUrl' => function($model){
+                    if ($_POST['editTask']) {
+                        return Yii::app() -> createUrl('task/edit',['arg' => $model -> id]);
+                    } else {
+                        return Yii::app() -> createUrl('cabinet/index');
+                    }
+                },
+                'redirect' => false,
+                'ignore' => false
             ),
         );
     }

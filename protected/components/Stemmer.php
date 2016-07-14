@@ -165,4 +165,13 @@ class Stemmer {
     public function prepareText($string){
 
     }
+
+    /**
+     * @param string $word
+     * @return string
+     */
+    public function lemmatize ($word) {
+        $upper = mb_strtoupper($word,'utf8');
+        return $this -> morphy -> lemmatize($upper);
+    }
 }
