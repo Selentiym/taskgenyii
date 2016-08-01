@@ -100,12 +100,17 @@ class SearchPhrase extends StringModel {
 		return parent::model($className);
 	}
 	protected function beforeSave(){
-		return $this -> findByAttributes(array(
-			'id_task' => $this -> id_task,
-			'baseFreq' => $this -> baseFreq,
-			'directFreq' => $this -> directFreq,
-			'phraseFreq' => $this -> phraseFreq,
-		));
 		//Не даем добавлять уже существующие фразы
+		if ($this -> findByAttributes(array(
+				'id_task' => $this -> id_task,
+				'baseFreq' => $this -> baseFreq,
+				'directFreq' => $this -> directFreq,
+				'phraseFreq' => $this -> phraseFreq,
+		))) {
+			$this -> addError('id','Duplicate phrase. There is a phrase corresponding to the current task that has the same parameters.');
+			return false;
+		}
+		return true;
+
 	}
 }

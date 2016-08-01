@@ -115,9 +115,53 @@ function Phrase(text, param){
                 me.refresh();
             }
         });
+        me.changeElement = $('<input>',{
+            type:'hidden',
+            name:baseFormInputName + '[phrases][changed][]'
+        });
+        me.element.append(me.changeElement);
         //Контейнер для элеентов данного типа должен быть задан в прототипе.
         Phrase.prototype.container.append(me.element);
     }
+    /**
+     * информация по БД
+     */
+    //Тут будет храниться информация, которая связана с хранением объекта в БД
+    //Например, айдишник, флаг из БД ли выгружена фраза.
+    me.db = {};
+    if (param.dbId) {
+        me.db.id = param.dbId;
+    }
+    me.setDbChanged = function(val){
+        if (!me.initial) {
+            me.changeElement.val(val);
+        }
+        me.db.changed = val;
+    };
+    if ((param.fromDb)&&(param.dbId)) {
+        me.setDbChanged(0);
+    } else {
+        me.setDbChanged(1);
+    }
+
+    /**
+     * Если хоть что-то поменялось, то в дальнейшем нужно будет удалить старую
+     * фразу из БД, добавить новую
+     */
+    me.somethingChanged = function(){
+        if ((me.db.changed == 0)&&(me.db.id)) {
+            //Добавляем в список удаляемых.
+            me.element.append($('<input>',{
+                type:'hidden',
+                value:me.db.id,
+                name:baseFormInputName + '[phrases][toDel][]'
+            }));
+        }
+        me.setDbChanged(1);
+    };
+    /**
+     * Конец информации по БД
+     */
     Lexical.prototype.phrasesPool.push(me);
     /**
      * Генерирует вывод небольшого окошка с текстом фразы и частотностью
@@ -133,6 +177,7 @@ function Phrase(text, param){
     };
     //Если пользователь изменил фразу
     me.refresh = function() {
+        me.somethingChanged();
         if (me.used) {
             _.each(me.words, function(word) {
                 word.getUnused(me, me.initial);
@@ -218,7 +263,7 @@ function Phrase(text, param){
             if (e.which == 13) {
                 var temp = new Phrase('', {});
                 e.preventDefault();
-                e.preventBubble();
+                //e.preventBubble();
 
                 //temp.element.get().focus();
 

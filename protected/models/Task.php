@@ -58,6 +58,7 @@ class Task extends Commentable {
 			// @todo Please remove those attributes that should not be searched.
 			array('id, id_author, id_editor, id_pattern, created, id_text, name', 'safe', 'on'=>'search'),
 			array('id_author, id_pattern, phrases, name', 'safe', 'on'=>'create'),
+			array('id_author, id_pattern, phrases, name', 'safe', 'on'=>'generate'),
 			array('input_search, keystring', 'safe', 'on'=>'addKeywords'),
 		);
 	}
@@ -166,6 +167,9 @@ class Task extends Commentable {
 		if (!empty($this -> phrases['text'])) {
 			//Пока что только при создании, при обновлении такого нет.
 			foreach ($this->phrases['text'] as $key => $phr) {
+				if (!($this -> phrases['changed'][$key])) {
+					continue;
+				}
 				$kp = new Keyphrase();
 				$kp->id_task = $this->id;
 				$kp->phrase = $phr;
@@ -176,9 +180,16 @@ class Task extends Commentable {
 				}
 			}
 		}
+		//Удаляем ненужные записи
+		if (count($this -> phrases['toDel']) > 0) {
+			$crit = new CDbCriteria();
+			$crit->addInCondition('id', $this->phrases['toDel']);
+			Keyphrase::model() -> deleteAll($crit);
+		}
 		/**
 		 * Добавление поисковых фраз из textarea
 		 */
+		$ar = preg_split("/\r\n/", $this -> input_search);
 		array_map(function($el){
 			$temp = array_map('trim',preg_split("/\t/",trim($el)));
 			if ($temp[0]) {
@@ -197,7 +208,7 @@ class Task extends Commentable {
 				 }
 			}
 			return false;
-		},preg_split("/\r\n/", $this -> input_search));
+		},$ar);
 		/**
 		 * Добавление "библиотеки" ключевых слов, тоже из textarea
 		 */

@@ -8,6 +8,8 @@
 /**
  * @type Task $model
  */
+
+
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js', CClientScript::POS_BEGIN);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js', CClientScript::POS_END);
@@ -45,7 +47,8 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
             }
             foreach ($model -> keyphrases as $kp) {
                 $stems = json_encode($kp -> giveStems(),JSON_PRETTY_PRINT);
-                echo "new Phrase('$kp->phrase',{stems:$stems})".PHP_EOL;
+                $id = $kp -> id;
+                echo "new Phrase('$kp->phrase',{stems:$stems, fromDb: true, dbId:'$id'})".PHP_EOL;
             }
         ?>
     });
@@ -57,7 +60,7 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
     Слова из правой части можно перетаскивать в форму слева простым удерживанием ЛКМ<br/>
     <form method="post" id="phrasesCont">
         <div class="well">
-            <input type="text" name="Task[name]" placeholder="Название"/>
+            <input type="text" name="Task[name]" placeholder="Название" value="<?php echo $model -> name; ?>"/>
         </div>
         <div class="well">
             Автор:
@@ -66,6 +69,11 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
                 UHtml::listData(User::model() -> author() -> findAll(),'id','username'),
                 array('empty_line' => true,'style' => 'width:300px'),array_filter([$model -> id_author]),
                 json_encode(array('placeholder' => 'Автор не выбран','allowClear' => true, 'multiple' => false)));
+            if ($model -> id_author) {
+                Yii::app()->getClientScript()->registerScript('sel_val', '
+                $("#Task_id_author").val(' . $model->id_author . ').trigger("change");
+            ', CClientScript::POS_READY);
+            }
             ?>
         </div>
         <div class="well">
