@@ -5,6 +5,7 @@
  * Date: 05.07.2016
  * Time: 10:50
  */
+$this -> renderPartial('//_navBar');
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js',CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js',CClientScript::POS_BEGIN);
 Yii::app() -> getClientScript() -> registerScript('structure','

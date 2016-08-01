@@ -63,8 +63,10 @@
 							if (is_callable($this -> redirectUrl)) {
 								$this -> redirectUrl = call_user_func($this -> redirectUrl, $model);
 							}
-							$this->controller->redirect($this -> redirectUrl);
-							new CustomFlash('success',$this -> modelClass, 'CreateSuccess','Редактирование успешно!',true);
+							if (!$this -> redirect) {
+								$this->controller->redirect($this->redirectUrl);
+								new CustomFlash('success', $this->modelClass, 'CreateSuccess', 'Редактирование успешно!', true);
+							}
 						}				
 					}
 					if (!$this -> redirect) {

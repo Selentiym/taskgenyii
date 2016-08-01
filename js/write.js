@@ -2,6 +2,15 @@
  * Created by user on 11.07.2016.
  * @require jQuery, underscore.js
  */
+var form = $('#textForm');
+$('#send').click(function(){
+    form.attr('action',baseUrl + '/text/handIn/'+form.attr('data-id'));
+    form.submit();
+});
+$('#delay').click(function(){
+    form.attr('action',baseUrl + '/text/save/'+form.attr('data-id'));
+    form.submit();
+});
 var loaderImage = $('<img>',{
     src:baseUrl + '/images/loading.gif',
     alt:'loader',

@@ -187,8 +187,10 @@ class Text extends Commentable {
 	 * @param mixed[] $post
 	 * @param bool $return
 	 */
-	public function seoStat($post, $return = false){
+	public function seoStat($post, $return = false) {
 		$out = '';
+		 //очищаем от непонятных спецсимволов и тегов
+		$post['text'] = preg_replace('/\&[a-zA-Z]+\;/u', ' ', strip_tags($post['text']));
 		//Обращаемся на advego/text/seo/ с просьбой проанализировать текст
 		if ($curl = curl_init()) {
 			curl_setopt($curl, CURLOPT_URL, 'http://advego.ru/text/seo/');
@@ -286,5 +288,15 @@ class Text extends Commentable {
 		$this -> uniquePercent = $post['text_unique'];
 		$this -> save();
 		echo 'ok';
+	}
+	protected function beforeSave() {
+		switch ($this -> scenario) {
+			case 'handIn':
+				$this -> handedIn = true;
+				break;
+			case 'delay':
+				break;
+		}
+		return parent::beforeSave();
 	}
 }

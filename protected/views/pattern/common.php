@@ -19,7 +19,7 @@ $data = $model -> keyphrases;
 
 <style>
     tr td {
-        background: rgb(219, 255, 101);
+        background: #ffeb9c;
     }
     tr:first-child {
         font-weight:bold;

@@ -17,6 +17,20 @@ class TextController extends Controller {
                 'scenario' => 'write',
                 'layout' => 'cabinet'
             ),
+            'save' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Text',
+                'scenario' => 'delay',
+                'redirect' => '/cabinet',
+                'ignore' => false
+            ),
+            'handIn' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Text',
+                'scenario' => 'handIn',
+                'redirect' => Yii::app() -> baseUrl.'/cabinet',
+                'ignore' => false
+            ),
             'analyze' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'Text',

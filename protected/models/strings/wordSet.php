@@ -28,20 +28,26 @@ class wordSet {
         return implode(' ', array_map(function($w){ return $w -> getToPrint();},$this -> words));
     }
     public function lookFor($needle){
-        $amount = count(array_intersect($this ->stems, $needle -> stems));
+        $intersect = array_unique(array_intersect($this ->stems, $needle -> stems));
+        $amount = count($intersect);
+
         //Если фраза есть внутри, то нужно подсветить ее
         if ($amount == count($needle -> stems)) {
+            //Пробегаем по всем корням искомой фразы
             foreach ($needle -> words as $search) {
                 if (!$search -> stem) {
                     continue;
                 }
-                foreach ($this -> words as $word) {
+                //Пробегаем по всем корням предложения
+                foreach ($this -> words as $key => $word) {
                     if ($word -> used) {
                         continue;
                     }
                     if ($word -> stem == $search -> stem) {
                         $word -> makeUse('green',$needle -> param);
-
+                        //удаляем корень, чтобы в разных ключевых фразах не
+                        // было использовано одно слово
+                        unset($this -> stems[$key]);
                         break;
                     }
                 }

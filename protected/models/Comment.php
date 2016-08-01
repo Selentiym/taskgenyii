@@ -10,6 +10,9 @@
  * @property integer $id_obj_type
  * @property string $comment
  * @property string $date
+ *
+ * The followings are the available model relations:
+ * @property User $author
  */
 class Comment extends UModel
  {
@@ -27,21 +30,30 @@ class Comment extends UModel
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-				array('id, id_user, id_obj, id_obj_type, comment', 'required'),
+				array('id_user, id_obj, id_obj_type, comment', 'required'),
 				array('id, id_user, id_obj, id_obj_type', 'numerical', 'integerOnly'=>true),
 				// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_user, id_obj, id_obj_type, comment', 'safe', 'on'=>'search'),
+			array('id_user, id_obj, id_obj_type, comment', 'safe'),
 		);
+	}
+	protected function beforeValidate() {
+		if (!$this -> id_user) {
+			$this -> id_user = Yii::app() -> user -> getId();
+		}
+		return parent::beforeSave();
 	}
 
 	/**
 	 * @return array relational rules.
 	 */
 	public function relations() {
+
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+				'author' => array(self::BELONGS_TO, 'User', 'id_user'),
+				//'object' => array(self::BELONGS_TO, $class, 'id_obj'),
 			);
 	}
 

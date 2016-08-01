@@ -1,0 +1,22 @@
+.comments {
+    width:90%;
+    padding: 5%;
+    max-width: 500px;
+    display: inline-block;
+}
+.comment {
+    border: 1px solid black;
+    margin-top: 10px;
+    padding:5px;
+}
+.comment .head {
+    width:100px;
+    display: inline-block;
+    vertical-align: middle;
+    text-align:center;
+
+}
+.comment .in-container {
+    display:inline-block;
+    vertical-align: top;
+}

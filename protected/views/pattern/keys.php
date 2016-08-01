@@ -32,7 +32,7 @@
             $idMorph = '';
         }
         $phrase_text = $phrase -> phrase;
-        $trstyle = ($phrase -> direct > 0) ? 'background:green' : '' ;
+        $trstyle = ($phrase -> direct > 0) ? 'background:#c6efce' : '' ;
         echo "<tr><td style='padding:5px;vertical-align:middle;text-align:left;$trstyle'>$phrase_text</td><td $idDirect data-mustHave='$strict' style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$strict</td><td $idMorph data-mustHave='$morph' style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$morph</td></tr>";
     }
     ?>

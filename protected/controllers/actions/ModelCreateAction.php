@@ -24,6 +24,11 @@ class ModelCreateAction extends UAction {
      */
     public $redirectUrl = array('/cabinet');
     /**
+     * @var bool $partial - whether this is an ajax action
+     */
+    public $partial = false;
+
+    /**
      * @param $arg bool|string  - the argument of customFind
      * @throws CHttpException
      */
@@ -72,7 +77,11 @@ class ModelCreateAction extends UAction {
                     $this -> controller -> redirect($this -> redirectUrl);
                 }
                 //$this->controller->layout = '//layouts/site';
-                $this->controller->render($this->view, array('model' => $model));
+                if (!$this -> partial) {
+                    $this->controller->render($this->view, array('model' => $model));
+                } else {
+                    $this->controller->renderPartial($this->view, array('model' => $model));
+                }
             } else {
                 $this -> controller -> render('//accessDenied');
             }

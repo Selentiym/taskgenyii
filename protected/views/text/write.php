@@ -21,9 +21,11 @@ Yii::app() -> getClientScript() -> registerScript('check',"
 $text = $model;
 $this -> renderPartial('//_navBar');
 ?>
+<input type="button" value="Сдать" id="send"/>
+<input type="button" value="Сохранить и вернуться в кабинет" id="delay"/>
 <input type="button" value="Проверить" id="check"/>
 <input type="button" value="Уникальность" id="uniqueButton"/>
-<div>
+<form method="post" id="textForm" data-id="<?php echo $model -> id; ?>">
     <div style="width:59%; display: inline-block">
     <?php
     $this->widget('application.extensions.tinymce.TinyMce',
@@ -50,4 +52,5 @@ $this -> renderPartial('//_navBar');
         </div>
         <div id="rezultDiv">Текст с подсвеченными ключевыми словами: <br/></div>
     </div>
-</div>
+</form>
+<?php $this -> renderPartial('//comment/_comments',array('model' => $model));  ?>

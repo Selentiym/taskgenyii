@@ -52,7 +52,7 @@ class arrayString {
         //Чтобы санкт-петербург не сливался в одно слово
         $this -> text = str_replace('-',' ',$this -> text);
         //Оставляем только буквы и пробелы
-        $this -> text = preg_replace('/[^\s\w]/u', '', $this -> text);
+        $this -> text = preg_replace('/[^\s\w]/u', ' ', $this -> text);
         //Удаляем лишние пробелы и переносы строк
         $this -> text = preg_replace ("/(?<=\w)\s+(?=\w)/u", " ", $this -> text);
         //удаляем стоп-слова

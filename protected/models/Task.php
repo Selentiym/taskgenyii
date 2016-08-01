@@ -81,6 +81,7 @@ class Task extends Commentable {
 			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task'),
 			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1'),
+			//'currentlyWrittenText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 0'),
 			'parent' => array(self::BELONGS_TO, 'Task', 'id_parent'),
 			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
