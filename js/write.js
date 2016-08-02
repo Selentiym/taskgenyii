@@ -1,16 +1,27 @@
 /**
  * Created by user on 11.07.2016.
- * @require jQuery, underscore.js
+ * @require jQuery, underscore.js, tinymce
  */
 var form = $('#textForm');
 $('#send').click(function(){
     form.attr('action',baseUrl + '/text/handIn/'+form.attr('data-id'));
-    form.submit();
+    window.textObj.goSubmit(form);
 });
 $('#sendWithMistakes').click(function(){
     form.attr('action',baseUrl + '/text/handInWithMistakes/'+form.attr('data-id'));
-    form.submit();
+    window.textObj.goSubmit(form);
 });
+$('#accept').click(function(){
+    form.attr('action',baseUrl + '/text/accept/'+form.attr('data-id'));
+    form.submit();
+    //window.textObj.goSubmit(form);
+});
+$('#decline').click(function(){
+    form.attr('action',baseUrl + '/text/decline/'+form.attr('data-id'));
+    form.submit();
+    //window.textObj.goSubmit(form);
+});
+
 $('#delay').click(function(){
     form.attr('action',baseUrl + '/text/save/'+form.attr('data-id'));
     form.submit();
@@ -146,12 +157,13 @@ function text(id) {
         me.seoInfo.append($('<div>').html('Первый показатель в словах: '+data.first_word_num).append(data.first_word));
     };
     //Отправляет запрос на проверку.
-    me.uniqueRequest = function(){
+    me.uniqueRequest = function(callback){
         if (me.changedSinceUnique) {
             me.analyze();
             me.uid = false;
             me.counter = 0;
             me.changedSinceUnique = false;
+            me.uniqueCont.append(loaderImage.clone());
             if (me.obtainInterval) {
                 clearTimeout(me.obtainInterval);
                 me.obtainInterval = false;
@@ -160,12 +172,18 @@ function text(id) {
                 text: me.text
             }, function () {
             }, "JSON").done(function (data) { console.log(data);
+                if (typeof callback === 'function') {
+                    //Вызываем переданную функцию
+                    callback();
+                }
                 if (data.text_uid) {
                     me.uid = data.text_uid;
                     me.once = false;
                     me.obtainUnique();
                 }
             });
+        } else {
+            alert('Не было изменений с последней проверки уникальности.');
         }
     };
     me.obtainUniqueOnce = function(){
@@ -186,6 +204,7 @@ function text(id) {
                 }
                 me.unique = data.unique;
                 me.uid = data.uid;
+                me.changedSinceUnique = false;
                 me.renderUnique();
             } else {
                 me.counter ++;
@@ -208,6 +227,21 @@ function text(id) {
             }).append(me.unique));
         } else {
             me.uniqueCont.html('Проверка на уникальность не проводилась или завершена с ошибкой.');
+        }
+    };
+    me.goSubmit = function (form) {
+        if (me.changedSinceUnique) {
+
+            tinymce.activeEditor.getBody().setAttribute('contenteditable', false);
+            me.text = tinyMCE.activeEditor.getContent();
+            var cont = $("#editorBlock");
+            cont.after(me.text);
+            cont.hide();
+            me.uniqueRequest(function(){
+                form.submit();
+            });
+        } else {
+            form.submit();
         }
     };
     //А вдруг уже есть сохраненная уникальность с самого начала.

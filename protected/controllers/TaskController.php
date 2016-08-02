@@ -9,15 +9,15 @@ class TaskController extends Controller {
     public $layout = 'cabinet';
     public function actions(){
         return array(
-            'view' => array(
+            /**'view' => array(
                 'class' => 'application.controllers.actions.ModelViewAction',
                 //'view' => function ($model) { return '//pattern/'.$model -> pattern -> view;},
                 'view' => '//pattern/common',
                 'ignore' => false,
                 'modelClass' => 'Task',
                 'scenario' => 'view'
-            ),
-            'history' => array(
+            ),*/
+            'view' => array(
                 'class' => 'application.controllers.actions.ModelViewAction',
                 //'view' => function ($model) { return '//pattern/'.$model -> pattern -> view;},
                 'view' => '//task/_history',

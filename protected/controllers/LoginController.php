@@ -49,7 +49,7 @@ class LoginController extends Controller
     /*public function actionpss(){
         echo CPasswordHelper::hashPassword('qwerty');
     }*/
-    /*public function actionAddRules() {
+    public function actionAddRules() {
         //print_r(Yii::app() -> getAuthManager());
         $auth = Yii::app()->authManager;
         $auth->clearAll();
@@ -57,10 +57,13 @@ class LoginController extends Controller
         //$isParent = 'return Yii::app() -> user -> getId()==$params["user"] -> id_parent';
         //$auth->createOperation('viewChildUserCabinet', 'view your child user\'s cabinet.', $isParent);
 
+        $auth -> createOperation('administrateTask', 'Accept or decline texts corresponding to the task.', 'return ((User::logged() -> id == $params["task"] -> id_editor)||(Yii::app() -> user -> checkAccess("admin")));');
+
         $admin = $auth->createRole('admin');
         $editor = $auth->createRole('editor');
         $author = $auth->createRole('author');
 
+        $editor->addChild('administrateTask');
         $editor->addChild('author');
         $admin->addChild('editor');
 
@@ -79,5 +82,5 @@ class LoginController extends Controller
         $auth->assign('editor', $editor->id);
         $auth->assign('author', $author1->id);
         $auth->assign('author', $author2->id);
-    }*/
+    }//*/
 }

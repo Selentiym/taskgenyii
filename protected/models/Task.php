@@ -20,6 +20,7 @@
  * @property Text[] $texts
  * @property Text $currentText
  * @property Text $currentlyWrittenText
+ * @property Text $rezult
  * @property Task $parent
  * @property Task[] $children
  * @property Pattern $pattern
@@ -81,8 +82,10 @@ class Task extends Commentable {
 			'searchphrases' => array(self::HAS_MANY, 'SearchPhrase', 'id_task'),
 			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task', 'order' => 'updated DESC'),
-			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1', 'order' => 'updated DESC'),
+			//'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1', 'order' => 'updated DESC'),
+			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'order' => 'updated DESC'),
 			'currentlyWrittenText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 0', 'order' => 'updated DESC'),
+			'rezult' => array(self::BELONGS_TO, 'Text', 'id_text'),
 			'parent' => array(self::BELONGS_TO, 'Task', 'id_parent'),
 			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),

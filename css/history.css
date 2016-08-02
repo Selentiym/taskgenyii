@@ -1,0 +1,43 @@
+.textHistoryShortcut {
+    width:80%;
+    margin: 0 auto;
+    margin-bottom: 100px;
+}
+.textHistoryShortcut .head, .textHistoryShortcut .body {
+    width:100%;
+}
+.highlightTicksAndCrosses span:before {
+    display: inline-block;
+    vertical-align: middle;
+    padding-right: 5px;
+}
+.highlightTicksAndCrosses .tick {
+    color: #00e100;
+}
+.highlightTicksAndCrosses .cross {
+    color: #e14007;
+}
+.highlightTicksAndCrosses .time {
+    color: #e1aa00;
+}
+.highlightTicksAndCrosses .tick:before {
+    content:url('../images/tick_small.png');
+    width:20px;
+    height:20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.highlightTicksAndCrosses .cross:before {
+    content:url('../images/cross_small.png');
+    width:20px;
+    height:20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.highlightTicksAndCrosses .time:before {
+    content:url('../images/time_small.png');
+    width:20px;
+    height:20px;
+    display: inline-block;
+    vertical-align: middle;
+}

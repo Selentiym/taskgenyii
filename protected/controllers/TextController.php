@@ -29,7 +29,7 @@ class TextController extends Controller {
                 'modelClass' => 'Text',
                 'scenario' => 'handIn',
                 'redirectUrl' => Yii::app() -> baseUrl.'/cabinet',
-                'redirect' => function($model){ return '/text/write/'.$model -> id; },
+                'redirect' => function($model){ return '/task/'.$model -> task -> id; },
                 'ignore' => true
             ),
             'handInWithMistakes' => array(
@@ -37,9 +37,26 @@ class TextController extends Controller {
                 'modelClass' => 'Text',
                 'scenario' => 'handInWithMistakes',
                 'redirectUrl' => Yii::app() -> baseUrl.'/cabinet',
-                'redirect' => function($model){ return '/text/write/'.$model -> id; },
+                'redirect' => function($model){ return '/task/'.$model -> task -> id; },
                 'ignore' => true
             ),
+            'accept' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Text',
+                'scenario' => 'accept',
+                'redirectUrl' => Yii::app() -> baseUrl.'/cabinet',
+                'redirect' => function($model){ return '/task/'.$model -> task -> id; },
+                'ignore' => true
+            ),
+            'decline' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Text',
+                'scenario' => 'decline',
+                'redirectUrl' => Yii::app() -> baseUrl.'/cabinet',
+                'redirect' => function($model){ return '/task/'.$model -> task -> id; },
+                'ignore' => true
+            ),
+
             'analyze' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'Text',

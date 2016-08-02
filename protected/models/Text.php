@@ -333,6 +333,32 @@ class Text extends Commentable {
 				}
 				$this -> QHandedIn = 1;
 				break;
+			case 'accept':
+				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
+					$this -> accepted = 1;
+					$task = $this -> task;
+					$task -> id_text = $this -> id;
+					$task -> save();
+				} else {
+					return false;
+				}
+				break;
+			case 'decline':
+				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
+					$this -> accepted = 0;
+					$text = new Text();
+					$text -> text = $this -> text;
+					$text -> uniquePercent = $this -> uniquePercent;
+					$text -> uid = $this -> uid;
+					$text -> id_task = $this -> id_task;
+					$text -> updated = new CDbExpression('CURRENT_TIMESTAMP');
+					if (!$text -> save()) {
+						$ar = $text -> getErrors();
+					}
+				} else {
+					return false;
+				}
+				break;
 			case 'delay':
 				break;
 			case 'checkMath':
@@ -342,10 +368,12 @@ class Text extends Commentable {
 		/**
 		 * Сбрасываем уникальность, если меняется текст
 		 */
-		$db = $this -> DBModel();
-		if ($this -> text != $db -> text) {
-			$this -> uniquePercent = new CDbExpression('NULL');
-			$this -> uid = new CDbExpression('NULL');
+		if (!$this -> isNewRecord) {
+			$db = $this->DBModel();
+			if (arrayString::removeRubbishFromString($this->text) != arrayString::removeRubbishFromString($db->text)) {
+				$this->uniquePercent = new CDbExpression('NULL');
+				$this->uid = new CDbExpression('NULL');
+			}
 		}
 		return parent::beforeSave();
 	}
@@ -363,7 +391,7 @@ class Text extends Commentable {
 		 * Самая сложная проверка на уникальность
 		 */
 		//Если текст никак не изменился с момента последней проверки на уникальность
-		if ($this -> text == $this -> DBModel() -> text) {
+		if (arrayString::removeRubbishFromString($this -> text) == arrayString::removeRubbishFromString($this -> DBModel() -> text)) {
 			//Тогда смотрим уникальность
 			if ($this -> uniquePercent < self::MIN_UNIQUE) {
 				$log('Уникальность ниже '.self::MIN_UNIQUE.'%, пожалуйста, исправьте.');

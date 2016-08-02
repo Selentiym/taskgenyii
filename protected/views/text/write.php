@@ -21,19 +21,31 @@ Yii::app() -> getClientScript() -> registerScript('check',"
 $text = $model;
 
 $handInErr = Yii::app() -> user -> getFlash('textHandIn');
-$this -> renderPartial('//_navBar');
 ?>
 
 
     <div style="width:59%; display: inline-block">
     <form method="post" id="textForm" data-id="<?php echo $model -> id; ?>">
+
+        <?php if (!Yii::app()-> user -> checkAccess('editor')) :?>
         <input type="button" value="Сдать" id="send"/>
         <?php if ($handInErr) : ?>
         <input type="button" value="Попросить принять" id="sendWithMistakes"/>
         <?php endif; ?>
-        <input type="button" value="Сохранить и вернуться в кабинет" id="delay"/>
-        <input type="button" value="Проверить" id="check"/>
-        <input type="button" value="Уникальность" id="uniqueButton"/>
+        <?php endif; ?>
+
+        <?php if (Yii::app()-> user -> checkAccess('editor')) : ?>
+        <input type="button" value="Принять" id="accept"/>
+        <input type="button" value="Отклонить" id="decline"/>
+        <?php endif; ?>
+        <input type="button" value="Проверить seo, keys" id="check"/>
+        <input type="button" value="Проверить уникальность" id="uniqueButton"/>
+        <span class="highlightTicksAndCrosses">
+        <span class="<?php echo $model -> handedIn ? 'tick' : 'cross' ?>">Сдан</span>,
+        <span class="<?php echo $model -> QHandedIn ? 'tick' : 'cross' ?>">Просьба проверить</span>,
+        <span class="<?php if ($model -> accepted === null) echo 'time'; else echo $model -> accepted ? 'tick' : 'cross' ?>">Принят</span>
+        </span>
+        <div id="editorBlock">
         <?php
         $this->widget('application.extensions.tinymce.TinyMce',
             array(
@@ -50,6 +62,7 @@ $this -> renderPartial('//_navBar');
                 )
             ));
         ?>
+        </div>
         </form>
         <?php
         echo $handInErr;
