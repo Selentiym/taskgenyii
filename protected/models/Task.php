@@ -19,6 +19,7 @@
  * @property Keyword[] $keywords
  * @property Text[] $texts
  * @property Text $currentText
+ * @property Text $currentlyWrittenText
  * @property Task $parent
  * @property Task[] $children
  * @property Pattern $pattern
@@ -79,9 +80,9 @@ class Task extends Commentable {
 			'keyphrases' => array(self::HAS_MANY, 'Keyphrase', 'id_task'),
 			'searchphrases' => array(self::HAS_MANY, 'SearchPhrase', 'id_task'),
 			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
-			'texts' => array(self::HAS_MANY, 'Text', 'id_task'),
-			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1'),
-			//'currentlyWrittenText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 0'),
+			'texts' => array(self::HAS_MANY, 'Text', 'id_task', 'order' => 'updated DESC'),
+			'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1', 'order' => 'updated DESC'),
+			'currentlyWrittenText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 0', 'order' => 'updated DESC'),
 			'parent' => array(self::BELONGS_TO, 'Task', 'id_parent'),
 			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
@@ -237,15 +238,20 @@ class Task extends Commentable {
 	 */
 	public function lastText(){
 		$id = false;
-		if (!$this -> currentText) {
+		if (!$this -> currentlyWrittenText) {
 			$text = new Text;
 			$text->id_task = $this->id;
+			if ($old = $this -> currentText) {
+				$text -> text = $old -> text;
+				$text -> uniquePercent = $old -> uniquePercent;
+				$text -> uid = $old -> uid;
+			}
 			if ($text->save()) {
 				$id = $text->id;
 			}
 		} else {
-			$text = $this -> currentText;
-			$id = $this -> currentText -> id;
+			$text = $this -> currentlyWrittenText;
+			$id = $this -> currentlyWrittenText -> id;
 		}
 		if ($id) {
 			$this->toTextRedirect = Yii::app()->createUrl('text/write', array('arg' => $id));

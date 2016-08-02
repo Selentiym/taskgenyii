@@ -24,7 +24,7 @@
 		/**
 		 *
 		 */
-		public $layout = '//layouts/site';
+		public $layout = '//layouts/cabinet';
 		/**
 		 * @param $arg string model argument to be taken into customFind
 		 * @throws CHttpException

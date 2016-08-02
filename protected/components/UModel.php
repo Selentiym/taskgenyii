@@ -38,5 +38,13 @@ class UModel extends CActiveRecord {
      * @param mixed[] $data - некоторая информация со страницы
      */
     public function readData($data) { return; }
+
+    /**
+     * @return UModel - model stored in the database no matter what attributes
+     * (only PK is sufficient) the model has now.
+     */
+    public function DBModel(){
+        return $this -> findByPk($this -> getPrimaryKey());
+    }
 }
 ?>

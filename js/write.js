@@ -7,6 +7,10 @@ $('#send').click(function(){
     form.attr('action',baseUrl + '/text/handIn/'+form.attr('data-id'));
     form.submit();
 });
+$('#sendWithMistakes').click(function(){
+    form.attr('action',baseUrl + '/text/handInWithMistakes/'+form.attr('data-id'));
+    form.submit();
+});
 $('#delay').click(function(){
     form.attr('action',baseUrl + '/text/save/'+form.attr('data-id'));
     form.submit();

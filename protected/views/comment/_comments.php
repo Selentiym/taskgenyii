@@ -13,7 +13,7 @@
     <form class="commentForm">
         <input type="hidden" value="<?php echo $model -> CommentId(); ?>" name="Comment[id_obj_type]"/>
         <input type="hidden" value="<?php echo $model -> id; ?>" name="Comment[id_obj]"/>
-        <textarea name="Comment[comment]" placeholder="Введите текст комментария"></textarea>
+        <textarea style="width:400px; height:100px" name="Comment[comment]" placeholder="Введите текст комментария"></textarea><br/>
         <input type="button" value="Отправить комментарий" class="goComment"/>
     </form>
     <div class="olderOnes">

@@ -17,6 +17,15 @@ class TaskController extends Controller {
                 'modelClass' => 'Task',
                 'scenario' => 'view'
             ),
+            'history' => array(
+                'class' => 'application.controllers.actions.ModelViewAction',
+                //'view' => function ($model) { return '//pattern/'.$model -> pattern -> view;},
+                'view' => '//task/_history',
+                //'partial' => true,
+                'ignore' => false,
+                'modelClass' => 'Task',
+                'scenario' => 'history'
+            ),
             'makeTask' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'method' => 'lastText',
@@ -46,6 +55,10 @@ class TaskController extends Controller {
             ),
         );
     }
+
+    /**
+     * Ajax action that returns children info by the given task id
+     */
     public function actionChildren(){
         $data = $_GET;
         if ($data['id']) {

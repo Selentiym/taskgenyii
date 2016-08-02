@@ -19,30 +19,42 @@ Yii::app() -> getClientScript() -> registerScript('check',"
 ", CClientScript::POS_READY);
 
 $text = $model;
+
+$handInErr = Yii::app() -> user -> getFlash('textHandIn');
 $this -> renderPartial('//_navBar');
 ?>
-<input type="button" value="Сдать" id="send"/>
-<input type="button" value="Сохранить и вернуться в кабинет" id="delay"/>
-<input type="button" value="Проверить" id="check"/>
-<input type="button" value="Уникальность" id="uniqueButton"/>
-<form method="post" id="textForm" data-id="<?php echo $model -> id; ?>">
+
+
     <div style="width:59%; display: inline-block">
-    <?php
-    $this->widget('application.extensions.tinymce.TinyMce',
-        array(
-            'model'=>$model,
-            'attribute'=>'text',
-            'settings' => array(
-                'setup' => 'js:function(ed) {
-                ed.on("change", function(ed) {
-                    textObj.contentChanged(); // get actual content
-                })}',
-                'oninit' => 'js:function(){
-                textObj.analyze();
-                }'
-            )
-        ));
-    ?>
+    <form method="post" id="textForm" data-id="<?php echo $model -> id; ?>">
+        <input type="button" value="Сдать" id="send"/>
+        <?php if ($handInErr) : ?>
+        <input type="button" value="Попросить принять" id="sendWithMistakes"/>
+        <?php endif; ?>
+        <input type="button" value="Сохранить и вернуться в кабинет" id="delay"/>
+        <input type="button" value="Проверить" id="check"/>
+        <input type="button" value="Уникальность" id="uniqueButton"/>
+        <?php
+        $this->widget('application.extensions.tinymce.TinyMce',
+            array(
+                'model'=>$model,
+                'attribute'=>'text',
+                'settings' => array(
+                    'setup' => 'js:function(ed) {
+                    ed.on("change", function(ed) {
+                        textObj.contentChanged(); // get actual content
+                    })}',
+                    'oninit' => 'js:function(){
+                    textObj.analyze();
+                    }'
+                )
+            ));
+        ?>
+        </form>
+        <?php
+        echo $handInErr;
+        $this -> renderPartial('//comment/_comments',array('model' => $model));
+        ?>
     </div>
     <div style="width:39%; display:inline-block;vertical-align:top">
         <div id="unique"></div>
@@ -52,5 +64,5 @@ $this -> renderPartial('//_navBar');
         </div>
         <div id="rezultDiv">Текст с подсвеченными ключевыми словами: <br/></div>
     </div>
-</form>
-<?php $this -> renderPartial('//comment/_comments',array('model' => $model));  ?>
+
+

@@ -28,8 +28,17 @@ class TextController extends Controller {
                 'class' => 'application.controllers.actions.ModelUpdateAction',
                 'modelClass' => 'Text',
                 'scenario' => 'handIn',
-                'redirect' => Yii::app() -> baseUrl.'/cabinet',
-                'ignore' => false
+                'redirectUrl' => Yii::app() -> baseUrl.'/cabinet',
+                'redirect' => function($model){ return '/text/write/'.$model -> id; },
+                'ignore' => true
+            ),
+            'handInWithMistakes' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Text',
+                'scenario' => 'handInWithMistakes',
+                'redirectUrl' => Yii::app() -> baseUrl.'/cabinet',
+                'redirect' => function($model){ return '/text/write/'.$model -> id; },
+                'ignore' => true
             ),
             'analyze' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',

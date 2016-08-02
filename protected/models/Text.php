@@ -9,13 +9,22 @@
  * @property integer $length
  * @property string $text
  * @property bool $handedIn
+ * @property bool $QHandedIn
+ * @property bool $accepted
  * @property string $uid
+ * @property string $updated
  * @property float $uniquePercent
  *
  * The followings are the available model relations:
  * @property Task $task
  */
 class Text extends Commentable {
+	const MIN_UNIQUE = 97;
+	const MAX_NOSEA = 9;
+	const MAX_NUCL_WORD = 4;
+	const MAX_WORD = 4;
+
+	private $temp = '';
 	/**
 	 * @return string the associated database table name
 	 */
@@ -135,14 +144,25 @@ class Text extends Commentable {
 		foreach($this -> task -> keyphrases as $phr){
 			if ($phr -> direct > 0) {
 				++$i;
-				$rez['phrs']['direct'][] = $text->lookForLiteral($phr -> phrase);
+				$temp = $text->lookForLiteral($phr -> phrase);
+				$rez['phrs']['direct'][] = $temp;
+				if ($temp < $phr -> direct) {
+					$rez['failed']['direct'][] = array('phrase' => $phr -> phrase, 'need' => $phr -> direct, 'have' => $temp);
+				}
 			}
 		}
 		$i = -1;
 		foreach($this -> task -> keyphrases as $phr){
 			if ($phr -> morph > 0) {
+				//$i Является параметром, отделяющим разные фразы. Важно для морфовхождения,
+				// так как слова могут быть раскиданы по предложению и фразы могут пересекаться.
+				//В идеале потом выделять разным цветом разные фразы или что-то вроде.
 				++$i;
-				$rez['phrs']['morph'][] = $text->lookForSentenced(new wordSet($phr->phrase, $i));
+				$temp = $text->lookForSentenced(new wordSet($phr->phrase, $i));
+				$rez['phrs']['morph'][] = $temp;
+				if ($temp < $phr -> morph) {
+					$rez['failed']['morph'][] = array('phrase' => $phr -> phrase, 'need' => $phr -> morph, 'have' => $temp);
+				}
 			}
 		}
 		$rez['text'] = $text -> getToPrint();
@@ -161,6 +181,7 @@ class Text extends Commentable {
 	 * Весь вывод идет в виде json-объекта.
 	 * @var mixed[] $post
 	 * @var bool $return - whether to print json or return resulting array
+	 * @return array
 	 */
 	public function analyzeOld($post, $return = false){
 		$rez = array();
@@ -292,11 +313,95 @@ class Text extends Commentable {
 	protected function beforeSave() {
 		switch ($this -> scenario) {
 			case 'handIn':
-				$this -> handedIn = true;
+				$report = $this -> checkMath();
+				if ($report === true) {
+					$this -> handedIn = true;
+				} else {
+					Yii::app() -> user -> setFlash('textHandIn',$report);
+					$this -> addError('text',$report);
+					return false;
+				}
+				break;
+			case 'handInWithMistakes':
+				$db = $this -> DBModel();
+				if (($this -> text != $db -> text)||(!$db -> uid)) {
+					Yii::app() -> user -> setFlash('textHandIn','Проведите проверку на уникальность перед повторной просьбой рассмотреть статью.');
+					return false;
+				} elseif ($db -> uniquePercent < 80) {
+					Yii::app() -> user -> setFlash('textHandIn','Уникальность ниже 80%, что неприемлемо в любом случае.');
+					return false;
+				}
+				$this -> QHandedIn = 1;
 				break;
 			case 'delay':
 				break;
+			case 'checkMath':
+				return false;
+				break;
+		}
+		/**
+		 * Сбрасываем уникальность, если меняется текст
+		 */
+		$db = $this -> DBModel();
+		if ($this -> text != $db -> text) {
+			$this -> uniquePercent = new CDbExpression('NULL');
+			$this -> uid = new CDbExpression('NULL');
 		}
 		return parent::beforeSave();
+	}
+
+	/**
+	 * @return bool|string Текст ошибки или true
+	 */
+	public function checkMath() {
+		$oldScenario = $this -> getScenario();
+		$this -> setScenario('mathCheck');
+		$log = function($str) {
+			$this -> temp .= $str.'<br/>';
+		};
+		/**
+		 * Самая сложная проверка на уникальность
+		 */
+		//Если текст никак не изменился с момента последней проверки на уникальность
+		if ($this -> text == $this -> DBModel() -> text) {
+			//Тогда смотрим уникальность
+			if ($this -> uniquePercent < self::MIN_UNIQUE) {
+				$log('Уникальность ниже '.self::MIN_UNIQUE.'%, пожалуйста, исправьте.');
+			}
+		} else {
+			$log('Проверка на уникальность не актуальна, пожалуйста, проведите проверку перед очередной попыткой сдать статью.');
+		}
+
+		/**
+		 * Проверка на seo параметры
+		 */
+		$seo = $this -> seoStat(['text' => $this -> text], true);
+		if ($seo['first_nucl_num'] > self::MAX_NUCL_WORD) {
+			$log('Первый показатель в семантическом ядре превышает '.self::MAX_NUCL_WORD.'.');
+		}
+		if ($seo['first_word_num'] > self::MAX_WORD) {
+			$log('Первый показатель в словах превышает '.self::MAX_WORD.".");
+		}
+		if ($seo['sick'] > self::MAX_NOSEA) {
+			$log('Тошнотность превышает '.self::MAX_NOSEA.".");
+		}
+		$keys = $this -> analyze(['text' => $this -> text], true);
+		if (!empty($keys['failed']['direct'])) {
+			foreach ($keys['failed']['direct'] as $phr) {
+				$log ('Фраза "' . $phr["phrase"] . '" имеет недостаточное количество прямых вхождений: ' . $phr['have'] . '/' . $phr['need'] . '.');
+			}
+		}
+		if (!empty($keys['failed']['morph'])) {
+			foreach ($keys['failed']['morph'] as $phr) {
+				$log ('Фраза "'.$phr["phrase"].'" имеет недостаточное количество морфологических вхождений: '.$phr['have'].'/'.$phr['need'].'.');
+			}
+		}
+		$this -> setScenario($oldScenario);
+		//$string = $log('');
+		if (!$this -> temp) {
+			return true;
+		} else {
+			return $this -> temp;
+		}
 	}
 }
