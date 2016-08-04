@@ -14,6 +14,11 @@ Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/taskCreate.css');
+
+//Если нет уже созданных фраз, генерируем автонабор
+/*if (!$model -> keyphrases) {
+    $model->generateKeyPhrases();
+}*/
 ?>
 <!--<link rel="stylesheet" href="css/usergen.css"/>
 <script src="js/jquery.min.js"></script>
@@ -86,7 +91,8 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
         </div>
         <input type="submit" value="Сохранить"/>
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
-        <input type="button" onClick="Word.prototype.showAll()" value="Ппоказать все слова" />
+        <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
+        <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
     </form>
 </div>
 <table id="keywords">

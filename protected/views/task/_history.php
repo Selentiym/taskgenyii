@@ -12,19 +12,19 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
 $this -> renderPartial('//_navBar');
 $texts = $model -> texts;
 if (empty($texts)) {
-    $texts = [];
+	$texts = [];
 }
 if ($t = $model -> prepareTextModel()) {
-    $model -> currentText = $t;
-    array_unshift($texts, $t);
+	$model -> currentText = $t;
+	array_unshift($texts, $t);
 }
 foreach ($texts as $text) {
-    if (($text -> id == $model -> currentText -> id)&&(!$model -> rezult)) {
-        $view = '//text/write';
-    } else {
-        $view = '//text/_history';
-    }
-    $this -> renderPartial($view,['model' => $text]);
+	if (($text -> id == $model -> currentText -> id)&&(!$model -> rezult)) {
+		$view = '//text/write';
+	} else {
+		$view = '//text/_history';
+	}
+	$this -> renderPartial($view,['model' => $text]);
 }
 $this -> renderPartial('//pattern/common',['model' => $model]);
 ?>

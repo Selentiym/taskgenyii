@@ -170,7 +170,6 @@ class Task extends Commentable {
 	}
 	protected function afterSave(){
 		if (!empty($this -> phrases['text'])) {
-			//Пока что только при создании, при обновлении такого нет.
 			foreach ($this->phrases['text'] as $key => $phr) {
 				if (!($this -> phrases['changed'][$key])) {
 					continue;
@@ -223,7 +222,10 @@ class Task extends Commentable {
 			$key = new Keyword();
 			$key -> num = $temp[1];
 			$key -> word = $temp[0];
-			$this -> addKey($key);
+			//Стараемся не сохранять стопы и прочий мусор
+			if (trim(arrayString::removeRubbishFromString($key -> word))) {
+				$this->addKey($key);
+			}
 		},array_map('trim',preg_split("/\r\n/",$this -> keystring)));
 		return parent::afterSave();
 	}

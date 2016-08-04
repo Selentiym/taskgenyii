@@ -64,3 +64,10 @@
 .phraseShortCut.initial{
     background:lightgoldenrodyellow;
 }
+
+.deletePhraseInput {
+    display: inline-block;
+    width:20px;
+    height:20px;
+    background: url('../images/cross_small.png');
+}

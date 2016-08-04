@@ -12,6 +12,32 @@ Word.prototype.showAll = function(){
         word.show();
     });
 };
+/**
+ * Функция пробегает по всему словарю в возрастающем порядке, выцепляя наиболее популярные
+ * фразы, содаржащие это слово
+ */
+Phrase.prototype.completeSet = function(){
+    //Пробегаем по всем словам. порядок по .num должен быть по возрастанию
+    _.each(_.sortBy(Lexical.prototype.wordsPool, 'num'), function(el){
+        //Если слово еще нужно использовать, то пытаемся найти для него фразу.
+        if (el.counter > 0) {
+            var toSearch = el.getInitialPhrases();
+            if (toSearch.length > 0) {
+                var maxNum = -1;
+                var toUse = false;
+                _.each(toSearch, function(phr){
+                    if (phr.freq > maxNum) {
+                        maxNum = phr.freq;
+                        toUse = phr;
+                    }
+                });
+                if (toUse) {
+                    new Phrase(toUse.text, {fromDb: false, stems: toUse.stems });
+                }
+            }
+        }
+    });
+};
 function Lexical(text, param) {
     var me = {};
     //Чтобы лишний раз не дергать сервер, анализировать будем только если флаг false
@@ -107,6 +133,11 @@ function Phrase(text, param){
             "class": "morph"
         }));
         me.element.append(me.inputEl);
+        me.element.append($('<span>',{
+            "class": "deletePhraseInput"
+        }).click(function(){
+            me.removePhrase();
+        }));
         //Позволяем инпуту ловить ключевые слова
         me.inputEl.droppable({
             drop: function (e, ui) {
@@ -270,11 +301,27 @@ function Phrase(text, param){
             }
         });
     }
+    /**
+     * Удаляем фразу. Просто удалить можно только если она не имеет праобраза в БД.
+     * Если имеет, то нужно передать при сабмите, что нужно эту фразу удалить.
+     */
+    me.removePhrase = function(){
+        me.inputEl.val("");
+        me.refresh();
+        if (me.db.id) {
+            me.somethingChanged();
+            me.element.hide();
+        } else {
+            me.element.remove();
+        }
+    };
     return me;
 }
 function Word(text,param) {
     var me = new Lexical(text,param);
     me.num = param.num;
+    //Показывает, был ли выделен массив изначальных фраз
+    me.initialSearched = false;
     me.counterCell = $('<td>',{"class":"counter"});
     me.stemCell = $('<td>',{"class":"stem"});
     me.textEl = $('<span>',{
@@ -411,6 +458,21 @@ function Word(text,param) {
         me.stems = param.stems;
         me.onAfterAnalyze();
     }
+    //Выдает массив поисковых фраз
+    me.getInitialPhrases = function(){
+        //Если поиск произведен, просто выдаем
+        if (!me.initialSearched) {
+            me.initialPhrases = [];
+            //Иначе ищем
+            _.each(me.phrases, function(phr){
+                if (phr.initial) {
+                    me.initialPhrases.push(phr);
+                }
+            });
+            me.initialSearched = true;
+        }
+        return me.initialPhrases;
+    };
     return me;
 }
 function LinkedDom(node, attrs, linkTo){
