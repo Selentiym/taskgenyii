@@ -9,6 +9,21 @@
  * @type Author $model
  */
 $this -> renderPartial('//_navBar');
-foreach($model -> tasks as $task) {
-    $this -> renderPartial('//task/shortcut', array('task' => $task));
-}
+?>
+<h2>Активные задания</h2>
+<ul>
+    <?php
+    foreach($model -> activeTasks as $task) {
+        $this -> renderPartial('//task/shortcut', array('task' => $task));
+    }
+    ?>
+</ul>
+
+<h2>Завершенные задания</h2>
+<ul>
+    <?php
+    foreach($model -> completedTasks as $task) {
+        $this -> renderPartial('//task/shortcut', array('task' => $task));
+    }
+    ?>
+</ul>

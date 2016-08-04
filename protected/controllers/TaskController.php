@@ -28,7 +28,7 @@ class TaskController extends Controller {
             ),
             'makeTask' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
-                'method' => 'lastText',
+                'method' => 'prepareTextModel',
                 'redirectMethod' => 'redirectAfterTextCreate',
                 'ignore' => true,
                 'modelClass' => 'Task',

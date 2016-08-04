@@ -10,8 +10,15 @@
  */
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/history.css');
 $this -> renderPartial('//_navBar');
-
-foreach ($model -> texts as $text) {
+$texts = $model -> texts;
+if (empty($texts)) {
+    $texts = [];
+}
+if ($t = $model -> prepareTextModel()) {
+    $model -> currentText = $t;
+    array_unshift($texts, $t);
+}
+foreach ($texts as $text) {
     if (($text -> id == $model -> currentText -> id)&&(!$model -> rezult)) {
         $view = '//text/write';
     } else {

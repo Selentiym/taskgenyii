@@ -346,12 +346,7 @@ class Text extends Commentable {
 			case 'decline':
 				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
 					$this -> accepted = 0;
-					$text = new Text();
-					$text -> text = $this -> text;
-					$text -> uniquePercent = $this -> uniquePercent;
-					$text -> uid = $this -> uid;
-					$text -> id_task = $this -> id_task;
-					$text -> updated = new CDbExpression('CURRENT_TIMESTAMP');
+					$text = Task::createText($this);
 					if (!$text -> save()) {
 						$ar = $text -> getErrors();
 					}

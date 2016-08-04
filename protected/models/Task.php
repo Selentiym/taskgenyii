@@ -237,11 +237,48 @@ class Task extends Commentable {
 	}
 
 	/**
-	 * Creates a text and saves its id to redirect afterwards
+	 * @param Text $t - text to be based on. If new record then nothing but a task id will be set
+	 * @return Text
 	 */
-	public function lastText(){
+	public function createText(Text $t){
+		if ($t -> isNewRecord) {
+			$text = $t;
+		} else {
+			$text = new Text();
+			$text -> text = $t -> text;
+			$text -> uniquePercent = $t -> uniquePercent;
+			$text -> uid = $t -> uid;
+		}
+		$text -> id_task = $this -> id;
+		$text -> updated = new CDbExpression('CURRENT_TIMESTAMP');
+		return $text;
+	}
+	/**
+	 * Creates a new text if necessary
+	 * @return bool|Text the created text
+	 */
+	public function prepareTextModel(){
 		$id = false;
-		if (!$this -> currentlyWrittenText) {
+		//Если задание выполнено, то точно создавать ничего не нужно.
+		if ($this -> id_text) {
+			return false;
+		}
+		$current = $this -> currentText;
+		if (!$current) {
+			$text = $this -> createText(new Text());
+			$text -> save();
+			return $text;
+		}
+		if ($current -> accepted === null) {
+			return false;
+		} else {
+			$text = $this -> createText($current);
+			$text -> save();
+			return $text;
+		}
+
+
+		/*if (!$this -> currentlyWrittenText) {
 			$text = new Text;
 			$text->id_task = $this->id;
 			if ($old = $this -> currentText) {
@@ -256,10 +293,8 @@ class Task extends Commentable {
 			$text = $this -> currentlyWrittenText;
 			$id = $this -> currentlyWrittenText -> id;
 		}
-		if ($id) {
-			$this->toTextRedirect = Yii::app()->createUrl('text/write', array('arg' => $id));
-		}
-		return $text;
+		$this->toTextRedirect = Yii::app()->createUrl('task/view', array('arg' => $this -> id));
+		return $text;*/
 	}
 
 	/**
@@ -267,11 +302,12 @@ class Task extends Commentable {
 	 * @return string|array - redirect path
 	 */
 	public function redirectAfterTextCreate($url){
-		if ($this -> toTextRedirect) {
+		return Yii::app()->createUrl('task/view', array('arg' => $this -> id));
+		/*if ($this -> toTextRedirect) {
 			return $this->toTextRedirect;
 		} else {
 			return $url;
-		}
+		}*/
 	}
 
 	/**

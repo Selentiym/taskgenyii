@@ -10,7 +10,7 @@
  */
 $user = User::logged();
 if ($model -> author == $user) {
-    echo "<a class='button' href='".Yii::app() -> createUrl('task/makeTask',["arg" => $model -> id])."'>Выполнить</a>";
+    //echo "<a class='button' href='".Yii::app() -> createUrl('task/makeTask',["arg" => $model -> id])."'>Выполнить</a>";
 }
 //$this -> renderPartial('//pattern/'.$model -> pattern -> view, array('model' => $model));
 $data = $model -> keyphrases;
