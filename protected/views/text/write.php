@@ -52,6 +52,7 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
                 'model'=>$model,
                 'attribute'=>'text',
                 'settings' => array(
+                    'entity_encoding' => 'raw',
                     'setup' => 'js:function(ed) {
                     ed.on("change", function(ed) {
                         textObj.contentChanged(); // get actual content
@@ -71,6 +72,7 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
     </div>
     <div style="width:39%; display:inline-block;vertical-align:top">
         <div id="unique"></div>
+        <div id="crossUnique"></div>
         <div id="seoData"></div>
         <div>
             <?php $this -> renderPartial('//pattern/keys', array('data' => $model -> task -> keyphrases)); ?>

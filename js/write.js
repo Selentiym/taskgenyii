@@ -40,6 +40,7 @@ function text(id) {
     me.seoInfo = $("#seoData");
     me.rez = $('#rezultDiv');
     me.uniqueCont = $("#unique");
+    me.crossUnique = $("#crossUnique");
     me.check = $("#check");
     me.check.click(function(){
         me.analyze();
@@ -168,6 +169,33 @@ function text(id) {
                 clearTimeout(me.obtainInterval);
                 me.obtainInterval = false;
             }
+            $.post(baseUrl + '/text/giveCrossUnique/' + me.id,{
+                text: me.text
+            },function(){},"JSON").done(function (data) {
+                var phrases = '';
+                console.log(data);
+                if (data.matches) {
+                    phrases = data.matches.join('<br/>');
+                }
+                if (data.percent == -1) {
+                    me.crossUnique.html('Не найдено похожих текстов в базе данных.');
+                } else {
+                    var textCont = $('<div>',{
+                        "id": "textCont",
+                        css: {display:"none"}
+                    }).html($('<div>').html(data.text)).append($('<div>').html(phrases));
+                    me.crossUnique.html('');
+                    me.crossUnique.append($('<span>',{
+                        "id": "crossPercent",
+                        css:{
+                            cursor:"pointer"
+                        }
+                    }).html('Максимальный процент совпадений среди текстов в системе: ' + data.percent).click(function(){
+                        textCont.toggle();
+                    }));
+                    me.crossUnique.append(textCont);
+                }
+            });
             $.post(baseUrl + '/text/uniqueCheck/' + me.id, {
                 text: me.text
             }, function () {

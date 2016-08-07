@@ -1,5 +1,4 @@
 <?php
-
 // uncomment the following to define a path alias
 // Yii::setPathOfAlias('local','path/to/local-folder');
 
@@ -11,7 +10,9 @@ return array(
 
 	// preloading 'log' component
 	'preload'=>array('log'),
-
+	'aliases'=> array(
+			'Shingles' => dirname(__FILE__) . '/../components/shingles/',
+	),
 	// autoloading model and component classes
 	'import'=>array(
 		'application.models.*',

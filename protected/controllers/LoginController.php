@@ -46,9 +46,9 @@ class LoginController extends Controller
         Yii::app() -> user -> raiseEvent('onLogout',new CEvent($this));
         $this->redirect(Yii::app()->homeUrl);
     }
-    /*public function actionpss(){
+    public function actionpss(){
         echo CPasswordHelper::hashPassword('919232');
-    }*/
+    }
     public function actionAddRules() {
         //print_r(Yii::app() -> getAuthManager());
         $auth = Yii::app()->authManager;

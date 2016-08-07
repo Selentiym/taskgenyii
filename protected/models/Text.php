@@ -14,6 +14,7 @@
  * @property string $uid
  * @property string $updated
  * @property float $uniquePercent
+ * @property string $shingles
  *
  * The followings are the available model relations:
  * @property Task $task
@@ -24,6 +25,7 @@ class Text extends Commentable {
 	const MAX_NUCL_WORD = 4;
 	const MAX_WORD = 4;
 
+	const crossCheckNum = 3;
 	private $temp = '';
 	/**
 	 * @return string the associated database table name
@@ -310,6 +312,71 @@ class Text extends Commentable {
 		$this -> save();
 		echo 'ok';
 	}
+
+	/**
+	 * Функция сканирует БД, достает все принятые работы. Проверяет их быстрым образом, выбирает
+	 * несколько "самых похожих", проверяет их более подробно и возвращает одну с максимальным
+	 * числом совпадений.
+	 * @param bool $return
+	 * @return array
+	 * @throws DatabaseException
+	 */
+	public function crossUnique($return = false){
+		$conn = MysqlConnect::getConnection();
+		$q = mysqli_query($conn,"SELECT `id`, `shingles` FROM `tbl_text` WHERE `accepted`='1' and `shingles` IS NOT NULL");
+		$rez = [];
+		if ($q) {
+			$main = $this -> fastShingles();
+			while ($temp = $q->fetch_array(MYSQLI_NUM)) {
+				$rez [$temp[0]] = $main->compare(new \Shingles\Fast($temp[1], true));
+			}
+
+
+			$toCheck = array_slice(array_flip($rez), 0, self::crossCheckNum);
+			$texts = Text::model()->findAllByPk($toCheck);
+			$cur = new \Shingles\Full($this->text);
+			$matches = [];
+			$t = false;
+			$max = -1;
+			foreach ($texts as $text) {
+				$compare = $cur->compare(new \Shingles\Full($text->text));
+				if ($compare > $max) {
+					$max = $compare;
+					$matches = $cur->dump;
+					$t = $text;
+				}
+			}
+		}
+		/**
+		 * @type Text $t
+		 */
+		if ($t) {
+			$rez = [
+					'text' => $t->text,
+					'matches' => array_values($matches),
+					'percent' => $max
+			];
+		} else {
+			$rez = [
+				'percent' => -1
+			];
+		}
+		if ($return) {
+			return $rez;
+		}
+		echo json_encode($rez);
+		return $rez;
+	}
+	/**
+	 * @return \Shingles\Fast
+	 */
+	public function fastShingles() {
+		if ($this -> shingles) {
+			return new \Shingles\Fast($this -> shingles, true);
+		} else {
+			return new \Shingles\Fast($this -> text);
+		}
+	}
 	protected function beforeSave() {
 		switch ($this -> scenario) {
 			case 'handIn':
@@ -336,6 +403,7 @@ class Text extends Commentable {
 			case 'accept':
 				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
 					$this -> accepted = 1;
+					$this -> shingles = $this -> fastShingles() -> archive();
 					$task = $this -> task;
 					$task -> id_text = $this -> id;
 					$task -> save();
@@ -346,7 +414,7 @@ class Text extends Commentable {
 			case 'decline':
 				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
 					$this -> accepted = 0;
-					$text = Task::createText($this);
+					$text = $this -> task -> createText($this);
 					if (!$text -> save()) {
 						$ar = $text -> getErrors();
 					}

@@ -87,6 +87,16 @@ class TextController extends Controller {
                 'ignore' => true,
                 'scenario' => 'analyze'
             ),
+            'giveCrossUnique' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'crossUnique',
+                'access' => true,
+                'args' => false,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'crossUnique'
+            ),
             'giveUnique' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'Text',

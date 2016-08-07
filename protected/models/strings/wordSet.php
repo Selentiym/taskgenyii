@@ -16,6 +16,7 @@ class wordSet {
         if ($param) {
             $this -> param = $param;
         }
+        $string = str_replace('-',' ', $string);
         $this -> words = array_map(function($word){
             $temp = new word(trim($word));
             if ($temp -> stem) {
