@@ -25,7 +25,6 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
 <script src="js/underscore.js"></script>
 <script src="js/Classes.js"></script>-->
 <script>
-
     $(document).ready(function(){
         Word.prototype.container = $("#wordsCont");
         Phrase.prototype.container = $("#phrasesCont");

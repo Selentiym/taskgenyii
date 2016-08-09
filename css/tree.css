@@ -23,6 +23,30 @@
 #TreeContainer ul li {
     margin-top:5px;
 }
+#TreeContainer ul li .branchName.over {
+    background: rgba(255, 255, 0, 0.3);
+}
 #TreeContainer ul li .branchName{
 
 }
+#TreeContainer .buttonContainer .button{
+    display:inline-block;
+    width:20px;
+    height:20px;
+}
+#TreeContainer .buttonContainer .editButton{
+    background: url('../images/edit_small.png');
+}
+#TreeContainer .buttonContainer .addWordsButton{
+    background: url('../images/folder_small.png');
+}
+#TreeContainer .buttonContainer .viewButton{
+    background: url('../images/view_small.png');
+}
+#TreeContainer .buttonContainer .addDescendantButton {
+    background: url('../images/plus_small.png');
+}
+#TreeContainer .buttonContainer .dragButton{
+    background: url('../images/expand_small.png');
+}
+

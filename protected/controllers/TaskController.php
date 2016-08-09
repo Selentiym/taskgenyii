@@ -53,6 +53,15 @@ class TaskController extends Controller {
                 'redirect' => false,
                 'ignore' => false
             ),
+            'move' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                //'view' => function ($model) { return '//pattern/'.$model -> pattern -> view;},
+                //'partial' => true,
+                'ignore' => true,
+                'modelClass' => 'Task',
+                'scenario' => 'move',
+                'redirect' => '/cabinet'
+            ),
         );
     }
 

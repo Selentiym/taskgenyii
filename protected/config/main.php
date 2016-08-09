@@ -60,6 +60,7 @@ return array(
 				'<action:(TaskCreate|TextCreate)>' => 'cabinet/<action>',
 				'cabinet' => 'cabinet/index',
 				'loadKeywords/<arg:\d+>' => 'cabinet/loadKeywords',
+				'task/move/<arg:\d+>/to/<where:\d+>' => 'task/move',
 
 				//'loadKeywords/parent/<parentId:\d+>' => 'cabinet/loadKeywords',
 				//'cabinet/<arg:\w+>' => 'cabinet/index',

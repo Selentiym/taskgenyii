@@ -512,6 +512,7 @@ function TreeBranch(parent, param){
     me.url = parent.url;
     me.toHref = parent.toHref;
     me.childFunc = parent.childFunc;
+    me.generateButtons = parent.generateButtons;
     me.method = parent.method;
     me.clickHandler = parent.clickHandler;
     //В нем содержится название ветки (этот же элемент будет отвечать за сворачивание)
@@ -527,6 +528,11 @@ function TreeBranch(parent, param){
     });
     //И элемент с детьми
     me.element.append(me.textEl);
+    me.buttonContainer = $('<span>',{'class':'buttonContainer'});
+    if (typeof me.generateButtons == 'function') {
+        me.generateButtons(me);
+    }
+    me.element.append(me.buttonContainer);
     me.childrenContainer = $('<ul>',{
         "class":"branchChildren",
         css:{
@@ -602,6 +608,7 @@ function TreeStructure(url, param){
     me.childFunc = param.childFunc;
     me.clickHandler = param.clickHandler;
     me.toHref = param.toHref;
+    me.generateButtons = param.generateButtons;
     me.firstEl = me.childFunc(me, param);
     me.firstEl.toggle();
     if (!param.container) {
@@ -609,4 +616,51 @@ function TreeStructure(url, param){
     }
     $("#TreeContainer").append(me.childrenContainer);
     return me;
+}
+function addButtons(branch){
+    if (!branch) {return;}
+    if (!branch.parent.parent) {return;}
+    branch.editButton = $("<a>",{
+        target:'_blank',
+        "class":"editButton button",
+        href: baseUrl + "/task/edit/" + branch.id
+    });
+    branch.buttonContainer.append(branch.editButton);
+    branch.addWordsButton = $("<a>",{
+        target:'_blank',
+        "class":"addWordsButton button",
+        href: baseUrl + "/loadKeywords/" + branch.id
+    });
+    branch.buttonContainer.append(branch.addWordsButton);
+    branch.viewButton = $("<a>",{
+        target:'_blank',
+        "class":"viewButton button",
+        href: baseUrl + "/task/" + branch.id
+    });
+    branch.buttonContainer.append(branch.viewButton);
+    branch.addDescendantButton = $("<a>",{
+        target:'_blank',
+        "class":"addDescendantButton button",
+        href: baseUrl + "/TaskCreate/parent/" + branch.id
+    });
+    branch.buttonContainer.append(branch.addDescendantButton);
+
+    branch.dragButton = $("<span>",{
+        "class":"dragButton button"
+    });
+    branch.element.draggable({
+        handle: branch.dragButton,
+        helper:function(){ return branch.textEl.clone(); },
+        cursorAt:{left:10},
+        scope:'task'
+    });
+    branch.element.attr('data-id',branch.id);
+    branch.textEl.droppable({
+        hoverClass:'over',
+        scope:'task',
+        drop:function(event, ui){
+            location.href = baseUrl + '/task/move/'+ ui.draggable.attr('data-id') +'/to/'+ branch.id;
+        }
+    });
+    branch.buttonContainer.append(branch.dragButton);
 }

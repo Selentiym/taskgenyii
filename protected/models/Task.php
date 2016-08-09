@@ -187,6 +187,11 @@ class Task extends Commentable {
 		if ($this -> id_author) {
 			$this -> notifyAuthorFlag = $this -> DBModel() -> id_author != $this -> id_author;
 		}
+		if ($this -> getScenario() == 'move') {
+			if ($toMove = Task::model() -> findByPk($_GET['where'])) {
+				$this->id_parent = $toMove -> id;
+			}
+		}
 		return parent::beforeSave();
 	}
 
@@ -258,6 +263,10 @@ class Task extends Commentable {
 		if ($arg) {
 			if (($this->scenario == 'view')||($this -> scenario == 'make')) {
 				return $this -> findByPk($arg);
+			}
+			if ($this -> getScenario() == 'move') {
+				//Чтобы прошло сохранение.
+				$_POST['Task'] = [];
 			}
 		}
 		return $this -> findByPk($arg);
