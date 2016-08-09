@@ -25,6 +25,7 @@
  * @property Task[] $children
  * @property Pattern $pattern
  * @property Author $author
+ * @property Editor $editor
  */
 class Task extends Commentable {
 	/**
@@ -39,6 +40,13 @@ class Task extends Commentable {
 	 * @var string $input_search - данные из textarea по кластеру
 	 */
 	public $keystring;
+	/**
+	 * @var bool $notifyAuthorFlag
+	 */
+	public $notifyAuthorFlag = false;
+	/**
+	 * @var int $toTextRedirect
+	 */
 	public $toTextRedirect;
 	/**
 	 * @return string the associated database table name
@@ -90,6 +98,7 @@ class Task extends Commentable {
 			'children' => array(self::HAS_MANY, 'Task', 'id_parent'),
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
 			'author' => array(self::BELONGS_TO, 'Author', 'id_author'),
+			'editor' => array(self::BELONGS_TO, 'Editor', 'id_editor'),
 		) + parent::relations();
 		//Строчка +parent::relations() делает эту модель комментируемой.
 	}
@@ -168,7 +177,23 @@ class Task extends Commentable {
 			'uncategorized' => array('condition' => 'id_parent IS NULL'),
 		);
 	}
+	public function notifyAuthorAboutAssign(){
+		if ($this -> notifyAuthorFlag) {
+			Author::model() -> findByPk($this -> id_author) -> notify('Вам было присвоено задание '.$this -> show().'.');
+		}
+	}
+	protected function beforeSave() {
+		//Хочу оповестить автора о присвоении ему задания.
+		if ($this -> id_author) {
+			$this -> notifyAuthorFlag = $this -> DBModel() -> id_author != $this -> id_author;
+		}
+		return parent::beforeSave();
+	}
+
 	protected function afterSave(){
+		//Вызываем после получения id.
+		$this -> notifyAuthorAboutAssign();
+
 		if (!empty($this -> phrases['text'])) {
 			foreach ($this->phrases['text'] as $key => $phr) {
 				if (!($this -> phrases['changed'][$key])) {
@@ -331,5 +356,12 @@ class Task extends Commentable {
 		//Если этого слова пока нет, то ничего страшного, просто добавляем его
 		$key -> id_task = $this -> id;
 		return $key -> save();
+	}
+
+	/**
+	 * @return string - a link to the task
+	 */
+	public function show(){
+		return CHtml::link($this -> name, Yii::app() -> createUrl('task/view',['arg' => $this -> id]));
 	}
 }

@@ -40,7 +40,7 @@ class UModel extends CActiveRecord {
     public function readData($data) { return; }
 
     /**
-     * @return UModel - model stored in the database no matter what attributes
+     * @return static - model stored in the database no matter what attributes
      * (only PK is sufficient) the model has now.
      */
     public function DBModel(){

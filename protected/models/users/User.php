@@ -10,8 +10,7 @@
  * @property string $password
  * @property string $name
  */
-class User extends UModel
-{
+class User extends UModel {
 	/**
 	 * @return string the associated database table name
 	 */
@@ -160,5 +159,188 @@ class User extends UModel
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
+	}
+
+	/**
+	 * @param string $string
+	 */
+	public function notify($string){
+		$this -> send($string, true);
+	}
+	/**
+	 * @param string|letter $string
+	 * @param bool $system
+	 * @return bool - whether the letter was sent
+	 */
+	public function send($string, $system = false) {
+		if (!is_a($string,'Letter')) {
+			$letter = new Letter();
+			$letter->text = $string;
+			$letter->id_receiver = $this->id;
+			if (!$system) {
+				$letter->id_sender = Yii::app()->user->getId();
+			} else {
+				$letter->id_sender = Letter::SYSTEM_SENDER;
+			}
+		} else {
+			$letter = $string;
+			$letter -> id_receiver = $this -> id;
+			$letter -> isNewRecord = true;
+		}
+		return $letter -> save();
+	}
+
+	/**
+	 * @param mixed[] $post
+	 * @return bool
+	 */
+	public function sendJS($post){
+		/*$rez = ['success' => false];
+		if ($post['idSender'] != Yii::app() -> user -> getId()) {
+			$rez['error'] = 'Отправитель и залогиненный пользователь не совпадают. Невозможно отправить.';
+		} else {
+			$receiver = $this -> findByPk($post['idReceiver']);
+			if (!$receiver) {
+				$rez['error'] = 'Получатель не найден.';
+			} else {*/
+		$receiver = User::findByPk($post['idReceiver']);
+		$rez = $this -> dialogInitialDataCheck($post);
+		if (!$rez['error']) {
+			$letter = new Letter();
+			$letter -> id_sender = $post['idSender'];
+			$letter -> text = $post['text'];
+			$rez['success'] = $receiver -> send($letter);
+			if (!$rez['success']) {
+				$rez['error'] = $letter -> getErrors();
+			}
+		}
+		//}
+		echo json_encode($rez);
+	}
+	public function dialogHistory($post){
+		$rez = $this -> dialogInitialDataCheck($post);
+		/*$rez = ['success' => false];
+		if ($post['idSender'] != Yii::app() -> user -> getId()) {
+			$rez['error'] = 'Отправитель и залогиненный пользователь не совпадают. Невозможно отправить.';
+		} else {
+			$receiver = $this -> findByPk($post['idReceiver']);
+			if (!$receiver) {
+				$rez['error'] = 'Получатель не найден.';
+			} else {*/
+		$idReceiver = $post['idReceiver'];
+		if (!$rez['error']) {
+			$sql = "SELECT * FROM `tbl_letters` WHERE (`id_sender`='$this->id' AND `id_receiver`='$idReceiver' OR `id_sender`='$idReceiver' AND `id_receiver`='$this->id' )";
+			if ($post['date'] == 'first') {
+				$sql .= ' ';
+			} elseif(preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',$post['date'])) {
+				$date = $post['date'];
+				$sql .= " AND `sent` < '$date'";
+			}
+			if ((is_int($post['size']*1))&&($post['size']*1)) {
+				$upper = $post['size'];
+			} else {
+				$upper = 5;
+			}
+			$sql .= " ORDER BY `sent` DESC LIMIT 0, $upper";
+			$conn = MysqlConnect::getConnection();
+			$query = mysqli_query($conn, $sql);
+			$count = 0;
+			if ($query) {
+				$html = '';
+				while ($array = mysqli_fetch_assoc($query)) {
+					$count ++;
+					$html = Yii::app()->controller->renderPartial('//cabinet/_letter', $array + [
+									'class' => $array['id_sender'] == $this->id ? 'oneself' : 'opponent'
+							], true) . $html;
+					if ($array['opened'] == 0) {
+						$rez['notRead'][] = $array['id'];
+					}
+					$rez['lastDate'] = $array['sent'];
+				}
+				$rez['html'] = $html;
+				$rez['noMore'] = $count < $upper;
+				$rez['success'] = true;
+			} else {
+				$rez['error'] = 'Запрос к базе данных завершился неудачей.';
+			}
+		}
+		//}
+		echo json_encode(array_filter($rez));
+	}
+	public function checkNewLetters($post) {
+		$rez = $this -> dialogInitialDataCheck($post);
+		/*$rez = ['success' => false];
+		if ($post['idSender'] != Yii::app() -> user -> getId()) {
+			$rez['error'] = 'Отправитель и залогиненный пользователь не совпадают. Невозможно отправить.';
+		} else {
+			$receiver = $this->findByPk($post['idReceiver']);
+			if (!$receiver) {
+				$rez['error'] = 'Получатель не найден.';
+			} else {*/
+		$idReceiver = $post['idReceiver'];
+		if (!$rez['error']) {
+			$sql = "SELECT * FROM `tbl_letters` WHERE (`id_sender`='$this->id' AND `id_receiver`='$idReceiver' OR `id_sender`='$idReceiver' AND `id_receiver`='$this->id' )";
+			if ($post['date'] == 'first') {
+				$sql .= ' ';
+			} elseif(preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/',$post['date'])) {
+				$date = $post['date'];
+				$sql .= " AND `sent` > '$date'";
+			}
+			$sql .= ' ORDER BY `sent` ASC';
+			$query = mysqli_query(MysqlConnect::getConnection(),$sql);
+			if ($query) {
+				$html = '';
+				while($array = mysqli_fetch_assoc($query)) {
+					$html .= Yii::app() -> controller -> renderPartial('//cabinet/_letter',$array + [
+									'class' => $array['id_sender'] == $this->id ? 'oneself' : 'opponent'
+							], true);
+					if ($array['opened'] == 0) {
+						$rez['notRead'][] = $array['id'];
+					}
+					$rez ['firstDate'] = $array['sent'];
+				}
+				$rez['html'] = $html;
+				if ($html) {
+					$rez['success'] = true;
+				}
+			} else {
+				$rez['error'] = 'Не удалось получить данные из базы данных.';
+			}
+		}
+		echo json_encode($rez);
+	}
+
+	/**
+	 * @param mixed[] $post
+	 */
+	public function read($post){
+		$rez = ['success' => true];
+		$crit = new CDbCriteria();
+		$crit -> addInCondition('id',array_values($post['toRead']));
+		$crit -> compare('id_receiver', Yii::app() -> user -> getId());
+		$crit -> compare('opened', 0);
+		$letters = Letter::model() -> findAll($crit);
+		foreach ($letters as $letter) {
+			$letter -> opened = 1;
+			$rez['success'] &= $letter -> save();
+		}
+		echo json_encode($rez);
+	}
+
+	/**
+	 * @param mixed[] $post
+	 * @return mixed[] $rez
+	 */
+	public function dialogInitialDataCheck($post) {
+		$rez = ['success' => false];
+		if ($post['idSender'] != Yii::app() -> user -> getId()) {
+			$rez['error'] = 'Отправитель и залогиненный пользователь не совпадают. Невозможно отправить.';
+		} else {
+			$receiver = $this->findByPk($post['idReceiver']);
+			if ((!$receiver)&&($post['idReceiver'] != 0)) {
+				$rez['error'] = 'Получатель не найден.';
+			}
+		}
+		return $rez;
 	}
 }

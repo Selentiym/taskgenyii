@@ -33,4 +33,13 @@ class Author extends User {
             'completedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
         );
     }
+
+    /**
+     * Возвращает количество символов, которые одобрены.
+     * @return int
+     * @throws DatabaseException
+     */
+    public function symbols(){
+        return reset(mysqli_fetch_assoc(mysqli_query($conn = MysqlConnect::getConnection(),"SELECT SUM(`tbl_text`.`length`) FROM `tbl_text`, `tbl_task` WHERE `tbl_text`.`id` = `tbl_task`.`id_text` AND `tbl_text`.`accepted` = '1' AND `tbl_task`.`id_author` = '$this->id'")));
+    }
 }

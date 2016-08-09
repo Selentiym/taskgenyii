@@ -1,0 +1,64 @@
+.dialog_container {
+    width:500px;
+    max-height:450px;
+    border:1px solid black;
+    padding:20px;
+}
+.dialog_container .more {
+    width:100%;
+    text-align:center;
+    color: #027170;
+    font-weight: bold;
+}
+.dialog_container .more .moreSpan {
+    cursor:pointer;
+}
+.dialog_container .letters {
+    max-height:300px;
+    overflow:auto;
+    margin: 0 auto;
+    width:480px;
+}/*
+.dialog_container .letters:before {
+    content:'';
+    display: inline-block;
+    width:1px;
+    height:100%;
+    vertical-align:top;
+}*/
+
+.dialog_container .letters .letter {
+    margin-top:10px;
+    display: inline-block;
+    width:450px;
+    vertical-align:top;
+    padding-left: 10px;
+}
+.dialog_container .letters .letter.new{
+    border-left:5px solid #ecff38;
+    padding-left:5px;
+}
+.dialog_container .letters .letter.opponent{
+    background: rgba(0, 90, 255, 0.22);
+}
+.dialog_container .pane {
+    display:inline-block;
+    vertical-align: middle;
+}
+.dialog_container .leftPane {
+    width:20%;
+}
+.dialog_container .rightPane {
+    width:70%;
+}
+
+.dialog_container .form .input {
+    max-width:400px;
+    max-height:100px;
+    min-width:400px;
+    min-height:100px;
+    display:block;
+    margin: 0 auto;
+    outline:none;
+    resize:none;
+}

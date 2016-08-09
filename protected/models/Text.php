@@ -383,6 +383,8 @@ class Text extends Commentable {
 				$report = $this -> checkMath();
 				if ($report === true) {
 					$this -> handedIn = true;
+					$task = $this -> task;
+					$this -> task -> editor -> notify('Текст по заданию '.$task -> show().' сдан.');
 				} else {
 					Yii::app() -> user -> setFlash('textHandIn',$report);
 					$this -> addError('text',$report);
@@ -391,7 +393,7 @@ class Text extends Commentable {
 				break;
 			case 'handInWithMistakes':
 				$db = $this -> DBModel();
-				if (($this -> text != $db -> text)||(!$db -> uid)) {
+				if ((arrayString::removeRubbishFromString($this -> text) != arrayString::removeRubbishFromString($db -> text))||(!$db -> uid)) {
 					Yii::app() -> user -> setFlash('textHandIn','Проведите проверку на уникальность перед повторной просьбой рассмотреть статью.');
 					return false;
 				} elseif ($db -> uniquePercent < 80) {
@@ -399,6 +401,8 @@ class Text extends Commentable {
 					return false;
 				}
 				$this -> QHandedIn = 1;
+				$task = $this -> task;
+				$this -> task -> editor -> notify('Поступила просьба рассмотреть текст по заданию '.$task -> show().'.');
 				break;
 			case 'accept':
 				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
@@ -407,6 +411,7 @@ class Text extends Commentable {
 					$task = $this -> task;
 					$task -> id_text = $this -> id;
 					$task -> save();
+					$task -> author -> notify('Текст по заданию '.$task -> show().' принят!');
 				} else {
 					return false;
 				}
@@ -418,6 +423,7 @@ class Text extends Commentable {
 					if (!$text -> save()) {
 						$ar = $text -> getErrors();
 					}
+					$this -> task -> author -> notify('Текст по заданию '.$this -> task -> show().' отклонен. Более подробную информацию ищите в комментариях.');
 				} else {
 					return false;
 				}
@@ -429,15 +435,22 @@ class Text extends Commentable {
 				break;
 		}
 		/**
-		 * Сбрасываем уникальность, если меняется текст
+		 * Сбрасываем уникальность, если меняется текст, а также сбрасываем статусы текста.
 		 */
 		if (!$this -> isNewRecord) {
 			$db = $this->DBModel();
 			if (arrayString::removeRubbishFromString($this->text) != arrayString::removeRubbishFromString($db->text)) {
 				$this->uniquePercent = new CDbExpression('NULL');
 				$this->uid = new CDbExpression('NULL');
+				$this -> handedIn = 0;
+				$this -> QHandedIn = 0;
 			}
 		}
+		/**
+		 * Считаем длину
+		 */
+		$toCount = preg_replace('/(\s|\r|\n)/u','',arrayString::removeSpecialChars($this -> text));
+		$this -> length = strlen($toCount);
 		return parent::beforeSave();
 	}
 

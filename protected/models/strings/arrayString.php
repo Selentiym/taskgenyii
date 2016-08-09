@@ -48,6 +48,11 @@ class arrayString {
         $this -> initial = $string;
         $this -> text = $string;
     }
+    public static function removeSpecialChars($str) {
+        $str = strip_tags($str);
+        $str = preg_replace('/&[a-z]+;/','',$str);
+        return $str;
+    }
     public static function removeRubbishFromString($str){
         //Чтобы санкт-петербург не сливался в одно слово
         $str = str_replace('-',' ',$str);

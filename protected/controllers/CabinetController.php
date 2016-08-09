@@ -22,6 +22,13 @@ class CabinetController extends Controller {
                 'view' => function($user){return $user -> view();},
                 'layout' => 'cabinet'
             ),
+            'archive' => array(
+                'class' => 'application.controllers.actions.ModelViewAction',
+                'modelClass' => 'Author',
+                'scenario' => 'cabinet',
+                'view' => '//cabinet/archive',
+                'layout' => 'cabinet'
+            ),
 
             'TaskCreate' => array(
                 'class' => 'application.controllers.actions.ModelCreateAction',

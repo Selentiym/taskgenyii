@@ -43,3 +43,5 @@ Ctrl + ЛКМ => добавить поисковые фразы к задани�
 <div id="TreeContainer">
 
 </div>
+<?php $this -> renderPartial('//cabinet/_notifications'); ?>
+<?php //$this -> renderPartial('//cabinet/dialog', array('model' => User::model() -> findByPk(3))); ?>
