@@ -1,6 +1,7 @@
 /**
  * Created by user on 07.08.2016.
  */
+Dialog.prototype.opened = {};
 function Dialog(container, idSender, idReceiver, date) {
     var me = {};
     me.portionSize = 5;
@@ -9,6 +10,7 @@ function Dialog(container, idSender, idReceiver, date) {
     console.log(me.firstDate);
     me.idSender = idSender;
     me.idReceiver = idReceiver;
+    me.container = container;
     me.letters = container.find('.letters');
     me.form = container.find('.form');
     me.textArea = container.find('.input');
@@ -138,5 +140,30 @@ function Dialog(container, idSender, idReceiver, date) {
     me.loadNewLetters();
     me.newInterval = 10000;
     me.newIntervalID = false;
+    //Сохранили диалог в массив.
+    if (!Dialog.prototype.opened) {
+        Dialog.prototype.opened = {};
+    }
+    Dialog.prototype.opened[me.container.attr('id')] = me;
     return me;
+}
+function addNewDialog(event){
+    var id = $(this).attr('data-id');
+    if (!Dialog.prototype.opened[id]) {
+        $.post(baseUrl + '/dialog/open/'+id,{},function(){},"JSON").done(function(data){
+            console.log(data);
+            if (!data.no) {
+                Dialog.prototype.container.append(data.html);
+                var created = new Dialog($('#' + id), data.idSender, data.idReceiver, data.date);
+                var parent = created.container.parent();
+                if (parent.filter('.toDrag').length) {
+                    parent.draggable();
+                }
+            }
+        });
+    } else {
+        alert('found');
+        //Dialog.prototype.opened[id].
+    }
+    event.preventDefault();
 }

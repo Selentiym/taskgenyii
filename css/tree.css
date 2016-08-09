@@ -1,0 +1,28 @@
+#TreeContainer {
+    width:400px;
+}
+#TreeContainer ul{
+    list-style-type: none;
+    padding-left:0px;
+    margin-left:15px;
+}
+#TreeContainer ul.treeRoot > li > div.branchName:before {
+    display:none;
+}
+#TreeContainer .branchName {
+    display: inline-block;
+}
+#TreeContainer .branchName:before {
+    content:'';
+    display: inline-block;
+    width:10px;
+    height:10px;
+    margin-right:4px;
+    background: url('../images/cross_small.png');
+}
+#TreeContainer ul li {
+    margin-top:5px;
+}
+#TreeContainer ul li .branchName{
+
+}

@@ -40,6 +40,17 @@ class DialogController extends Controller {
                 'ignore' => true,
                 'scenario' => 'dialogHistory'
             ),
+            'open' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'User',
+                'method' => 'openDialog',
+                'guest' => false,
+                'access' => true,
+                'args' => $_POST,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'openDialog'
+            ),
             'checkNewLetters' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'User',

@@ -5,18 +5,22 @@
  * Date: 06.07.2016
  * Time: 10:11
  */
-Yii::app() -> getClientScript() -> registerCoreScript('jquery');
-//Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl.'/js/jquery.min.js',CClientScript::POS_BEGIN);
-Yii::app() -> getClientScript() -> registerScript('baseUrlDefine',"baseUrl = '".Yii::app() -> baseUrl."';",CClientScript::POS_BEGIN);
-Yii::app() -> getClientScript() -> registerScript('buttonScript',"
-var _pressedButton = undefined;
-$('body').keypress(function(e){
-    _pressedButton = e.which;
-    //alert(_pressedButton);
-});
-$('body').keyup(function(e){
-    _pressedButton = undefined;
-});
-",CClientScript::POS_END);
+$this -> renderPartial('//layouts/commonScripts');
+Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl.'/js/dialog.js', CClientScript::POS_BEGIN);
+Yii::app() -> getClientScript() -> registerScript('saveDialogCont','Dialog.prototype.container = $("#dialogContainer");', CClientScript::POS_END);
+Yii::app() -> getClientScript() -> registerScript('addNewDialog',"$('.dialogCreator').click(addNewDialog);", CClientScript::POS_READY);
+?>
+<div id="dialogContainer">
+    <?php
+    $this->renderPartial('//cabinet/_notifications');
+    foreach(User::logged() -> newLetters as $letter){
+        if ($letter -> id_sender != 0) {
+            $this->renderPartial('//cabinet/dialog', ['model' => $letter->sender]);
+        }
+    };
+    ?>
+</div>
 
+<?php
 echo $content;
+?>

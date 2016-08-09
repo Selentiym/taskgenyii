@@ -1,0 +1,7 @@
+.inlineBlock {
+    display: inline-block;
+}
+.toDrag {
+    display: inline-block;
+    position:absolute;
+}

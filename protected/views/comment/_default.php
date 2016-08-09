@@ -12,7 +12,7 @@
 <div class="comment">
     <div class="head">
         <div class="author">
-            <?php echo $model -> author -> name; ?>
+            <?php echo $model -> author -> show(); ?>
         </div>
         <div class="date">
             <?php echo $model -> date; ?>

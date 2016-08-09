@@ -55,10 +55,12 @@ return array(
 				'' => 'cabinet/index',
 				'stem' => 'site/stem',
 				'logout' => 'login/logout',
+				'dialog/open/<arg:\w+>' => 'dialog/open',
 				'<action:(TaskCreate|TextCreate)>/parent/<parentId:\d+>' => 'cabinet/<action>',
 				'<action:(TaskCreate|TextCreate)>' => 'cabinet/<action>',
 				'cabinet' => 'cabinet/index',
 				'loadKeywords/<arg:\d+>' => 'cabinet/loadKeywords',
+
 				//'loadKeywords/parent/<parentId:\d+>' => 'cabinet/loadKeywords',
 				//'cabinet/<arg:\w+>' => 'cabinet/index',
 				/*array(
@@ -66,6 +68,7 @@ return array(
 						'connectionID' => 'db'
 				),*/
 				'<controller:\w+>/<arg:\d+>'=>'<controller>/view',
+				'<controller:\w+>/<action:\w+>/<arg:\w+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>/<arg:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),

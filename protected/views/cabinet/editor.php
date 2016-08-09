@@ -6,6 +6,7 @@
  * Time: 10:50
  */
 $this -> renderPartial('//_navBar');
+Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/tree.css');
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js',CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js',CClientScript::POS_BEGIN);
 Yii::app() -> getClientScript() -> registerScript('structure','
@@ -43,5 +44,5 @@ Ctrl + ЛКМ => добавить поисковые фразы к задани�
 <div id="TreeContainer">
 
 </div>
-<?php $this -> renderPartial('//cabinet/_notifications'); ?>
+
 <?php //$this -> renderPartial('//cabinet/dialog', array('model' => User::model() -> findByPk(3))); ?>

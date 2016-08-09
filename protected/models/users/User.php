@@ -9,6 +9,9 @@
  * @property string $username
  * @property string $password
  * @property string $name
+ *
+ * The followings are the available model relations:
+ * @property Letter[] $newLetters
  */
 class User extends UModel {
 	/**
@@ -46,6 +49,8 @@ class User extends UModel {
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'newLetters' => array(self::HAS_MANY, 'Letter', 'id_receiver',
+				'condition' => 'opened = 0', 'group' => 'id_sender'),
 		);
 	}
 
@@ -105,7 +110,7 @@ class User extends UModel {
 
 	/**
 	 * @param bool|string $arg defines what to search for
-	 * @return User
+	 * @return static
 	 */
 	public function customFind($arg = false){
 		if (($this -> scenario == 'cabinet')&&($arg)) {
@@ -115,9 +120,11 @@ class User extends UModel {
 			} else {
 				return self::logged();
 			}
-		} else {
-			return $this -> findByPk(Yii::app() -> user -> getId());
 		}
+		if($this -> scenario == 'openDialog') {
+			return self::findByUsername($arg);
+		}
+		return $this -> findByPk(Yii::app() -> user -> getId());
 	}
 	/**
 	 * We're overriding this method to fill findAll() and similar method result
@@ -329,6 +336,22 @@ class User extends UModel {
 
 	/**
 	 * @param mixed[] $post
+	 */
+	public function openDialog($post){
+		$loggedId = Yii::app() -> user -> getId();
+		$rez['no'] = false;
+		if ($this -> id != $loggedId) {
+			$rez['html'] = Yii::app()->controller->renderPartial('//cabinet/dialog', ['model' => $this], true);
+			$rez['idReceiver'] = $this->id;
+			$rez['idSender'] = $loggedId;
+			$rez['date'] = date('Y-m-d H:i:s');
+		} else {
+			$rez['no'] = true;
+		}
+		echo json_encode($rez);
+	}
+	/**
+	 * @param mixed[] $post
 	 * @return mixed[] $rez
 	 */
 	public function dialogInitialDataCheck($post) {
@@ -342,5 +365,12 @@ class User extends UModel {
 			}
 		}
 		return $rez;
+	}
+
+	/**
+	 * @return string - link to dialog with this user
+	 */
+	public function show(){
+		return CHtml::link($this -> name, "#",array('class' => 'dialogCreator', 'data-id' => $this -> username));
 	}
 }
