@@ -19,7 +19,7 @@ Yii::app() -> getClientScript() -> registerScript('dialog'.$id,
     "new Dialog($('#$id'),".Yii::app()->user->getId().",$model->id,'".date('Y-m-d H:i:s')."');",CClientScript::POS_READY);
 
 ?>
-<div class="toDrag">
+<div class="toDrag" style="z-index:5">
     <div id="<?php echo $id; ?>" class="dialog_container">
         <div>Диалог с пользователем <?php echo $model -> name; ?></div>
         <div class="more"><span class="moreSpan">Больше сообщений</span></div>

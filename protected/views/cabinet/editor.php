@@ -39,14 +39,6 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     });
 ',CClientScript::POS_READY);
 ?>
-ЛКМ => закрыть/открыть список подветок<br/>
-Shift + Ctrl + ЛКМ => открыть в новой вкладке таблицу ключевых слов<br/>
-Shift + ЛКМ => открыть в новом окне окошко создания нового ТЗ в качестве дочернего к выбранной ветке дерева<br/>
-Ctrl + ЛКМ => добавить поисковые фразы к заданию из KeyCollector'а
-<div id="check">
-    <div class="square"></div>
-    <div class="square"></div>
-</div>
 <div id="TreeContainer">
 
 </div>

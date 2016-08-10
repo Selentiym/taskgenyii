@@ -100,6 +100,9 @@ $(document).click(function(){
 var baseFormInputName = 'Task';
 function Phrase(text, param){
     var me = new Lexical(text, param);
+    if (param.id) {
+        me.id = param.id;
+    }
     //Сохраняем частотность
     me.freq = param.freq;
     if (param.stems instanceof Array) {
@@ -153,6 +156,20 @@ function Phrase(text, param){
         me.element.append(me.changeElement);
         //Контейнер для элеентов данного типа должен быть задан в прототипе.
         Phrase.prototype.container.append(me.element);
+    } else {
+        me.element = new LinkedDom('div',{
+            "class":"initialPhrase"
+        }, me);
+        me.element.attr('data-id',me.id);
+        me.element.append(me.text);
+        Phrase.prototype.InitialPhrasesContainer.append(me.element);
+        me.element.dblclick(function(){
+            new Phrase(me.text, {fromDb: false, stems: me.stems });
+        });
+        me.element.draggable({
+            helper:"clone",
+            scope:"phrase"
+        });
     }
     /**
      * информация по БД
@@ -614,7 +631,8 @@ function TreeStructure(url, param){
     if (!param.container) {
         param.container = $("body");
     }
-    $("#TreeContainer").append(me.childrenContainer);
+    $("#TreeContainer").html(me.childrenContainer);
+
     return me;
 }
 function addButtons(branch){

@@ -19,6 +19,10 @@
 		 */
 		public $redirectUrl;
 		/**
+		 * @var bool
+		 */
+		public $ajax = false;
+		/**
 		 * @var string scenario - scenario that is to be assigned to the model
 		 */
 		public $scenario = false;
@@ -47,19 +51,25 @@
 				if (is_callable($this -> redirect)) {
 					$this -> redirect = call_user_func($this -> redirect, $model);
 				}
+				//Если указан, какой должен быть у модели сценарий, то задаем его.
+				if ($this -> scenario) {
+					$model -> setScenario($this -> scenario);
+				}
 				//Если у зашедшего достаточно прав, чтобы редактировать модель, то делаем это, иначе выводим сообщение, что юзер не прав.
 				if ($model -> checkUpdateAccess()) {
-					//Если указан, какой должен быть у модели сценарий, то задаем его.
-					if ($this -> scenario) {
-						$model -> setScenario($this -> scenario);
-					}
+
 					//Сохраняем атрибуты
-					if (isset($_POST[$this -> modelClass])) {
-						$model -> attributes = $_POST[$this -> modelClass];
+					if ((isset($_POST[$this -> modelClass]))||($this -> ajax)) {
+						if ($_POST[$this -> modelClass]) {
+							$model->attributes = $_POST[$this->modelClass];
+						}
 						//$model -> setAttr($_POST);
 						//var_dump($model);
 						
 						if ($model -> save()) {
+							if ($this -> ajax) {
+								return;
+							}
 							if (is_callable($this -> redirectUrl)) {
 								$this -> redirectUrl = call_user_func($this -> redirectUrl, $model);
 							}
@@ -69,7 +79,9 @@
 							}
 						}				
 					}
-					if (!$this -> redirect) {
+					if ($this -> ajax) {
+						return;
+					} elseif (!$this -> redirect) {
 						//$this->controller->layout = '//layouts/site';
 						$this->controller->render($this->view, array('model' => $model));
 					} else {

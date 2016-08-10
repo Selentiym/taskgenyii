@@ -61,6 +61,7 @@ return array(
 				'cabinet' => 'cabinet/index',
 				'loadKeywords/<arg:\d+>' => 'cabinet/loadKeywords',
 				'task/move/<arg:\d+>/to/<where:\d+>' => 'task/move',
+				'SearchPhrase/move/<arg:\d+>/to/<where:\d+>' => 'task/moveSearchPhrase',
 
 				//'loadKeywords/parent/<parentId:\d+>' => 'cabinet/loadKeywords',
 				//'cabinet/<arg:\w+>' => 'cabinet/index',

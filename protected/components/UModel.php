@@ -1,7 +1,11 @@
 <?php
 class UModel extends CActiveRecord {
+    /**
+     * @param string|bool $arg
+     * @return static
+     */
     public function CustomFind($arg = false){
-        return User::model() -> findByPk($arg);
+        return static::model() -> findByPk($arg);
     }
     /**
      * @return bool whether one can create this record or not

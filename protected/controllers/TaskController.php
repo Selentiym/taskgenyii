@@ -62,6 +62,15 @@ class TaskController extends Controller {
                 'scenario' => 'move',
                 'redirect' => '/cabinet'
             ),
+            'moveSearchPhrase' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                //'view' => function ($model) { return '//pattern/'.$model -> pattern -> view;},
+                //'partial' => true,
+                'ignore' => true,
+                'modelClass' => 'SearchPhrase',
+                'scenario' => 'move',
+                'ajax' => true
+            ),
         );
     }
 

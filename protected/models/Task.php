@@ -346,6 +346,19 @@ class Task extends Commentable {
 		}*/
 	}
 
+	public function renewVocabularyWithSearchPhrase(SearchPhrase $phrase){
+		$words = explode(' ', $phrase -> phrase);
+		array_map(function($word){
+			$word = arrayString::removeRubbishFromString($word);
+			if (!$word) {
+				return false;
+			}
+			$key = new Keyword();
+			$key -> word = $word;
+			$key -> num = 1;
+			return $this -> addKey($key);
+		},$words);
+	}
 	/**
 	 * @param Keyword $key
 	 * добавляет ключ, если нет уже такого, проводит поиск
@@ -362,7 +375,7 @@ class Task extends Commentable {
 				//попытка дописывать формы, но зачем?
 			}
 		}
-		//Если этого слова пока нет, то ничего страшного, просто добавляем его
+		//Если этого слова пока нет, то просто добавляем его
 		$key -> id_task = $this -> id;
 		return $key -> save();
 	}

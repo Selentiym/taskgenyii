@@ -13,6 +13,10 @@
  */
 class SearchPhrase extends StringModel {
 	/**
+	 * @var bool
+	 */
+	private $addKeywordsToTheNewTaskFlag = false;
+	/**
 	 * @return string - name of the attribute
 	 */
 	public function stringAttribute() {
@@ -40,6 +44,8 @@ class SearchPhrase extends StringModel {
 			array('id, phrase, id_task', 'safe', 'on'=>'search'),
 			array('baseFreq, directFreq, phraseFreq, phrase, id_task', 'safe', 'on'=>'create'),
 			array('id', 'unsafe', 'on'=>'create'),
+			array('*', 'unsafe', 'on'=>'move'),
+			array('id_task', 'safe', 'on'=>'move'),
 		);
 	}
 
@@ -100,6 +106,9 @@ class SearchPhrase extends StringModel {
 		return parent::model($className);
 	}
 	protected function beforeSave(){
+		if ($this -> scenario == 'move') {
+			$this -> id_task = $_GET['where'];
+		}
 		//Не даем добавлять уже существующие фразы
 		if ($this -> findByAttributes(array(
 				'id_task' => $this -> id_task,
@@ -110,7 +119,18 @@ class SearchPhrase extends StringModel {
 			$this -> addError('id','Duplicate phrase. There is a phrase corresponding to the current task that has the same parameters.');
 			return false;
 		}
+		if (!$this -> isNewRecord) {
+			if ($this->dbModel() -> id_task != $this -> id_task) {
+				$this -> addKeywordsToTheNewTaskFlag = true;
+			}
+		}
 		return true;
-
+	}
+	protected function afterSave() {
+		if ($this -> addKeywordsToTheNewTaskFlag) {
+			$task = Task::model() -> findByPk($this -> id_task);
+			$task -> renewVocabularyWithSearchPhrase($this);
+		}
+		parent::afterSave();
 	}
 }

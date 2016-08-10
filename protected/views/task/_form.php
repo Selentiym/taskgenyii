@@ -11,9 +11,80 @@
 
 
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/underscore.js', CClientScript::POS_BEGIN);
-Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
+//Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/taskCreate.css');
+Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/tree.css');
+
+Yii::app() -> getClientScript() -> registerScript('structure','
+    //var treeCont = $("#TreeContainer");
+    new TreeStructure("'.addslashes(Yii::app() -> urlManager -> createUrl('task/children')).'",{clickHandler: function(e){
+        if (!e) {
+            return false;
+        } else {
+            if ((e.ctrlKey)&&(e.shiftKey)) {
+                this.link.attr("href",baseUrl + "/task/edit/"+this.id);
+                return false;
+            } else if ((e.shiftKey)) {
+                this.link.attr("href",baseUrl + "/TaskCreate/parent/"+this.id);
+                return false;
+            } else if (e.ctrlKey) {
+                this.link.attr("href",baseUrl + "/loadKeywords/"+this.id);
+                return false;
+            }
+            e.preventDefault();
+            return true;
+        }
+    },
+    toHref: function(){
+        if (this.id) {
+            return baseUrl + "/loadKeywords/"+this.id;
+        }
+    },
+    generateButtons: function (branch){
+        if (!branch) {return;}
+        if (!branch.parent.parent) {return;}
+        branch.editButton = $("<a>",{
+            target:\'_blank\',
+            "class":"editButton button",
+            href: baseUrl + "/task/edit/" + branch.id
+        });
+        branch.buttonContainer.append(branch.editButton);
+        branch.addWordsButton = $("<a>",{
+            target:\'_blank\',
+            "class":"addWordsButton button",
+            href: baseUrl + "/loadKeywords/" + branch.id
+        });
+        branch.buttonContainer.append(branch.addWordsButton);
+        branch.viewButton = $("<a>",{
+            target:\'_blank\',
+            "class":"viewButton button",
+            href: baseUrl + "/task/" + branch.id
+        });
+        branch.buttonContainer.append(branch.viewButton);
+        branch.addDescendantButton = $("<a>",{
+            target:\'_blank\',
+            "class":"addDescendantButton button",
+            href: baseUrl + "/TaskCreate/parent/" + branch.id
+        });
+        branch.buttonContainer.append(branch.addDescendantButton);
+
+        branch.dragButton = $("<span>",{
+            "class":"dragButton button"
+        });
+        branch.element.attr(\'data-id\',branch.id);
+        branch.textEl.droppable({
+            hoverClass:\'over\',
+            scope:\'phrase\',
+            drop:function(event, ui){
+                $.post(baseUrl + \'/SearchPhrase/move/\'+ ui.draggable.attr(\'data-id\') +\'/to/\'+ branch.id);
+                //location.href = baseUrl + \'/SearchPhrase/move/\'+ ui.draggable.attr(\'data-id\') +\'/to/\'+ branch.id;
+            }
+        });
+        branch.buttonContainer.append(branch.dragButton);
+    }
+    });
+',CClientScript::POS_END);
 
 //Если нет уже созданных фраз, генерируем автонабор
 /*if (!$model -> keyphrases) {
@@ -28,6 +99,8 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
     $(document).ready(function(){
         Word.prototype.container = $("#wordsCont");
         Phrase.prototype.container = $("#phrasesCont");
+        Phrase.prototype.InitialPhrasesContainer = $("#initialPhrasesCont");
+
         <?php
             foreach($model -> keywords as $key) {
                 /**
@@ -46,7 +119,7 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
                  */
                 $stems = json_encode($sp -> giveStems(),JSON_PRETTY_PRINT);
                 $freq = $sp -> directFreq;
-                echo "new Phrase('$sp->phrase',{stems:$stems, initial:true, freq:'$freq'})".PHP_EOL;
+                echo "new Phrase('$sp->phrase',{stems:$stems, initial:true, freq:'$freq',id:$sp->id})".PHP_EOL;
                 //break;
             }
             foreach ($model -> keyphrases as $kp) {
@@ -58,10 +131,6 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
     });
 </script>
 <div id="phrasesWrapper">
-    Чтобы посмотреть список фраз, в которых используется слово, нажмите Alt + ЛКМ на строке со словом в правой части<br/>
-    Чтобы удалить слово совсем, нажмите Shift + ЛКМ на слове<br/>
-    Чтобы скрыть слово, которое не нужно, но может потом пригодиться, нажмите Ctrl + ЛКМ<br/>
-    Слова из правой части можно перетаскивать в форму слева простым удерживанием ЛКМ<br/>
     <form method="post" id="phrasesCont">
         <div class="well">
             <input type="text" name="Task[name]" placeholder="Название" value="<?php echo $model -> name; ?>"/>
@@ -93,6 +162,13 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
         <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
     </form>
+    <div id="TreeContainer">
+
+    </div>
+    <div id="initialPhrasesCont">
+
+    </div>
+
 </div>
 <table id="keywords">
     <thead>
@@ -102,4 +178,3 @@ Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css
 
     </tbody>
 </table>
-

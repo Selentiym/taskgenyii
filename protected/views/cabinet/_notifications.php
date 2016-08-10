@@ -20,7 +20,7 @@ Yii::app() -> getClientScript() -> registerScript('dialog',
 "new Dialog($('#$id'),".$user -> id.",0,'".date('Y-m-d H:i:s')."');",CClientScript::POS_READY);
 
 ?>
-<div class="toDrag">
+<div class="toDrag" style="z-index:5">
     <div id="<?php echo $id; ?>" class="dialog_container">
         <div>Уведомления:</div>
         <div class="more"><span class="moreSpan">Больше сообщений</span></div>
