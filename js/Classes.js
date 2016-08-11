@@ -56,6 +56,7 @@ function Lexical(text, param) {
             }).done(function (data) {
                 me.stems = data.stems;
                 console.log(data);
+                me.analyzed = true;
                 me.onAfterAnalyze();
             });
         } else {
@@ -225,6 +226,7 @@ function Phrase(text, param){
     };
     //Если пользователь изменил фразу
     me.refresh = function() {
+
         me.somethingChanged();
         if (me.used) {
             _.each(me.words, function(word) {
@@ -238,6 +240,7 @@ function Phrase(text, param){
         me.used = false;
         me.analyzed = false;
         me.text = me.inputEl.val();
+
         me.analyze();
     };
     /**
@@ -278,6 +281,16 @@ function Phrase(text, param){
             me.used = true;
         }
     };
+    me.unUse = function(){
+        if (me.used) {
+            _.each(me.words, function(word) {
+                if (word) {
+                    word.getUnused(me, me.initial);
+                }
+            });
+            me.used = false;
+        }
+    };
     /**
      * Проверяет, есть ли слово в данной фразе
      * @param word string|Word
@@ -298,6 +311,23 @@ function Phrase(text, param){
         }
     };
     me.onAfterAnalyze = function(){
+        //Проверяем, нет ли такой же фразы, но занятой.
+        _.each(Lexical.prototype.phrasesPool,function(phrase, key){
+
+            if ((phrase.analyzed)&&(!phrase.initial)&&(phrase)&&(phrase.stems.length)&&(me.stems.length)&&(me != phrase)) {
+                console.log(phrase);
+                var shorter = phrase;
+                var longer = me;
+                if (phrase.stems.length > me.stems.length) {
+                    shorter = me;
+                    longer = phrase;
+                }
+                var intersect = _.intersection(longer.stems, shorter.stems);
+                if (intersect.length == shorter.stems.length) {
+                    alert('Фраза "' + shorter.text + '" морфологически включена в фразу "' + longer.text+'"');
+                }
+            }
+        });
         //Нам же интересно, чтобы фраза была использована
         me.use();
     };
@@ -347,6 +377,7 @@ function Word(text,param) {
             display:"inline-block"
         }
     }).html(text);
+    me.numCell = $('<td>').html(me.num);
     me.element = new LinkedDom('tr',{
         "class":"word"
     },me)
@@ -354,7 +385,7 @@ function Word(text,param) {
             .append(me.textEl))
         .append(me.stemCell)
         .append(me.counterCell)
-        .append(me.num);
+        .append(me.numCell);
     //Добавляем возможность скрыть слово
     me.hidden = false;
     me.hide = function() {
@@ -464,10 +495,21 @@ function Word(text,param) {
         }
     };
     me.getUnused = function(phrase, noChangeCounter){
+        console.log(me);
         var ind = me.phrases.indexOf(phrase);
         me.phrases.splice(ind, 1);
         if (!noChangeCounter) {
             me.setCounter(me.counter + 1);
+        } else {
+            //Если была отключена поисковая фраза, не ключевая,
+            // то уменьшить нужно счетчик важности.
+            me.num --;
+            if (me.num < 1) {
+                me.delete();
+            }
+            if (me.numCell) {
+                me.numCell.html(me.num);
+            }
         }
     };
     //Если снаружи задан массив корней слова (должен иметь один элемент)
@@ -494,6 +536,7 @@ function Word(text,param) {
 }
 function LinkedDom(node, attrs, linkTo){
     var me = $('<'+node+'>',attrs);
+    me.data('obj',linkTo);
     me.obj = linkTo;
     return me;
 }

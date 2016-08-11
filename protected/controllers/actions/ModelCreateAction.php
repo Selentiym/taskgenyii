@@ -72,6 +72,9 @@ class ModelCreateAction extends UAction {
                         $model -> explainErrors();
                     }//*/
                 }
+                if (is_callable($this -> redirectUrl)) {
+                    $this -> redirectUrl = call_user_func($this -> redirectUrl,$model);
+                }
                 //В случае удачного создания перенаправляем
                 if (($created)&&($this -> redirectUrl)){
                     $this -> controller -> redirect($this -> redirectUrl);

@@ -48,6 +48,9 @@ class TaskController extends Controller {
                     } else {
                         return Yii::app() -> createUrl('cabinet/index');
                     }*/
+                    if ($_REQUEST['redirectToKeywords']) {
+                        return Yii::app() -> createUrl('cabinet/loadKeywords',['arg' => $model -> id]);
+                    }
                     return Yii::app() -> createUrl('cabinet/index');
                 },
                 'redirect' => false,

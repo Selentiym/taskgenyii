@@ -69,15 +69,17 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         });
         branch.buttonContainer.append(branch.addDescendantButton);
 
-        branch.dragButton = $("<span>",{
-            "class":"dragButton button"
-        });
         branch.element.attr(\'data-id\',branch.id);
         branch.textEl.droppable({
             hoverClass:\'over\',
             scope:\'phrase\',
             drop:function(event, ui){
+                console.log(ui.draggable);
+                var obj = ui.draggable.data("obj");
                 $.post(baseUrl + \'/SearchPhrase/move/\'+ ui.draggable.attr(\'data-id\') +\'/to/\'+ branch.id);
+
+                obj.unUse();
+                obj.element.remove();
                 //location.href = baseUrl + \'/SearchPhrase/move/\'+ ui.draggable.attr(\'data-id\') +\'/to/\'+ branch.id;
             }
         });
@@ -161,6 +163,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
         <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
+        <input type="submit" name="redirectToKeywords" value="Загрузить данные из KeyCollector" />
     </form>
     <div id="TreeContainer">
 

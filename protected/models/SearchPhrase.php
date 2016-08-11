@@ -15,7 +15,7 @@ class SearchPhrase extends StringModel {
 	/**
 	 * @var bool
 	 */
-	private $addKeywordsToTheNewTaskFlag = false;
+	private $idOldTask = false;
 	/**
 	 * @return string - name of the attribute
 	 */
@@ -79,21 +79,26 @@ class SearchPhrase extends StringModel {
 	 * models according to data in model fields.
 	 * - Pass data provider to CGridView, CListView or any similar widget.
 	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
+	 * @return CDbCriteria
 	 */
 	public function search() {
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
 
-			$criteria->compare('id',$this->id);
 		$criteria->compare('phrase',$this->phrase,true);
 		$criteria->compare('id_task',$this->id_task);
+		if ($this -> baseFreq) {
+			$criteria->compare('baseFreq', $this->baseFreq);
+		}
+		if ($this -> directFreq) {
+			$criteria->compare('directFreq', $this->directFreq);
+		}
+		if ($this -> phraseFreq) {
+			$criteria->compare('phraseFreq', $this->phraseFreq);
+		}
 
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
+		return $criteria;
 	}
 
 		/**
@@ -110,26 +115,24 @@ class SearchPhrase extends StringModel {
 			$this -> id_task = $_GET['where'];
 		}
 		//Не даем добавлять уже существующие фразы
-		if ($this -> findByAttributes(array(
-				'id_task' => $this -> id_task,
-				'baseFreq' => $this -> baseFreq,
-				'directFreq' => $this -> directFreq,
-				'phraseFreq' => $this -> phraseFreq,
-		))) {
+		if ($this -> find($this -> search())) {
 			$this -> addError('id','Duplicate phrase. There is a phrase corresponding to the current task that has the same parameters.');
 			return false;
 		}
 		if (!$this -> isNewRecord) {
-			if ($this->dbModel() -> id_task != $this -> id_task) {
-				$this -> addKeywordsToTheNewTaskFlag = true;
+			$db = $this -> DBModel();
+			if ($db -> id_task != $this -> id_task) {
+				$this -> idOldTask = $db -> id_task;
 			}
 		}
 		return true;
 	}
 	protected function afterSave() {
-		if ($this -> addKeywordsToTheNewTaskFlag) {
+		if ($this -> idOldTask) {
 			$task = Task::model() -> findByPk($this -> id_task);
 			$task -> renewVocabularyWithSearchPhrase($this);
+			$oldTask = Task::model() -> findByPk($this -> idOldTask);
+			$oldTask -> renewVocabularyRemoveSearchPhrase($this);
 		}
 		parent::afterSave();
 	}

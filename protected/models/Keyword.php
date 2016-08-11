@@ -13,11 +13,18 @@
  * @property Task $idTask
  */
 class Keyword extends StringModel{
+	public $truncatedWord;
 	/**
 	 * @return string - name of the attribute
 	 */
 	public function stringAttribute() {
-		return 'word';
+		$pos = strpos($this -> word,',');
+		if ($pos > 1) {
+			$this->truncatedWord = substr($this->word, 0, $pos);
+		} else {
+			$this->truncatedWord = $this->word;
+		}
+		return 'truncatedWord';
 	}
 	/**
 	 * @return string the associated database table name

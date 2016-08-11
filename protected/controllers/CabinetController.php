@@ -34,7 +34,13 @@ class CabinetController extends Controller {
                 'class' => 'application.controllers.actions.ModelCreateAction',
                 'modelClass' => 'Task',
                 'view' => '//task/_form',
-                'scenario' => 'create'
+                'scenario' => 'create',
+                'redirectUrl' => function($model){
+                    if ($_REQUEST['redirectToKeywords']) {
+                        return Yii::app() -> createUrl('cabinet/loadKeywords',['arg' => $model -> id]);
+                    }
+                    return Yii::app() -> createUrl('cabinet/index');
+                }
             ),
             'loadKeywords' => array(
                 'class' => 'application.controllers.actions.ModelUpdateAction',

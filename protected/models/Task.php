@@ -236,7 +236,7 @@ class Task extends Commentable {
 						'id_task' => $this -> id
 				);
 				 if ($phr -> save()) {
-
+					 echo '';
 				 } else {
 					 $err = $phr -> getErrors();
 				 }
@@ -359,6 +359,19 @@ class Task extends Commentable {
 			return $this -> addKey($key);
 		},$words);
 	}
+	public function renewVocabularyRemoveSearchPhrase(SearchPhrase $phrase){
+		$words = explode(' ', $phrase -> phrase);
+		array_map(function($word){
+			$word = arrayString::removeRubbishFromString($word);
+			if (!$word) {
+				return false;
+			}
+			$key = new Keyword();
+			$key -> word = $word;
+			$key -> num = 1;
+			return $this -> removeKey($key);
+		},$words);
+	}
 	/**
 	 * @param Keyword $key
 	 * добавляет ключ, если нет уже такого, проводит поиск
@@ -378,6 +391,28 @@ class Task extends Commentable {
 		//Если этого слова пока нет, то просто добавляем его
 		$key -> id_task = $this -> id;
 		return $key -> save();
+	}
+	/**
+	 * @param Keyword $key
+	 * добавляет ключ, если нет уже такого, проводит поиск
+	 * посредством приведения к стандартной форме.
+	 * @return bool - удалили ли слово
+	 */
+	public function removeKey(Keyword $key){
+		foreach ($this -> keywords as $has) {
+			$flag = $has -> giveLemma() == $key -> giveLemma();
+			if ($flag) {
+				$has -> num -= $key -> num;
+				if ($has -> num <= 0) {
+					return $has -> delete();
+				}
+				return $has -> save();
+				//Значит мы нашли нужную строку
+				//preg_match('/(^|, )'.$.'($|, )/', $has -> word);
+				//попытка дописывать формы, но зачем?
+			}
+		}
+		return false;
 	}
 
 	/**
