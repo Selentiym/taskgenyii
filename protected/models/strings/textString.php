@@ -43,6 +43,9 @@ class textString {
         }
     }
     public function getToPrint(){
+        if (empty($this -> sentences)) {
+            $this -> prepare();
+        }
         $rez = implode('. ',array_map(function($sent){ return $sent -> getToPrint();}, $this -> sentences));
         foreach ($this -> subs as $key => $value) {
             $rez = str_replace($key, $value, $rez);

@@ -259,7 +259,35 @@ class Text extends Commentable {
 		echo json_encode($rez, JSON_PRETTY_PRINT);
 		return $rez;
 	}
-
+	/**
+	 * @param mixed[] $post
+	 * @param bool $return
+	 * @return mixed[]
+	 */
+	public function fastUnique($post, $return = false){
+		$str = arrayString::removeRubbishFromString($post['text']);
+		//if ($str != arrayString::removeRubbishFromString($this -> text)) {
+			$content = new ContentWatch($str);
+			$content->sendRequest();
+			$rez = $content->summary();
+		/*} else {
+			$rez = ['error' => 'С прошлой проверки существенных изменений не произошло.','success' => false];
+		}*/
+		$toSave = ['text'];
+		$this -> text = $post['text'];
+		if ($rez['percent']) {
+			$this -> uniquePercent = $rez['percent'];
+			$toSave[] = 'uniquePercent';
+			$this -> uid = new CDbExpression('NULL');
+			$toSave[] = 'uid';
+		}
+		$this -> save($toSave);
+		if ($return) {
+			return $rez;
+		}
+		echo json_encode($rez);
+		return $rez;
+	}
 	/**
 	 * @param mixed[] $post
 	 * @param bool $return
@@ -273,7 +301,9 @@ class Text extends Commentable {
 		if ($rez['text_uid']) {
 			$this -> uid = $rez['text_uid'];
 			$this -> uniquePercent = new CDbExpression('NULL');
-			$this -> save(true, array('uid','unique','text'));
+			if (!$this -> save(true, array('uid','uniquePercent','text'))){
+				$err = $this -> getErrors();
+			}
 		}
 		if ($return) {
 			return $rez;
@@ -330,9 +360,9 @@ class Text extends Commentable {
 			while ($temp = $q->fetch_array(MYSQLI_NUM)) {
 				$rez [$temp[0]] = $main->compare(new \Shingles\Fast($temp[1], true));
 			}
-
-
-			$toCheck = array_slice(array_flip($rez), 0, self::crossCheckNum);
+			//Ключи $rez - айдишники, а значения - величины перекрывания
+			asort($rez);
+			$toCheck = array_keys(array_slice($rez, 0, self::crossCheckNum));
 			$texts = Text::model()->findAllByPk($toCheck);
 			$cur = new \Shingles\Full($this->text);
 			$matches = [];
@@ -385,21 +415,39 @@ class Text extends Commentable {
 					$this -> handedIn = true;
 					$task = $this -> task;
 					$this -> task -> editor -> notify('Текст по заданию '.$task -> show().' сдан.');
+					Yii::app() -> user -> setFlash('textHandIn',$report);
 				} else {
 					Yii::app() -> user -> setFlash('textHandIn',$report);
+					$flashes = Yii::app() -> user -> getFlashes(false);
 					$this -> addError('text',$report);
 					return false;
 				}
 				break;
 			case 'handInWithMistakes':
 				$db = $this -> DBModel();
-				if ((arrayString::removeRubbishFromString($this -> text) != arrayString::removeRubbishFromString($db -> text))||(!$db -> uid)) {
+
+				if (arrayString::leaveOnlyLetters($this -> text) != arrayString::leaveOnlyLetters($db -> text)) {
+					$this -> setScenario('checkMath');
+					$unique = $this -> fastUnique(['text' => $this -> text] , true);
+					$this -> uniquePercent = $unique['percent'];
+					$this -> setScenario('handInWithMistakes');
+				}
+				if (!$this -> uniquePercent) {
+					Yii::app() -> user -> setFlash('textHandIn','Проверка на уникальность не проведена или завершена с ошибкой.');
+					return false;
+				} else {
+					if ($this -> uniquePercent < 80) {
+						Yii::app() -> user -> setFlash('textHandIn','Уникальность ниже 80%, что неприемлемо в любом случае.');
+						return false;
+					}
+				}
+				/*if ((arrayString::removeRubbishFromString($this -> text) != arrayString::removeRubbishFromString($db -> text))) {
 					Yii::app() -> user -> setFlash('textHandIn','Проведите проверку на уникальность перед повторной просьбой рассмотреть статью.');
 					return false;
 				} elseif ($db -> uniquePercent < 80) {
 					Yii::app() -> user -> setFlash('textHandIn','Уникальность ниже 80%, что неприемлемо в любом случае.');
 					return false;
-				}
+				}*/
 				$this -> QHandedIn = 1;
 				$task = $this -> task;
 				$this -> task -> editor -> notify('Поступила просьба рассмотреть текст по заданию '.$task -> show().'.');
@@ -440,8 +488,12 @@ class Text extends Commentable {
 		if (!$this -> isNewRecord) {
 			$db = $this->DBModel();
 			if (arrayString::removeRubbishFromString($this->text) != arrayString::removeRubbishFromString($db->text)) {
-				$this->uniquePercent = new CDbExpression('NULL');
-				$this->uid = new CDbExpression('NULL');
+				//Если процент уникальности меняется, значит сохранение идет из функции проверки кникальности.
+				//Само собой текст при этом тоже поменяется. Плохо будет ставить уникальность в ноль тогда.
+				if ($this -> uniquePercent == $this -> DBModel() -> uniquePercent) {
+					$this->uniquePercent = new CDbExpression('NULL');
+					$this->uid = new CDbExpression('NULL');
+				}
 				$this -> handedIn = 0;
 				$this -> QHandedIn = 0;
 			}
@@ -466,15 +518,33 @@ class Text extends Commentable {
 		/**
 		 * Самая сложная проверка на уникальность
 		 */
+		$str1 = arrayString::leaveOnlyLetters($this -> text);
+		$str2 = arrayString::leaveOnlyLetters($this -> DBModel() -> text);
+		$len1 = strlen($str1);
+		$len2 = strlen($str2);
+		if ($str1 != $str2) {
+			$unique = $this -> fastUnique(['text' => $this -> text], true);
+			if ($unique['success']) {
+				$this->uniquePercent = $unique['percent'];
+			}
+		}
+		if ($this -> uniquePercent) {
+			if ($this -> uniquePercent < self::MIN_UNIQUE) {
+				$log('Уникальность ниже '.self::MIN_UNIQUE.'%, пожалуйста, исправьте.');
+			}
+		} else {
+			$log('Проверка на уникальность не проводилась или выполнена с ошибкой.');
+		}
 		//Если текст никак не изменился с момента последней проверки на уникальность
-		if (arrayString::removeRubbishFromString($this -> text) == arrayString::removeRubbishFromString($this -> DBModel() -> text)) {
+		/*if ($str1 == $str2) {
 			//Тогда смотрим уникальность
 			if ($this -> uniquePercent < self::MIN_UNIQUE) {
 				$log('Уникальность ниже '.self::MIN_UNIQUE.'%, пожалуйста, исправьте.');
 			}
 		} else {
+
 			$log('Проверка на уникальность не актуальна, пожалуйста, проведите проверку перед очередной попыткой сдать статью.');
-		}
+		}*/
 
 		/**
 		 * Проверка на seo параметры

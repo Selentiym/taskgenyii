@@ -48,7 +48,8 @@ function text(id) {
     me.uniqueButton = $("#uniqueButton");
     me.uniqueButton.click(function(){
 
-        me.uniqueRequest();
+        //me.uniqueRequest();
+        me.fastUnique();
     });
     me.contentChanged = function () {
         me.falseChecks();
@@ -157,6 +158,114 @@ function text(id) {
         me.seoInfo.append($('<div>').html('Первый показатель в семантическом ядре: '+data.first_nucl_num).append(data.first_nucl));
         me.seoInfo.append($('<div>').html('Первый показатель в словах: '+data.first_word_num).append(data.first_word));
     };
+    me.crossUniqueCheck = function(){
+        $.post(baseUrl + '/text/giveCrossUnique/' + me.id,{
+            text: me.text
+        },function(){},"JSON").done(function (data) {
+            var phrases = '';
+            console.log(data);
+            if (data.matches) {
+                phrases = data.matches.join('<br/>');
+            }
+            if (data.percent == -1) {
+                me.crossUnique.html('Не найдено похожих текстов в базе данных.');
+            } else {
+                var textCont = $('<div>',{
+                    "id": "textCont",
+                    css: {display:"none"}
+                }).html($('<div>').html(data.text)).append($('<div>').html(phrases));
+                me.crossUnique.html('');
+                me.crossUnique.append($('<span>',{
+                    "id": "crossPercent",
+                    css:{
+                        cursor:"pointer"
+                    }
+                }).html('Максимальный процент совпадений среди текстов в системе: ' + data.percent).click(function(){
+                    textCont.toggle();
+                }));
+                me.crossUnique.append(textCont);
+            }
+        });
+    };
+    me.highlight = function(hl_array){
+        var t_hl = me.cleanUniqueText.split(" ");
+        for (var i = 0; i < hl_array.length; i++)
+        {
+            if (hl_array[i] instanceof Array) {
+                t_hl[ hl_array[i][0] ] = "<b>" + (t_hl[ hl_array[i][0] ] === undefined ? "" : t_hl[ hl_array[i][0] ]);
+                t_hl[ hl_array[i][1] ] = (t_hl[ hl_array[i][1] ] === undefined ? "" : t_hl[ hl_array[i][1] ]) + "</b>";
+            } else {
+                t_hl[ hl_array[i] ] = "<b>" + t_hl[ hl_array[i] ] + "</b>";
+            }
+        }
+        me.uniqueDetail.html(t_hl.join(" "));
+        return false;
+    };
+    me.fastUnique = function(callback){
+        me.analyze();
+        if (me.changedSinceUnique) {
+            me.crossUniqueCheck();
+            me.cleanUniqueText = '';
+            me.uid = false;
+            me.changedSinceUnique = false;
+            me.uniqueCont.append(loaderImage.clone());
+            $.post(baseUrl + '/text/fastUnique/' + me.id, {
+                text: me.text
+            }, function () {
+            }, "JSON").done(function (data) {
+                if (data.success) {
+                    me.uniqueDetail = $('<div>',{
+                        "class":"uniqueDetail",
+                        css:{display:"none"}
+                    }).html(loaderImage.clone());
+                    me.showUniqueInfo = $('<span>',{
+                        "class":"showUnique"
+                    }).html(data.percent);
+                    me.uniqueCont.html("Уникальность: ").append(me.showUniqueInfo).append(me.uniqueDetail);
+                    me.showUniqueInfo.click(function(){me.uniqueDetail.toggle(1000);});
+                    me.cleanUniqueText = data.text;
+                    me.uniqueDetail.html(data.text);
+                    /*if (data.highlight instanceof Array) {
+                        var hl_array = data.highlight;
+                        var t_hl = data.text.split(' ');
+                        for (var i = 0; i < hl_array.length; i++) {
+                            if (hl_array[i] instanceof Array) {
+                                t_hl[hl_array[i][0]] = "<b>" + (t_hl[hl_array[i][0]] === undefined ? "" : t_hl[hl_array[i][0]]);
+                                t_hl[hl_array[i][1]] = (t_hl[hl_array[i][1]] === undefined ? "" : t_hl[hl_array[i][1]]) + "</b>";
+                            } else {
+                                t_hl[hl_array[i]] = "<b>" + t_hl[hl_array[i]] + "</b>";
+                            }
+                        }
+                        me.uniqueDetail.html(t_hl.join(" "));
+                    }*/
+                    if (data.matches instanceof Array) {
+                        var table = $('<table>');
+                        me.uniqueCont.append(table);
+                        _.each(data.matches, function(match){
+                            var line = $('<tr><td><a href="' + match['url'] + '" target="_blank">' + match['url'] + '</a></td>' +
+                            '<td><strong>' + match['percent'] + '%</strong></td>'+
+                            '<td><a class="show" href="#">подсветить совпадения</a></td></tr>');
+                            line.find('.show').click(function(){
+                                me.highlight(match['highlight']);
+                            });
+                            table.append(line);
+                        });
+                    }
+                    me.changedSinceUnique = false;
+                    if (typeof callback == 'function') {
+                        callback();
+                    }
+                } else {
+                    me.uniqueCont.children('img').remove();
+                    alert(data.error);
+                    me.changedSinceUnique = true;
+                }
+            });
+        } else {
+            alert('Не было изменений с прошлой проверки уникальности.');
+        }
+    };
+
     //Отправляет запрос на проверку.
     me.uniqueRequest = function(callback){
         if (me.changedSinceUnique) {
@@ -169,33 +278,7 @@ function text(id) {
                 clearTimeout(me.obtainInterval);
                 me.obtainInterval = false;
             }
-            $.post(baseUrl + '/text/giveCrossUnique/' + me.id,{
-                text: me.text
-            },function(){},"JSON").done(function (data) {
-                var phrases = '';
-                console.log(data);
-                if (data.matches) {
-                    phrases = data.matches.join('<br/>');
-                }
-                if (data.percent == -1) {
-                    me.crossUnique.html('Не найдено похожих текстов в базе данных.');
-                } else {
-                    var textCont = $('<div>',{
-                        "id": "textCont",
-                        css: {display:"none"}
-                    }).html($('<div>').html(data.text)).append($('<div>').html(phrases));
-                    me.crossUnique.html('');
-                    me.crossUnique.append($('<span>',{
-                        "id": "crossPercent",
-                        css:{
-                            cursor:"pointer"
-                        }
-                    }).html('Максимальный процент совпадений среди текстов в системе: ' + data.percent).click(function(){
-                        textCont.toggle();
-                    }));
-                    me.crossUnique.append(textCont);
-                }
-            });
+            me.crossUniqueCheck();
             $.post(baseUrl + '/text/uniqueCheck/' + me.id, {
                 text: me.text
             }, function () {
@@ -219,7 +302,7 @@ function text(id) {
         me.obtainUnique();
     };
     //Проверяет, есть ли ответ
-    me.obtainUnique = function(){
+    me.obtainUnique = function() {
         $.post(baseUrl + '/text/giveUnique/' + me.id, {
         }, function () {
         }, "JSON").done(function (data) {
@@ -253,24 +336,29 @@ function text(id) {
             me.uniqueCont.html("Уникальность: ").append($('<a>', {
                 href: 'http://text.ru/antiplagiat/' + me.uid
             }).append(me.unique));
+        } else if(me.unique) {
+            me.uniqueCont.html("Уникальность: ").append($('<span>', {
+            }).append(me.unique));
         } else {
             me.uniqueCont.html('Проверка на уникальность не проводилась или завершена с ошибкой.');
         }
     };
     me.goSubmit = function (form) {
-        if (me.changedSinceUnique) {
+        form.submit();
+        /*if (me.changedSinceUnique) {
 
             tinymce.activeEditor.getBody().setAttribute('contenteditable', false);
             me.text = tinyMCE.activeEditor.getContent();
             var cont = $("#editorBlock");
             cont.after(me.text);
             cont.hide();
-            me.uniqueRequest(function(){
+            me.fastUnique(function(){form.submit();});
+            /*me.uniqueRequest(function(){
                 form.submit();
-            });
-        } else {
+            });*/
+        /*} else {
             form.submit();
-        }
+        }*/
     };
     //А вдруг уже есть сохраненная уникальность с самого начала.
     me.obtainUniqueOnce();

@@ -87,6 +87,16 @@ class TextController extends Controller {
                 'ignore' => true,
                 'scenario' => 'analyze'
             ),
+            'fastUnique' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'fastUnique',
+                'access' => true,
+                'args' => $_POST,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'analyze'
+            ),
             'giveCrossUnique' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'Text',

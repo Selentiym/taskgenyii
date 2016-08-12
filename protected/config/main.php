@@ -19,6 +19,7 @@ return array(
 		'application.models.users.*',
 		'application.models.strings.*',
 		'application.components.*',
+		'application.components.unique.*',
 		'application.extensions.tinymce.*',
 	),
 
