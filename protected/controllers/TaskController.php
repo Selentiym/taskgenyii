@@ -89,7 +89,16 @@ class TaskController extends Controller {
             $models = array_merge(Task::model() -> root() -> findAll(), Task::model() -> uncategorized() -> findAll());
         }
         echo json_encode(UHtml::giveArrayFromModels($models,function($el){
-            return array('id' => $el -> id, 'name' => $el -> name);
+            $text = $el -> currentText;
+            /**
+             * @type Text $text
+             */
+            return array('id' => $el -> id, 'name' => $el -> name, 'extra' => [
+                'handedIn' => $text -> handedIn,
+                'QHandedIn' => $text -> QHandedIn,
+                'accepted' => $text -> accepted,
+                'noAuthor' => (!$el -> author)
+            ]);
         }), JSON_PRETTY_PRINT);
     }
 }

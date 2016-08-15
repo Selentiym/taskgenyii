@@ -4,6 +4,7 @@
  * @require Underscore.js
  * @require jQuery-ui.js
  */
+var phrasesCount = {};
 Lexical.prototype.wordsPool = [];
 Lexical.prototype.phrasesPool = [];
 Lexical.prototype.initialPhrasesPool = [];
@@ -361,9 +362,18 @@ function Phrase(text, param){
         } else {
             me.element.remove();
         }
+        Lexical.prototype.phrasesPool.splice(Lexical.prototype.phrasesPool.indexOf(me),1);
+        Phrase.prototype.countPhrases();
     };
+    Phrase.prototype.countPhrases();
     return me;
 }
+Phrase.prototype.countPhrases = function() {
+    phrasesCount = _.countBy(Lexical.prototype.phrasesPool, function (phrase) {
+        return phrase.initial ? 'searchphrase' : 'keyphrase';
+    });
+    Phrase.prototype.phraseCountCont.html(phrasesCount.keyphrase);
+};
 function Word(text,param) {
     var me = new Lexical(text,param);
     me.num = param.num;
@@ -404,7 +414,7 @@ function Word(text,param) {
         me.element.remove();
         Lexical.prototype.wordsPool.splice(Lexical.prototype.wordsPool.indexOf(me),1);
         me = {};
-        console.log(Lexical.prototype.wordsPool);
+        //console.log(Lexical.prototype.wordsPool);
     };
     me.showPopup = function(top,left){
         var popupEl = $('<div>',{
@@ -554,6 +564,8 @@ function TreeBranch(parent, param){
     console.log(param);
     //Сохраняем свой id, иначе не будет детей
     me.id = param.id;
+    //Хранится специфичная информация, изменяемая в зависимости от типа отображаемого объекта.
+    me.extra = param.extra;
     //Сохраняем родителя, иначе не будет отображения на странице
     //Родителя полностью рекурсивно копируем, потом понадобится
     me.parent = $.extend({},parent);
@@ -603,6 +615,25 @@ function TreeBranch(parent, param){
 
     //Присваиваем элемент контейнеру
     me.parent.childrenContainer.append(me.element);
+    me.iterateOverChildren = function(callback){
+        if ((typeof callback == 'function')&&(me.children)) {
+            _.each(me.children, callback);
+        }
+    };
+    me.iterateOverDescendants = function(callback){
+        if ((typeof callback == 'function')&&(me.children)) {
+            _.each(me.children, function(a, b, c){
+                callback(a, b, c);
+                a.iterateOverDescendants(callback);
+            });
+        }
+    };
+    me.iterateOverSelfAndDescendants = function(callback){
+        if (typeof callback == 'function') {
+            callback(me);
+            me.iterateOverDescendants(callback);
+        }
+    };
     /**
      * Отвечает за создание детей. Обращается на сервер и получает своих потомков,
      * затем инициализирует их
@@ -681,6 +712,10 @@ function TreeStructure(url, param){
 function addButtons(branch){
     if (!branch) {return;}
     if (!branch.parent.parent) {return;}
+    branch.tick = $('<input>',{
+        type: 'checkbox',
+        "class":"branchTick"
+    });
     branch.editButton = $("<a>",{
         target:'_blank',
         "class":"editButton button",
@@ -706,6 +741,23 @@ function addButtons(branch){
     });
     branch.buttonContainer.append(branch.addDescendantButton);
 
+    branch.changeDescendantStatusButton = $('<span>',{
+        "class":"changeDescendantsStatusbutton button"
+    });
+    branch.changeDescendantStatusButton.click(function(event){
+        if (event.shiftKey) {
+            branch.iterateOverSelfAndDescendants(function(element){
+                element.tick.prop('checked', true);
+            });
+        }
+        if (event.ctrlKey) {
+            branch.iterateOverSelfAndDescendants(function(element){
+                element.tick.prop('checked', false);
+            });
+        }
+    });
+    branch.buttonContainer.append(branch.changeDescendantStatusButton);
+
     branch.dragButton = $("<span>",{
         "class":"dragButton button"
     });
@@ -724,4 +776,45 @@ function addButtons(branch){
         }
     });
     branch.buttonContainer.append(branch.dragButton);
+    var status = branch.extra;
+    var imageName = '';
+    var imageAlt = '';
+    if (status.accepted) {
+        imageName = 'tick_small.png';
+        imageAlt = 'Принято';
+    } else if (status.handedIn) {
+        imageName = 'handedIn.png';
+        imageAlt = 'Задание сдано';
+    } else if (status.QHandedIn) {
+        imageName = 'QHandedIn.png';
+        imageAlt = 'Просьба рассмотреть';
+    } else {
+        imageName = 'empty.png';
+        imageAlt = 'Автор назначен, но текст пока не сдан';
+    }
+    branch.buttonContainer.append($('<img>',{
+        src:baseUrl+'/images/'+imageName,
+        alt: imageAlt,
+        title: imageAlt,
+        css:{
+            height:'20px'
+        }
+    }));
+    if (status.noAuthor) {
+        branch.buttonContainer.append($('<img>',{
+            src:baseUrl + '/images/missing.png',
+            alt: 'Нет автора',
+            title: 'Нет автора',
+            css:{
+                height:'20px'
+            }
+        }));
+        branch.element.addClass('noAuthor');
+    }
+
+    branch.buttonContainer.append(branch.tick);
+    branch.ticked = false;
+    branch.toggleTick = function(){
+        branch.tick.prop("checked", !branch.tick.prop("checked"));
+    };
 }

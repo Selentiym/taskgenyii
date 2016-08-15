@@ -102,7 +102,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         Word.prototype.container = $("#wordsCont");
         Phrase.prototype.container = $("#phrasesCont");
         Phrase.prototype.InitialPhrasesContainer = $("#initialPhrasesCont");
-
+        Phrase.prototype.phraseCountCont = $("#phraseCount");
         <?php
             foreach($model -> keywords as $key) {
                 /**
@@ -164,6 +164,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
         <input type="submit" name="redirectToKeywords" value="Загрузить данные из KeyCollector" />
+        <div>Всего фраз: <span id="phraseCount"></span></div>
     </form>
     <div id="TreeContainer">
 
