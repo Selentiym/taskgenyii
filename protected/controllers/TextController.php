@@ -129,4 +129,13 @@ class TextController extends Controller {
             ),
         );
     }
+    public function actionCountTexts(){
+        /*$text = Text::model() -> findByPk(19);
+        $length = $text -> countLength();
+        echo $length;*/
+        $texts = Text::model() -> findAll();
+        foreach($texts as $text) {
+            $length = $text -> countLength(true);
+        }
+    }
 }

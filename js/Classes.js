@@ -566,6 +566,11 @@ function TreeBranch(parent, param){
     me.id = param.id;
     //Хранится специфичная информация, изменяемая в зависимости от типа отображаемого объекта.
     me.extra = param.extra;
+    console.log(me);
+    if (!me.extra) {
+        me.extra = {};
+        alert('no extra');
+    }
     //Сохраняем родителя, иначе не будет отображения на странице
     //Родителя полностью рекурсивно копируем, потом понадобится
     me.parent = $.extend({},parent);
@@ -573,10 +578,7 @@ function TreeBranch(parent, param){
     me.children = [];
     //Детей пока не искали
     me.searched = false;
-    //Элемент, отображающий ветку дерева
-    me.element = $('<li>',{
-        "class":"treeBranch"
-    });
+
     //Таким образом сохраняем всевозможные атрибуты, передаваемые от родителя к детям
     //Среди них url, method и тд
     //При этом все новые методы/атрибуты должны замениться на дочерние
@@ -587,6 +589,24 @@ function TreeBranch(parent, param){
     me.generateButtons = parent.generateButtons;
     me.method = parent.method;
     me.clickHandler = parent.clickHandler;
+
+    /**
+     *@todo вынести как-то в отдельную функцию, передаваемую в качестве параметров в будущем
+     */
+    //Элемент, отображающий ветку дерева
+    me.element = $('<li>',{
+        "class":"treeBranch"
+    });
+    me.expandEl = $('<span>',{
+        "class":"expand"
+    });
+    if (me.extra.hasChildren) {
+        me.expandEl.addClass('hasChildren');
+        me.expandEl.click(function(){
+            me.getChildren();
+        });
+    }
+    me.element.append(me.expandEl);
     //В нем содержится название ветки (этот же элемент будет отвечать за сворачивание)
     me.textEl = $('<div>',{
         "class":"branchName"
@@ -690,9 +710,11 @@ function TreeStructure(url, param){
             if (this.id) {
                 return '#';
             }
+        },
+        extra:{
+            hasChildren: 1
         }
     },param);
-    console.log(param);
     me.childrenContainer = $('<ul>',{
         "class":"treeRoot"
     });

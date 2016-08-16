@@ -409,6 +409,9 @@ class Text extends Commentable {
 	}
 	protected function beforeSave() {
 		switch ($this -> scenario) {
+			case 'noBeforeSave' :
+				return true;
+				break;
 			case 'handIn':
 				$report = $this -> checkMath();
 				if ($report === true) {
@@ -501,8 +504,7 @@ class Text extends Commentable {
 		/**
 		 * Считаем длину
 		 */
-		$toCount = preg_replace('/(\s|\r|\n)/u','',arrayString::removeSpecialChars($this -> text));
-		$this -> length = strlen($toCount);
+		$this -> length = $this -> countLength(false);
 		return parent::beforeSave();
 	}
 
@@ -577,5 +579,17 @@ class Text extends Commentable {
 		} else {
 			return $this -> temp;
 		}
+	}
+	public function countLength($save = true){
+		$text = $this -> text;
+		$length = mb_strlen(arrayString::leaveOnlyLetters($text),'utf-8');
+		if ($save) {
+			$old = $this -> getScenario();
+			$this -> length = $length;
+			$this -> setScenario('noBeforeSave');
+			$this -> save(['length']);
+			$this -> setScenario($old);
+		}
+		return $length;
 	}
 }

@@ -6,28 +6,41 @@
     padding-left:0px;
     margin-left:15px;
 }
-#TreeContainer ul.treeRoot > li > div.branchName:before {
+#TreeContainer ul.treeRoot > li > .expand{
     display:none;
 }
+/*#TreeContainer ul.treeRoot > li > div.branchName:before {
+    display:none;
+}*/
 #TreeContainer .branchName {
     display: inline-block;
 }
-#TreeContainer .branchName:before {
+/*#TreeContainer .branchName:before {
     content:'';
     display: inline-block;
     width:10px;
     height:10px;
     margin-right:4px;
     background: url('../images/cross_small.png');
-}
+}*/
 #TreeContainer ul li {
     margin-top:5px;
 }
 #TreeContainer ul li .branchName.over {
     background: rgba(255, 255, 0, 0.3);
 }
-#TreeContainer ul li .branchName{
+#TreeContainer ul li .expand{
+    display: inline-block;
+    vertical-align: middle;
+    width:15px;
+    height:15px;
 
+}
+#TreeContainer ul li .expand.hasChildren{
+    background: url('../images/arrow_right.png');
+}
+#TreeContainer ul li .expand.hasChildren.opened{
+    background: url('../images/arrow_down.png');
 }
 #TreeContainer .buttonContainer .button{
     display:inline-block;

@@ -16,7 +16,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         if (!e) {
             return false;
         } else {
-            if ((e.ctrlKey)&&(e.shiftKey)) {
+            /*if ((e.ctrlKey)&&(e.shiftKey)) {
                 this.link.attr("href",baseUrl + "/task/edit/"+this.id);
                 return false;
             } else if ((e.shiftKey)) {
@@ -25,9 +25,10 @@ Yii::app() -> getClientScript() -> registerScript('structure','
             } else if (e.ctrlKey) {
                 this.link.attr("href",baseUrl + "/loadKeywords/"+this.id);
                 return false;
-            }
+            }*/
             e.preventDefault();
-            return true;
+            //return true;
+            return false;
         }
     },
     toHref: function(){
