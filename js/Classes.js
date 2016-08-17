@@ -3,6 +3,7 @@
  * @require jQuery
  * @require Underscore.js
  * @require jQuery-ui.js
+ * @require jquery.cookie.js
  */
 var phrasesCount = {};
 Lexical.prototype.wordsPool = [];
@@ -561,12 +562,12 @@ var loadingImage = $('<img>', {
 function TreeBranch(parent, param){
     var me = {};
     if (!(param instanceof Object)) { return; }
-    console.log(param);
+    //console.log(param);
     //Сохраняем свой id, иначе не будет детей
     me.id = param.id;
     //Хранится специфичная информация, изменяемая в зависимости от типа отображаемого объекта.
     me.extra = param.extra;
-    console.log(me);
+    //console.log(me);
     if (!me.extra) {
         me.extra = {};
         alert('no extra');
@@ -583,6 +584,7 @@ function TreeBranch(parent, param){
     //Среди них url, method и тд
     //При этом все новые методы/атрибуты должны замениться на дочерние
     //me = $.extend(parent, me);
+    me.tree = parent.tree;
     me.url = parent.url;
     me.toHref = parent.toHref;
     me.childFunc = parent.childFunc;
@@ -603,21 +605,27 @@ function TreeBranch(parent, param){
     if (me.extra.hasChildren) {
         me.expandEl.addClass('hasChildren');
         me.expandEl.click(function(){
-            me.getChildren();
+            me.toggle();
         });
     }
     me.element.append(me.expandEl);
-    //В нем содержится название ветки (этот же элемент будет отвечать за сворачивание)
+    //В нем содержится название ветки (этот же элемент будет отвечать за выделение)
     me.textEl = $('<div>',{
         "class":"branchName"
     });
-    me.link = $('<a>',{href: me.toHref()});
+    me.link = $('<span>',{href: me.toHref()});
     me.textEl.html(me.link.append(param.name));
     me.textEl.click(function(e){
+        if (!e.ctrlKey) {
+            me.tree.unselectAll();
+        }
+        me.toggleSelected();
+    });
+    /*me.textEl.click(function(e){
         if (me.clickHandler(e)){
             me.toggle();
         }
-    });
+    });*/
     //И элемент с детьми
     me.element.append(me.textEl);
     me.buttonContainer = $('<span>',{'class':'buttonContainer'});
@@ -658,8 +666,8 @@ function TreeBranch(parent, param){
      * Отвечает за создание детей. Обращается на сервер и получает своих потомков,
      * затем инициализирует их
      */
-    me.getChildren = function(){
-        me.childrenContainer.toggle();
+    me.getChildren = function(noExpandedChange){
+        me.childrenContainer.toggle(noExpandedChange);
         me.childrenContainer.html(loadingImage.clone());
         $.ajax({
             url: me.url,
@@ -673,11 +681,15 @@ function TreeBranch(parent, param){
         }).done(function (data) {
             me.childrenContainer.html('');
             _.each(data, function(el){
-                me.children.push(me.childFunc(me, el));
+                var child = me.childFunc(me, el);
+                me.children.push(child);
+                if (me.tree.expandedIds.indexOf(child.id) != -1) {
+                    child.getChildren(true);
+                }
             });
-            if (data.length == 0) {
+            /*if (data.length == 0) {
                 me.childrenContainer.append('Низший уровень вложенности');
-            }
+            }*/
             me.searched = true;
 
         });
@@ -685,17 +697,68 @@ function TreeBranch(parent, param){
     /**
      * Функция, отвечающая за раскрывание списка дочерних элементов
      */
-    me.toggle = function(){
+    me.toggle = function(noExpandedChange){
         if (me.searched) {
             me.childrenContainer.toggle(500);
         } else {
             me.getChildren();
         }
+        if (!noExpandedChange) {
+            me.tree.toggleExpanded(me.id);
+        }
+        me.expandEl.toggleClass('opened');
     };
+    me.setSelected = function(val){
+        if (val) {
+            me.selected = true;
+            me.element.addClass('selected');
+        } else {
+            me.selected = false;
+            me.element.removeClass('selected');
+        }
+    };
+    me.setSelected(false);
+    me.toggleSelected = function(){
+        me.selected = !me.selected;
+        me.element.toggleClass('selected');
+    };
+    return me;
+}
+function ControlButton(value, className, callback, tree,param){
+    var me = {};
+    //Сохраняем дерево, тк именно оно даст элементы
+    me.tree = tree;
+    if (!className) {className = '';}
+    if (!param) {param = '';}
+
+    //Создаем элемент кнопки. Все стили накладываются внешне.
+    me.element = $('<span>', $.extend({
+        "class":"button " + className
+    },param)).append(value);
+    //Вешаем действие кнопки.
+    me.element.click(function(event){
+        //Если нет элементов, то и делать нечего
+        if (me.tree) {
+            //Ищем все элементы
+            var elems = me.tree.getSelected();
+            console.log(elems);
+            //Не всегда действие можно применить ко всем элементам.
+            var stop = false;
+            _.each(elems, function(el){
+                if (!stop) {
+                    stop = callback(el, event);
+                }
+            });
+        } else {
+            alert('no tree');
+        }
+    });
+    me.tree.addButton(me);
     return me;
 }
 function TreeStructure(url, param){
     var me = {};
+
     me.url = url;
     if (!param) {
         param = {};
@@ -722,12 +785,69 @@ function TreeStructure(url, param){
     me.clickHandler = param.clickHandler;
     me.toHref = param.toHref;
     me.generateButtons = param.generateButtons;
+    me.tree = me;
     me.firstEl = me.childFunc(me, param);
-    me.firstEl.toggle();
+    me.firstEl.toggle(true);
     if (!param.container) {
         param.container = $("body");
     }
-    $("#TreeContainer").html(me.childrenContainer);
+    me.element = $("#TreeContainer");
+    me.element.html(me.childrenContainer);
+    //Задаем имя, в котором хранить информацию
+    me.cookieName = 'TreeExpandedIds'+me.element.attr('id');
+    //Получаем айдишники развернутых пунктов
+    var cookie;
+    if (cookie = $.cookie(me.cookieName)) {
+        me.expandedIds = JSON.parse(cookie);
+    }
+
+    if (!(me.expandedIds instanceof Array)) {
+        me.expandedIds = [];
+    }
+
+    me.toggleExpanded = function(id){
+        var ind = me.expandedIds.indexOf(id);
+        if (ind != -1) {
+            me.expandedIds.splice(ind, 1);
+        } else {
+            me.expandedIds.push(id);
+        }
+        //Сохраняем результат
+        $.cookie(me.cookieName, JSON.stringify(me.expandedIds));
+    };
+
+    me.addButton = function () {
+        alert('implement addButton!');
+    };
+
+    me.buttonContainer = $("<div>",{
+        "class":"controls"
+    });
+
+    me.element.prepend(me.buttonContainer);
+
+    me.addButton = function(button){
+        me.buttonContainer.append(button.element);
+    };
+
+    me.unselectAll = function(){
+        //alert('implement unselectAll');
+        me.firstEl.iterateOverSelfAndDescendants(function(el){
+            el.setSelected(false);
+        });
+    };
+
+    me.getSelected = function(){
+        console.log('getselected');
+        var toGive = [];
+        me.firstEl.iterateOverSelfAndDescendants(function(elem){
+            if (elem.selected) {
+                toGive.push(elem);
+            }
+        });
+        //console.log(toGive);
+        return toGive;
+    };
 
     return me;
 }
@@ -738,7 +858,7 @@ function addButtons(branch){
         type: 'checkbox',
         "class":"branchTick"
     });
-    branch.editButton = $("<a>",{
+    /*branch.editButton = $("<a>",{
         target:'_blank',
         "class":"editButton button",
         href: baseUrl + "/task/edit/" + branch.id
@@ -779,7 +899,7 @@ function addButtons(branch){
         }
     });
     branch.buttonContainer.append(branch.changeDescendantStatusButton);
-
+*/
     branch.dragButton = $("<span>",{
         "class":"dragButton button"
     });

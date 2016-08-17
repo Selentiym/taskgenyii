@@ -1,6 +1,27 @@
 #TreeContainer {
     width:400px;
 }
+#TreeContainer .controls .button{
+    width:20px;
+    height:20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+#TreeContainer .controls .edit{
+    background: url('../images/edit_small.png');
+}
+#TreeContainer .controls .keys{
+    background: url('../images/folder_small.png');
+}
+#TreeContainer .controls .look{
+    background: url('../images/view_small.png');
+}
+#TreeContainer .controls .plus{
+    background: url('../images/plus_small.png');
+}
+#TreeContainer .controls .plus{
+    background: url('../images/plus_small.png');
+}
 #TreeContainer ul{
     list-style-type: none;
     padding-left:0px;
@@ -26,6 +47,9 @@
 #TreeContainer ul li {
     margin-top:5px;
 }
+#TreeContainer ul li.selected > .branchName {
+    border:1px solid red;
+}
 #TreeContainer ul li .branchName.over {
     background: rgba(255, 255, 0, 0.3);
 }
@@ -42,8 +66,15 @@
 #TreeContainer ul li .expand.hasChildren.opened{
     background: url('../images/arrow_down.png');
 }
-#TreeContainer .buttonContainer .button{
+
+#TreeContainer .buttonContainer *{
+    vertical-align:middle;
     display:inline-block;
+}
+#TreeContainer .buttonContainer *:first-child{
+    margin-left:10px;
+}
+#TreeContainer .buttonContainer .button{
     width:20px;
     height:20px;
 }
