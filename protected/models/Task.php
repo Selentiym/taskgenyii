@@ -269,6 +269,9 @@ class Task extends Commentable {
 				$_POST['Task'] = [];
 			}
 		}
+		if ($this -> getScenario() == 'deleteGroup') {
+			return self::model();
+		}
 		return $this -> findByPk($arg);
 	}
 
@@ -420,5 +423,47 @@ class Task extends Commentable {
 	 */
 	public function show(){
 		return CHtml::link($this -> name, Yii::app() -> createUrl('task/view',['arg' => $this -> id]));
+	}
+
+	/**
+	 *
+	 */
+	public function deleteGroup($post){
+		if (count($post['ids']) > 0) {
+			$models = $this->findAllByPk($post['ids']);;
+			$rez = '';
+			foreach ($models as $model) {
+				if (!$model -> delete()) {
+					$rez .= 'При удалении задания '.$model -> name.' возникла ошибка.';
+					$rez .= $model -> getError('id');
+					$rez .= $model -> getError('id_parent');
+					$rez .= PHP_EOL;
+				}
+			}
+			if (!$rez) {
+				$rez = 'Удаление успешно завершено!';
+			}
+		} else {
+			$rez = false;
+		}
+		echo json_encode($rez);
+	}
+	public function beforeDelete() {
+		if (count($this -> children) > 0) {
+			$this -> addError('id_parent','У задания есть потомки.');
+			return false;
+		}
+		if (count($this -> texts)>1) {
+			$this -> addError('id','К заданию написаны несколько текстов.');
+			return false;
+		}
+		if ($this -> currentText -> length > 1000) {
+			$this -> addError('id','Текущий текст длинее 1000 символов.');
+			return false;
+		}
+		foreach ($this -> texts as $text) {
+			$text -> delete();
+		}
+		return parent::beforeDelete();
 	}
 }

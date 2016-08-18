@@ -37,6 +37,18 @@ class TaskController extends Controller {
                     return ($task -> author == User::logged());
                 }
             ),
+            'deleteGroup' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Task',
+                'method' => 'deleteGroup',
+                'ignore' => true,
+                'ajax' => true,
+                'args' => $_POST,
+                'scenario' => 'deleteGroup',
+                'access' => function(){
+                    return Yii::app() -> user -> checkAccess('editor');
+                }
+            ),
             'edit' => array(
                 'class' => 'application.controllers.actions.ModelUpdateAction',
                 'modelClass' => 'Task',

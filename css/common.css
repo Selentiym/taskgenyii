@@ -1,3 +1,6 @@
+#dialogContainer{
+    overflow: auto;
+}
 .inlineBlock {
     display: inline-block;
 }

@@ -39,12 +39,40 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     },
     generateButtons: addButtons
     });
-    //new ControlButton("selected","giveSelected",function(el){return false;},tree);
-    new ControlButton("","edit",function(el){location.href = baseUrl + "/task/edit/" + el.id; return true;},tree);
-    new ControlButton("","keys",function(el){location.href = baseUrl + "/cabinet/loadKeywords/" + el.id; return true;},tree);
-    new ControlButton("","look",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree);
-    new ControlButton("","plus",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree);
-    new ControlButton("","selectDescendants",function(el){el.iterateOverDescendants(function(child){child.setSelected(true);});},tree,{title:"Выделить потомков"});
+    //new ControlButton("selected","giveSelected",function(el){if (el.ticked) {alert("el.name");}},tree);
+    new ControlButton("","edit",function(el){location.href = baseUrl + "/task/edit/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","keys",function(el){location.href = baseUrl + "/cabinet/loadKeywords/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","look",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree,{}, ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
+    new ControlButton("&#9745;","font20",function(el){el.iterateOverDescendants(function(child){child.setSelected(true);});},tree,{title:"Выделить потомков"}, true);
+    new ControlButton("&#9746;","font20",function(el){el.iterateOverSelfAndDescendants(function(child){child.setSelected(false);});},tree,{title:"Снять выделение с потомков"}, true);
+    new ControlButton("","delete",function(el, event, collection){
+        var toDel = [];
+        var yesToAll;
+        if (collection.length > 1) {
+            yesToAll = !confirm("Вы собираетесь удалить "+collection.length+" заданий. Перечислить их по очреди?");
+            _.map(collection, function(elem){
+            var toDelFlag = yesToAll;
+            if (!toDelFlag) {
+                toDelFlag = confirm("Удалить задание: "+elem.name+"?");
+            }
+            if (toDelFlag) {
+                toDel.push(elem.id);
+            }
+        });
+        } else {
+            if (confirm("Удалить задание: "+el.name+"?")) {
+                toDel = [el.id];
+            }
+        }
+        console.log(toDel);
+        $.post(baseUrl+"/task/deleteGroup",{ids:toDel},function(){},"JSON").done(function(data){
+            alert(data);
+            location.reload();
+        });
+        //Не продолжаем потом прбегать по элементам
+        return true;
+    },tree,{title:"Снять выделение с потомков"}, true);
 ',CClientScript::POS_READY);
 ?>
 <div id="controlPanel">

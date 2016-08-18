@@ -565,6 +565,8 @@ function TreeBranch(parent, param){
     //console.log(param);
     //Сохраняем свой id, иначе не будет детей
     me.id = param.id;
+    //Понадобится где-нибудь
+    me.name = param.name;
     //Хранится специфичная информация, изменяемая в зависимости от типа отображаемого объекта.
     me.extra = param.extra;
     //console.log(me);
@@ -683,8 +685,8 @@ function TreeBranch(parent, param){
             _.each(data, function(el){
                 var child = me.childFunc(me, el);
                 me.children.push(child);
-                if (me.tree.expandedIds.indexOf(child.id) != -1) {
-                    child.getChildren(true);
+                if (me.tree.expandedIdsInitial.indexOf(child.id) != -1) {
+                    child.getChildren();
                 }
             });
             /*if (data.length == 0) {
@@ -724,12 +726,40 @@ function TreeBranch(parent, param){
     };
     return me;
 }
-function ControlButton(value, className, callback, tree,param){
+ControlButton.prototype.hasAnythingCheck = function(collection){
+    if (collection.length == 0) {
+        alert('Не выбрано ни одного элемента.');
+        return false;
+    }
+    return true;
+};
+ControlButton.prototype.tooManyCheck = function(collection){
+    if (collection.length > 1) {
+        return confirm('Выбрано более одного элемента. Применить действие к самому верхнему выбранному элементу?');
+    }
+    return true;
+};
+ControlButton.prototype.actionForOneCountChecks = function(collection){
+    if (ControlButton.prototype.hasAnythingCheck(collection)) {
+        return ControlButton.prototype.tooManyCheck(collection);
+    } else {
+        return false;
+    }
+};
+function ControlButton(value, className, callback, tree, param, preValidator){
     var me = {};
     //Сохраняем дерево, тк именно оно даст элементы
     me.tree = tree;
     if (!className) {className = '';}
     if (!param) {param = '';}
+
+    if (typeof preValidator != 'function') {
+        me.preValidator = ControlButton.prototype.hasAnythingCheck;
+    } else if (preValidator === true) {
+        me.preValidator = function(){return true};
+    } else{
+        me.preValidator = preValidator;
+    }
 
     //Создаем элемент кнопки. Все стили накладываются внешне.
     me.element = $('<span>', $.extend({
@@ -741,14 +771,15 @@ function ControlButton(value, className, callback, tree,param){
         if (me.tree) {
             //Ищем все элементы
             var elems = me.tree.getSelected();
-            console.log(elems);
-            //Не всегда действие можно применить ко всем элементам.
-            var stop = false;
-            _.each(elems, function(el){
-                if (!stop) {
-                    stop = callback(el, event);
-                }
-            });
+            if (me.preValidator(elems)) {
+                //Не всегда действие можно применить ко всем элементам.
+                var stop = false;
+                _.each(elems, function (el) {
+                    if (!stop) {
+                        stop = callback(el, event, elems);
+                    }
+                });
+            }
         } else {
             alert('no tree');
         }
@@ -797,14 +828,16 @@ function TreeStructure(url, param){
     me.cookieName = 'TreeExpandedIds'+me.element.attr('id');
     //Получаем айдишники развернутых пунктов
     var cookie;
+    me.expandedIds = [];
     if (cookie = $.cookie(me.cookieName)) {
-        me.expandedIds = JSON.parse(cookie);
+        me.expandedIdsInitial = JSON.parse(cookie);
     }
 
-    if (!(me.expandedIds instanceof Array)) {
-        me.expandedIds = [];
+    if (!(me.expandedIdsInitial instanceof Array)) {
+        me.expandedIdsInitial = [];
     }
 
+    me.expandedIdsInitial = _.unique(me.expandedIdsInitial);
     me.toggleExpanded = function(id){
         var ind = me.expandedIds.indexOf(id);
         if (ind != -1) {

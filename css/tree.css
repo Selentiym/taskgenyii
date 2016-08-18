@@ -22,6 +22,12 @@
 #TreeContainer .controls .plus{
     background: url('../images/plus_small.png');
 }
+#TreeContainer .controls .font20{
+    font-size:20px;
+}
+#TreeContainer .controls .delete{
+    background: url('../images/cross_small.png');
+}
 #TreeContainer ul{
     list-style-type: none;
     padding-left:0px;
