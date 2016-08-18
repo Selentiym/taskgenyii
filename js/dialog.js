@@ -10,12 +10,30 @@ function Dialog(container, idSender, idReceiver, date) {
     console.log(me.firstDate);
     me.idSender = idSender;
     me.idReceiver = idReceiver;
+    me.shortcut = $("#"+container.attr('id')+"_shortcut");
     me.container = container;
+    if (me.shortcut.length > 0) {
+        container.hide();
+        me.shortcut.append(me.container.find('.talkerName').html());
+        me.shortcut.click(function(){
+            me.container.toggle(500);
+        });
+    }
+
+    me.container.removeClass('hidden');
+    console.log(me.container);
     me.letters = container.find('.letters');
     me.form = container.find('.form');
     me.textArea = container.find('.input');
     me.moreButton = container.find('.moreSpan');
     me.sendButton = container.find('.send');
+    me.minifyButton = container.find('.minify');
+    me.closeButton = container.find('.close');
+    if (me.minifyButton.length > 0) {
+        me.minifyButton.click(function () {
+            me.container.toggle(500);
+        });
+    }
     me.notRead = [];
     me.loadHistory = function(){
         if (!me.noMore) {
@@ -147,8 +165,10 @@ function Dialog(container, idSender, idReceiver, date) {
     Dialog.prototype.opened[me.container.attr('id')] = me;
     return me;
 }
-function addNewDialog(event){
-    var id = $(this).attr('data-id');
+function addNewDialogFromClick(event) {
+    addNewDialog($(this).attr('data-id'));
+}
+function addNewDialog(id){
     if (!Dialog.prototype.opened[id]) {
         $.post(baseUrl + '/dialog/open/'+id,{},function(){},"JSON").done(function(data){
             console.log(data);
@@ -162,8 +182,7 @@ function addNewDialog(event){
             }
         });
     } else {
-        alert('found');
-        //Dialog.prototype.opened[id].
+        alert('Диалог уже открыт!');
     }
     event.preventDefault();
 }

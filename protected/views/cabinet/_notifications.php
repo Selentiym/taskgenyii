@@ -18,11 +18,12 @@ Yii::app() -> getClientScript() -> registercssFile(Yii::app() -> baseUrl. '/css/
 
 Yii::app() -> getClientScript() -> registerScript('dialog',
 "new Dialog($('#$id'),".$user -> id.",0,'".date('Y-m-d H:i:s')."');",CClientScript::POS_READY);
-
+$this -> renderPartial('//cabinet/_newDialog');
 ?>
-<div class="toDrag" style="z-index:5">
-    <div id="<?php echo $id; ?>" class="dialog_container">
-        <div>Уведомления:</div>
+<div id="<?php echo $id; ?>_shortcut" class="dialog_shortcut"></div>
+<div class="toDrag" style="z-index:5;">
+    <div id="<?php echo $id; ?>" class="dialog_container hidden">
+        <div><span class="talkerName">Уведомления</span>:</div>
         <div class="more"><span class="moreSpan">Больше сообщений</span></div>
         <div class="letters">
 

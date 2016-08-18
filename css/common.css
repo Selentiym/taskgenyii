@@ -8,3 +8,6 @@
     display: inline-block;
     position:absolute;
 }
+.hidden {
+    display:none;
+}

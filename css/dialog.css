@@ -1,9 +1,32 @@
+#dialogContainer .dialog_shortcut {
+    border:1px solid black;
+    margin-left:5px;
+    padding:5px;
+    display: inline-block;
+}
 .dialog_container {
     width:500px;
     max-height:450px;
     border:1px solid black;
     padding:20px;
     background: white;
+}
+.dialog_container .head_panel {
+    height:20px;
+    text-align:right;
+}
+.dialog_container .head_panel span{
+    width:20px;
+    height:20px;
+    display: inline-block;
+    margin-left:5px;
+}
+.dialog_container .head_panel span.close{
+    background: url('../images/cross_small.png');
+}
+.dialog_container .head_panel span.minify{
+    border-bottom: 2px solid black;
+    /*background: url('../images/cross_small.png');*/
 }
 .dialog_container .more {
     width:100%;

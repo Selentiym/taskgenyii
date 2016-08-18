@@ -8,7 +8,7 @@
 $this -> renderPartial('//layouts/commonScripts');
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl.'/js/dialog.js', CClientScript::POS_BEGIN);
 Yii::app() -> getClientScript() -> registerScript('saveDialogCont','Dialog.prototype.container = $("#dialogContainer");', CClientScript::POS_END);
-Yii::app() -> getClientScript() -> registerScript('addNewDialog',"$('.dialogCreator').click(addNewDialog);", CClientScript::POS_READY);
+Yii::app() -> getClientScript() -> registerScript('addNewDialog',"$('.dialogCreator').click(addNewDialogFromClick);", CClientScript::POS_READY);
 ?>
 <div id="dialogContainer">
     <?php

@@ -113,6 +113,7 @@ class SiteController extends Controller
 		$this->redirect(Yii::app()->homeUrl);
 	}
 	public function actionCheck(){
-		var_dump(array('abc' => array('d'),'bcd' => array('e')) + array('cde' => ['f'],'def' => ['g']));
+		echo "working!";
+		//var_dump(array('abc' => array('d'),'bcd' => array('e')) + array('cde' => ['f'],'def' => ['g']));
 	}
 }
