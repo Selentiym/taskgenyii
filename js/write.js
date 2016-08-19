@@ -42,6 +42,16 @@ function text(id) {
     me.uniqueCont = $("#unique");
     me.crossUnique = $("#crossUnique");
     me.check = $("#check");
+    me.lengthCont = $("#lengthContainer");
+    me.lengthSpan = me.lengthCont.find("#length");
+    var min = me.lengthCont.attr("data-min");
+    if (min > 0) {
+        me.lengthCont.prepend(min + ' < ');
+    }
+    var max = me.lengthCont.attr("data-max");
+    if (max > 0) {
+        me.lengthCont.append(' < ' + max);
+    }
     me.check.click(function(){
         me.analyze();
     });
@@ -53,7 +63,25 @@ function text(id) {
     });
     me.contentChanged = function () {
         me.falseChecks();
+        me.recountLength()
         me.text = tinyMCE.activeEditor.getContent();
+    };
+    me.lengthInterval = false;
+    me.setLength = function(val){
+        me.lengthSpan.html(val);
+    };
+    me.recountLength = function(){
+        me.text = tinyMCE.activeEditor.getContent();
+        if (me.lengthInterval) {
+            clearTimeout(me.lengthInterval);
+            me.lengthInterval = false;
+        }
+        $.post(baseUrl + '/text/length/' + me.id,{
+            text:me.text
+        },null,"JSON").done(function(data){
+            me.setLength(data.length);
+            me.lengthInterval = setTimeout(me.recountLength, 60*1000);
+        });
     };
     me.falseChecks = function() {
         me.checks = {};
@@ -100,6 +128,7 @@ function text(id) {
     };
     me.analyze = function () {
         me.falseChecks();
+        me.recountLength();
         me.text = tinyMCE.activeEditor.getContent();
         $.post(baseUrl + '/text/analyze/' + me.id, {
             text: me.text
@@ -110,27 +139,29 @@ function text(id) {
             me.rez.html('Текст с подсветкой ключевых слов:<br/>' + data.text);
             var tempCur = 0;
             var tempMax = 0;
-            _.each(data.phrs.direct, function (el, key) {
-                var dom = $('#direct' + key);
-                tempMax ++;
-                var mustHave = dom.attr('data-mustHave');
-                dom.html(el + '/' + mustHave);
-                if (el >= mustHave) {
-                    tempCur ++;
-                }
-            });
-            var directFlag = (tempCur == tempMax);
-            tempCur = 0;
-            tempMax = 0;
-            _.each(data.phrs.morph, function (el, key) {
-                var dom = $('#morph' + key);
-                tempMax ++;
-                var mustHave = dom.attr('data-mustHave');
-                dom.html(el + '/' + mustHave);
-                if (el >= mustHave) {
-                    tempCur ++;
-                }
-            });
+            if (data.phrs) {
+                _.each(data.phrs.direct, function (el, key) {
+                    var dom = $('#direct' + key);
+                    tempMax++;
+                    var mustHave = dom.attr('data-mustHave');
+                    dom.html(el + '/' + mustHave);
+                    if (el >= mustHave) {
+                        tempCur++;
+                    }
+                });
+                var directFlag = (tempCur == tempMax);
+                tempCur = 0;
+                tempMax = 0;
+                _.each(data.phrs.morph, function (el, key) {
+                    var dom = $('#morph' + key);
+                    tempMax++;
+                    var mustHave = dom.attr('data-mustHave');
+                    dom.html(el + '/' + mustHave);
+                    if (el >= mustHave) {
+                        tempCur++;
+                    }
+                });
+            }
             var morphFlag = (tempCur == tempMax);
             me.checks.keyCheck = morphFlag && directFlag;
         });

@@ -127,6 +127,16 @@ class TextController extends Controller {
                 'ignore' => true,
                 'scenario' => 'analyze'
             ),
+            'length' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Text',
+                'method' => 'countTextJS',
+                'args' => $_POST,
+                'access' => true,
+                'ajax' => true,
+                'ignore' => true,
+                'scenario' => 'analyze'
+            ),
         );
     }
     public function actionCountTexts(){

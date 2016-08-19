@@ -23,6 +23,10 @@ body {margin: 0}
 #topPanel #nav{
     float:right;
 }
+.content {
+    padding:8px;
+}
+
 .inlineBlock {
     display: inline-block;
 }

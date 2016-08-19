@@ -12,6 +12,9 @@
  * @property integer $id_parent
  * @property string $created
  * @property integer $id_text
+ * @property integer $min_length
+ * @property integer $max_length
+
  *
  * The followings are the available model relations:
  * @property Keyphrase[] $keyphrases
@@ -66,9 +69,9 @@ class Task extends Commentable {
 			array('id, id_author, id_editor, id_pattern, id_text', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, id_author, id_editor, id_pattern, created, id_text, name', 'safe', 'on'=>'search'),
-			array('id_author, id_pattern, phrases, name', 'safe', 'on'=>'create'),
-			array('id_author, id_pattern, phrases, name', 'safe', 'on'=>'generate'),
+			array('id, id_author, id_editor, id_pattern, created, id_text, name, min_length, max_length', 'safe', 'on'=>'search'),
+			array('id_author, id_pattern, phrases, name, min_length, max_length', 'safe', 'on'=>'create'),
+			array('id_author, id_pattern, phrases, name, min_length, max_length', 'safe', 'on'=>'generate'),
 			array('input_search, keystring', 'safe', 'on'=>'addKeywords'),
 		);
 	}

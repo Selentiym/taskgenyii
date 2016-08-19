@@ -19,7 +19,7 @@ Yii::app() -> getClientScript() -> registerScript('dialog'.$id,
     "new Dialog($('#$id'),".Yii::app()->user->getId().",$model->id,'".date('Y-m-d H:i:s')."');",CClientScript::POS_READY);
 
 ?>
-<div class="dialog_shortcut" id="<?php echo $id; ?>_shortcut">
+<div class="dialog_shortcut <?php echo $new ? 'new' : ''; ?>" id="<?php echo $id; ?>_shortcut">
 
 </div>
 <div class="toDrag" style="z-index:5;position:absolute;">

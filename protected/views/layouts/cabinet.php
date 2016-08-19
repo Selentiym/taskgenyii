@@ -18,7 +18,7 @@ Yii::app() -> getClientScript() -> registerScript('addNewDialog',"$('.dialogCrea
                 $this->renderPartial('//cabinet/_notifications');
                 foreach(User::logged() -> newLetters as $letter){
                     if ($letter -> id_sender != 0) {
-                        $this->renderPartial('//cabinet/dialog', ['model' => $letter->sender]);
+                        $this->renderPartial('//cabinet/dialog', ['model' => $letter->sender, 'new' => true]);
                     }
                 };
                 ?>
@@ -31,6 +31,8 @@ Yii::app() -> getClientScript() -> registerScript('addNewDialog',"$('.dialogCrea
         </div>
     </div>
 </div>
-<?php
-echo $content;
-?>
+<div class="content">
+    <?php
+    echo $content;
+    ?>
+</div>

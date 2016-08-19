@@ -72,6 +72,10 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
     <div style="width:39%; display:inline-block;vertical-align:top">
         <div id="unique"></div>
         <div id="crossUnique"></div>
+        Длина:
+        <div id="lengthContainer" <?php if ($model -> task -> max_length > 0) echo "data-max='".$model->task->max_length."'"; ?> <?php if ($model -> task -> min_length > 0) echo "data-min='".$model->task->min_length."'"; ?>>
+            <span id="length"><?php echo $model -> length; ?></span>
+        </div>
         <div id="seoData"></div>
         <div>
             <?php $this -> renderPartial('//pattern/keys', array('data' => $model -> task -> keyphrases)); ?>

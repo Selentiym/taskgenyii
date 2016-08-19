@@ -116,10 +116,14 @@ class Text extends Commentable {
 		return parent::model($className);
 	}
 	public function CustomFind($arg){
-		if ($this -> scenario == 'write') {
-			return $this -> findByPk($arg);
+		switch($this -> scenario){
+			case 'model':
+				return $this;
+				break;
+			default:
+				return $this -> findByPk($arg);
+				break;
 		}
-		return $this -> findByPk($arg);
 	}
 
 	/**
@@ -518,7 +522,7 @@ class Text extends Commentable {
 			$this -> temp .= $str.'<br/>';
 		};
 		/**
-		 * Самая сложная проверка на уникальность
+		 * Самая сложная проверка - на уникальность
 		 */
 		$str1 = arrayString::leaveOnlyLetters($this -> text);
 		$str2 = arrayString::leaveOnlyLetters($this -> DBModel() -> text);
@@ -536,6 +540,20 @@ class Text extends Commentable {
 			}
 		} else {
 			$log('Проверка на уникальность не проводилась или выполнена с ошибкой.');
+		}
+		/**
+		 * Проверка на длину текста
+		 */
+		$this -> countLength(false);
+		if ($this -> task -> min_length > 0) {
+			if ($this -> length < $this -> task -> min_length) {
+				$log('Длина текста недостаточна.');
+			}
+		}
+		if ($this -> task -> max_length > 0) {
+			if ($this -> length > $this -> task -> max_length) {
+				$log('Текст слишком длинный.');
+			}
 		}
 		//Если текст никак не изменился с момента последней проверки на уникальность
 		/*if ($str1 == $str2) {
@@ -580,8 +598,12 @@ class Text extends Commentable {
 			return $this -> temp;
 		}
 	}
-	public function countLength($save = true){
-		$text = $this -> text;
+	public function countLength($save = true, $text = null){
+		if ($text === null) {
+			$text = $this -> text;
+		} else {
+			$this -> text = $text;
+		}
 		$length = mb_strlen(arrayString::leaveOnlyLetters($text),'utf-8');
 		if ($save) {
 			$old = $this -> getScenario();
@@ -591,5 +613,8 @@ class Text extends Commentable {
 			$this -> setScenario($old);
 		}
 		return $length;
+	}
+	public function countTextJS(){
+		echo json_encode(['length' => $this -> countLength(true,$_POST['text'])]);
 	}
 }
