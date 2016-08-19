@@ -61,9 +61,14 @@ function text(id) {
         //me.uniqueRequest();
         me.fastUnique();
     });
+    me.descriptionEl = $("#description");
+    me.descriptionEl.change(function(){
+        me.description = me.descriptionEl.val();
+        me.recountLength();
+    });
     me.contentChanged = function () {
         me.falseChecks();
-        me.recountLength()
+        me.recountLength();
         me.text = tinyMCE.activeEditor.getContent();
     };
     me.lengthInterval = false;
@@ -72,12 +77,14 @@ function text(id) {
     };
     me.recountLength = function(){
         me.text = tinyMCE.activeEditor.getContent();
+        me.description = me.descriptionEl.val();
         if (me.lengthInterval) {
             clearTimeout(me.lengthInterval);
             me.lengthInterval = false;
         }
         $.post(baseUrl + '/text/length/' + me.id,{
-            text:me.text
+            text:me.text,
+            description:me.description
         },null,"JSON").done(function(data){
             me.setLength(data.length);
             me.lengthInterval = setTimeout(me.recountLength, 60*1000);

@@ -13,6 +13,7 @@
  * @property bool $accepted
  * @property string $uid
  * @property string $updated
+ * @property string $description
  * @property float $uniquePercent
  * @property string $shingles
  *
@@ -43,7 +44,7 @@ class Text extends Commentable {
 		return array(
 				array('id_task', 'required'),
 				array('id, id_task, length', 'numerical', 'integerOnly'=>true),
-				array('text', 'safe'),
+				array('text, description', 'safe'),
 				// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, id_task, length, text', 'safe', 'on'=>'search'),
@@ -604,7 +605,7 @@ class Text extends Commentable {
 		} else {
 			$this -> text = $text;
 		}
-		$length = mb_strlen(arrayString::leaveOnlyLetters($text),'utf-8');
+		$length = mb_strlen(arrayString::leaveOnlyLetters($text),'utf-8') + mb_strlen(arrayString::leaveOnlyLetters($this -> description),'utf-8');
 		if ($save) {
 			$old = $this -> getScenario();
 			$this -> length = $length;
@@ -614,7 +615,9 @@ class Text extends Commentable {
 		}
 		return $length;
 	}
-	public function countTextJS(){
-		echo json_encode(['length' => $this -> countLength(true,$_POST['text'])]);
+	public function countTextJS($post){
+		$this -> text = $post['text'];
+		$this -> description = $post['description'];
+		echo json_encode(['length' => $this -> countLength(true)]);
 	}
 }

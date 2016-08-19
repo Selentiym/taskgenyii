@@ -61,6 +61,7 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
                     }'
                 )
             ));
+        echo UHtml::activeTextArea($model,'description',['class' => 'description','placeholder' => 'Описание текста, показываемое при поиске.','id' => 'description']);
         ?>
         </div>
         </form>
