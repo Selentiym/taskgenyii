@@ -817,13 +817,9 @@ function TreeStructure(url, param){
     me.toHref = param.toHref;
     me.generateButtons = param.generateButtons;
     me.tree = me;
-    me.firstEl = me.childFunc(me, param);
-    me.firstEl.toggle(true);
-    if (!param.container) {
-        param.container = $("body");
-    }
     me.element = $("#TreeContainer");
     me.element.html(me.childrenContainer);
+
     //Задаем имя, в котором хранить информацию
     me.cookieName = 'TreeExpandedIds'+me.element.attr('id');
     //Получаем айдишники развернутых пунктов
@@ -848,6 +844,15 @@ function TreeStructure(url, param){
         //Сохраняем результат
         $.cookie(me.cookieName, JSON.stringify(me.expandedIds));
     };
+
+    //Важно, чтобы первый элемент создавался именно здесь, иначе в его параметры
+    // попадут лишние функции - будет illigal invokation
+    me.firstEl = me.childFunc(me, param);
+    me.firstEl.toggle();
+    if (!param.container) {
+        param.container = $("body");
+    }
+
 
     me.addButton = function () {
         alert('implement addButton!');
