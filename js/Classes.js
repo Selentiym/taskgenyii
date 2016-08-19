@@ -686,7 +686,7 @@ function TreeBranch(parent, param){
                 var child = me.childFunc(me, el);
                 me.children.push(child);
                 if (me.tree.expandedIdsInitial.indexOf(child.id) != -1) {
-                    child.getChildren();
+                    child.toggle();
                 }
             });
             /*if (data.length == 0) {
@@ -705,10 +705,11 @@ function TreeBranch(parent, param){
         } else {
             me.getChildren();
         }
-        if (!noExpandedChange) {
+        /*if (!noExpandedChange) {
             me.tree.toggleExpanded(me.id);
-        }
+        }*/
         me.expandEl.toggleClass('opened');
+        me.tree.setExpanded(me.id,me.expandEl.hasClass('opened'));
     };
     me.setSelected = function(val){
         if (val) {
@@ -843,6 +844,14 @@ function TreeStructure(url, param){
         }
         //Сохраняем результат
         $.cookie(me.cookieName, JSON.stringify(me.expandedIds));
+        console.log(me.expandedIds);
+    };
+    me.setExpanded = function(id, val){
+        var state = me.expandedIds.indexOf(id) != -1;
+
+        if (state != val) {
+            me.toggleExpanded(id);
+        }
     };
 
     //Важно, чтобы первый элемент создавался именно здесь, иначе в его параметры
