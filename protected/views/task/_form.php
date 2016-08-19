@@ -88,7 +88,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     }
     });
 ',CClientScript::POS_END);
-$this -> renderPartial('//_navBar');
+//$this -> renderPartial('//_navBar');
 //Если нет уже созданных фраз, генерируем автонабор
 /*if (!$model -> keyphrases) {
     $model->generateKeyPhrases();

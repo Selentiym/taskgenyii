@@ -1,5 +1,27 @@
 #dialogContainer{
-    overflow: auto;
+
+}
+body {margin: 0}
+.anchor {
+    height:50px;
+}
+#topPanel {
+    position:fixed;
+    z-index:1;
+    background: #00daff;
+    width:100%;
+    display: block;
+}
+#topPanelInner {
+    padding: 8px;
+    height:30px;
+}
+#topPanelInner > div {
+    display: inline-block;
+    vertical-align: middle;
+}
+#topPanel #nav{
+    float:right;
 }
 .inlineBlock {
     display: inline-block;

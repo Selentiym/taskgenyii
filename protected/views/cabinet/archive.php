@@ -9,7 +9,7 @@
  * @type Author $model
  * @type CabinetController $this
  */
-$this -> renderPartial('//_navBar');
+//$this -> renderPartial('//_navBar');
 foreach ($model -> completedTasks as  $task) {
     $this -> renderPartial('//task/shortcut',['model' => $task]);
 }

@@ -8,7 +8,7 @@
 /**
  * @type Author $model
  */
-$this -> renderPartial('//_navBar');
+//$this -> renderPartial('//_navBar');
 /**$rez = array_reduce($model -> completedTasks, function($prev, $task){
     return $prev + $task -> rezult -> length;
 }, 0);*/

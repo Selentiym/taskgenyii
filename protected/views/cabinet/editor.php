@@ -5,7 +5,7 @@
  * Date: 05.07.2016
  * Time: 10:50
  */
-$this -> renderPartial('//_navBar');
+//$this -> renderPartial('//_navBar');
 Yii::app() -> getClientScript() -> registerCss('asd','.square {display:block; width:20px; height:20px; background:#123; margin:10px;}');
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/tree.css');
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js',CClientScript::POS_END);

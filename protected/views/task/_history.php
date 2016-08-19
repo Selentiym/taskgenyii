@@ -9,7 +9,7 @@
  * @type Task $model
  */
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/history.css');
-$this -> renderPartial('//_navBar');
+//$this -> renderPartial('//_navBar');
 $texts = $model -> texts;
 if (empty($texts)) {
 	$texts = [];

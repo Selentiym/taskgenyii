@@ -901,52 +901,8 @@ function TreeStructure(url, param){
 function addButtons(branch){
     if (!branch) {return;}
     if (!branch.parent.parent) {return;}
-    branch.tick = $('<input>',{
-        type: 'checkbox',
-        "class":"branchTick"
-    });
-    /*branch.editButton = $("<a>",{
-        target:'_blank',
-        "class":"editButton button",
-        href: baseUrl + "/task/edit/" + branch.id
-    });
-    branch.buttonContainer.append(branch.editButton);
-    branch.addWordsButton = $("<a>",{
-        target:'_blank',
-        "class":"addWordsButton button",
-        href: baseUrl + "/loadKeywords/" + branch.id
-    });
-    branch.buttonContainer.append(branch.addWordsButton);
-    branch.viewButton = $("<a>",{
-        target:'_blank',
-        "class":"viewButton button",
-        href: baseUrl + "/task/" + branch.id
-    });
-    branch.buttonContainer.append(branch.viewButton);
-    branch.addDescendantButton = $("<a>",{
-        target:'_blank',
-        "class":"addDescendantButton button",
-        href: baseUrl + "/TaskCreate/parent/" + branch.id
-    });
-    branch.buttonContainer.append(branch.addDescendantButton);
 
-    branch.changeDescendantStatusButton = $('<span>',{
-        "class":"changeDescendantsStatusbutton button"
-    });
-    branch.changeDescendantStatusButton.click(function(event){
-        if (event.shiftKey) {
-            branch.iterateOverSelfAndDescendants(function(element){
-                element.tick.prop('checked', true);
-            });
-        }
-        if (event.ctrlKey) {
-            branch.iterateOverSelfAndDescendants(function(element){
-                element.tick.prop('checked', false);
-            });
-        }
-    });
-    branch.buttonContainer.append(branch.changeDescendantStatusButton);
-*/
+
     branch.dragButton = $("<span>",{
         "class":"dragButton button"
     });
@@ -1000,10 +956,4 @@ function addButtons(branch){
         }));
         branch.element.addClass('noAuthor');
     }
-
-    branch.buttonContainer.append(branch.tick);
-    branch.ticked = false;
-    branch.toggleTick = function(){
-        branch.tick.prop("checked", !branch.tick.prop("checked"));
-    };
 }

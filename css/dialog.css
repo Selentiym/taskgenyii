@@ -3,10 +3,12 @@
     margin-left:5px;
     padding:5px;
     display: inline-block;
+    border-radius: 5px;
+    background: rgb(203, 208, 113);
 }
 .dialog_container {
     width:500px;
-    max-height:450px;
+    max-height:500px;
     border:1px solid black;
     padding:20px;
     background: white;
