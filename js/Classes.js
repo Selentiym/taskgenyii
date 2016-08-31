@@ -618,6 +618,24 @@ function TreeBranch(parent, param){
     me.link = $('<span>',{href: me.toHref()});
     me.textEl.html(me.link.append(param.name));
     me.textEl.click(function(e){
+        //Если нажат shift
+        if ((e.shiftKey)&&(TreeBranch.prototype.lastSelected)) {
+            var indLast = me.parent.children.indexOf(TreeBranch.prototype.lastSelected);
+            if (indLast == -1) {
+                return;
+            }
+            var indCur = me.parent.children.indexOf(me);
+            if (indCur > indLast) {
+                var sv = indLast;
+                indLast = indCur;
+                indCur = sv;
+            }
+            for (var i = indCur; i <= indLast; i++) {
+                me.parent.children[i].setSelected(true);
+            }
+            e.preventDefault();
+            return;
+        }
         if (!e.ctrlKey) {
             me.tree.unselectAll();
         }
@@ -714,9 +732,11 @@ function TreeBranch(parent, param){
     me.setSelected = function(val){
         if (val) {
             me.selected = true;
+            TreeBranch.prototype.lastSelected = me;
             me.element.addClass('selected');
         } else {
             me.selected = false;
+            TreeBranch.prototype.lastSelected = null;
             me.element.removeClass('selected');
         }
     };
@@ -724,6 +744,11 @@ function TreeBranch(parent, param){
     me.toggleSelected = function(){
         me.selected = !me.selected;
         me.element.toggleClass('selected');
+        if (me.selected) {
+            TreeBranch.prototype.lastSelected = me;
+        } else {
+            TreeBranch.prototype.lastSelected = null;
+        }
     };
     return me;
 }
