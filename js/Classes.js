@@ -572,7 +572,7 @@ function TreeBranch(parent, param){
     //console.log(me);
     if (!me.extra) {
         me.extra = {};
-        alert('no extra');
+        //alert('no extra');
     }
     //Сохраняем родителя, иначе не будет отображения на странице
     //Родителя полностью рекурсивно копируем, потом понадобится
@@ -663,20 +663,37 @@ function TreeBranch(parent, param){
 
     //Присваиваем элемент контейнеру
     me.parent.childrenContainer.append(me.element);
-    me.iterateOverChildren = function(callback){
-        if ((typeof callback == 'function')&&(me.children)) {
-            _.each(me.children, callback);
+    me.iterateOverChildren = function(callback, obtainChildren){
+        if (typeof callback == 'function') {
+            if (me.children.length) {
+                _.each(me.children, callback);
+            } else {
+                if ((obtainChildren)&&(!me.searched)&&(me.extra.hasChildren)) {
+                    me.getChildren(null, callback);
+                }
+            }
         }
     };
-    me.iterateOverDescendants = function(callback){
+    me.iterateOverDescendants = function (callback, obtainChildren) {
+        if (typeof callback == 'function') {
+            me.iterateOverChildren(function (a) {
+                callback(a);
+                console.log(a);
+                console.log(obtainChildren);
+                a.iterateOverDescendants(callback, obtainChildren);
+            }, obtainChildren);
+        }
+    };
+    /*
+    me.iterateOverDescendants = function(callback, obtainChildren){
         if ((typeof callback == 'function')&&(me.children)) {
             _.each(me.children, function(a, b, c){
                 callback(a, b, c);
                 a.iterateOverDescendants(callback);
             });
         }
-    };
-    me.iterateOverSelfAndDescendants = function(callback){
+    };*/
+    me.iterateOverSelfAndDescendants = function(callback, obtainChildren){
         if (typeof callback == 'function') {
             callback(me);
             me.iterateOverDescendants(callback);
@@ -686,7 +703,7 @@ function TreeBranch(parent, param){
      * Отвечает за создание детей. Обращается на сервер и получает своих потомков,
      * затем инициализирует их
      */
-    me.getChildren = function(noExpandedChange){
+    me.getChildren = function(noExpandedChange, callback){
         me.childrenContainer.toggle(noExpandedChange);
         me.childrenContainer.html(loadingImage.clone());
         $.ajax({
@@ -705,6 +722,9 @@ function TreeBranch(parent, param){
                 me.children.push(child);
                 if (me.tree.expandedIdsInitial.indexOf(child.id) != -1) {
                     child.toggle();
+                }
+                if (typeof callback == 'function') {
+                    callback(child);
                 }
             });
             /*if (data.length == 0) {
@@ -732,6 +752,7 @@ function TreeBranch(parent, param){
     me.setSelected = function(val){
         if (val) {
             me.selected = true;
+            me.tree.setExpanded(me.parent.id, true);
             TreeBranch.prototype.lastSelected = me;
             me.element.addClass('selected');
         } else {
