@@ -55,13 +55,14 @@ class TaskController extends Controller {
                 'scenario' => 'generate',
                 'view' => '//task/_form',
                 'redirectUrl' => function($model){
-                    /*if ($_POST['editTask']) {
-                        return Yii::app() -> createUrl('task/edit',['arg' => $model -> id]);
-                    } else {
-                        return Yii::app() -> createUrl('cabinet/index');
-                    }*/
                     if ($_REQUEST['redirectToKeywords']) {
                         return Yii::app() -> createUrl('cabinet/loadKeywords',['arg' => $model -> id]);
+                    }
+                    if ($_REQUEST['redirectToShowTask']) {
+                        return Yii::app() -> createUrl('task/view',['arg' => $model -> id]);
+                    }
+                    if ($_REQUEST['redirectToEditTask']) {
+                        return Yii::app() -> createUrl('task/edit',['arg' => $model -> id]);
                     }
                     return Yii::app() -> createUrl('cabinet/index');
                 },

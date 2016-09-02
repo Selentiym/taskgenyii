@@ -737,7 +737,9 @@ function TreeBranch(parent, param){
     /**
      * Функция, отвечающая за раскрывание списка дочерних элементов
      */
+    me.opened = false;
     me.toggle = function(noExpandedChange){
+        me.opened = !me.opened;
         if (me.searched) {
             me.childrenContainer.toggle(500);
         } else {
@@ -748,6 +750,20 @@ function TreeBranch(parent, param){
         }*/
         me.expandEl.toggleClass('opened');
         me.tree.setExpanded(me.id,me.expandEl.hasClass('opened'));
+    };
+    me.setOpened = function(val){
+        me.opened = val;
+        if (me.opened) {
+            if (me.searched) {
+                me.childrenContainer.show(500);
+            } else {
+                me.getChildren();
+            }
+            me.expandEl.addClass('opened');
+            me.tree.setExpanded(me.id,true);
+        } else {
+            me.childrenContainer.hide(500);
+        }
     };
     me.setSelected = function(val){
         if (val) {

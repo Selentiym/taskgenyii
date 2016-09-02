@@ -45,6 +45,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     new ControlButton("","look",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree,{}, ControlButton.prototype.actionForOneCountChecks);
     new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
     new ControlButton("&#9745;","font20",function(el){el.iterateOverDescendants(function(child){child.setSelected(true);
+    child.parent.childrenContainer.show(500);
 
     },true);},tree,{title:"Выделить потомков"}, true);
     new ControlButton("&#9746;","font20",function(el){el.iterateOverSelfAndDescendants(function(child){child.setSelected(false);});},tree,{title:"Снять выделение с потомков"}, true);

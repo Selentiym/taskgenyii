@@ -172,7 +172,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
         <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
-        <input type="submit" name="redirectToKeywords" value="Загрузить данные из KeyCollector" />
+        <?php $this -> renderPartial('//task/_buttons',['task' => $model]); ?>
         <div>Всего фраз: <span id="phraseCount"></span></div>
     </form>
     <div id="TreeContainer">
