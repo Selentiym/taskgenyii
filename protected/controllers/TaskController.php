@@ -111,7 +111,8 @@ class TaskController extends Controller {
                 'QHandedIn' => $text -> QHandedIn,
                 'accepted' => $text -> accepted,
                 'noAuthor' => (!$el -> author),
-                'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $el -> id]) > 0)
+                'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $el -> id]) > 0),
+                'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10)
             ]);
         }), JSON_PRETTY_PRINT);
     }

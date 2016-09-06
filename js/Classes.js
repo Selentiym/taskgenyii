@@ -986,18 +986,22 @@ function addButtons(branch){
     var status = branch.extra;
     var imageName = '';
     var imageAlt = '';
-    if (status.accepted) {
+    console.log(branch.extra);
+    if (status.accepted == 1) {
         imageName = 'tick_small.png';
         imageAlt = 'Принято';
-    } else if (status.handedIn) {
+    } else if (status.handedIn == 1) {
         imageName = 'handedIn.png';
         imageAlt = 'Задание сдано';
-    } else if (status.QHandedIn) {
+    } else if (status.QHandedIn == 1) {
         imageName = 'QHandedIn.png';
         imageAlt = 'Просьба рассмотреть';
+    } else if (status.notEmpty == 1){
+        imageName = 'writing.png';
+        imageAlt = 'Текст в разработке';
     } else {
         imageName = 'empty.png';
-        imageAlt = 'Автор назначен, но текст пока не сдан';
+        imageAlt = 'Пока что ничего нет';
     }
     branch.buttonContainer.append($('<img>',{
         src:baseUrl+'/images/'+imageName,
@@ -1007,7 +1011,7 @@ function addButtons(branch){
             height:'20px'
         }
     }));
-    if (status.noAuthor) {
+    if (status.noAuthor == 1) {
         branch.buttonContainer.append($('<img>',{
             src:baseUrl + '/images/missing.png',
             alt: 'Нет автора',
