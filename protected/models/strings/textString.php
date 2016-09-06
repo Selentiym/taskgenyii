@@ -27,6 +27,7 @@ class textString {
     }
     public function prepare(){
         if (!$this -> prepared) {
+            $this -> text = str_replace(["!","?"],".",$this -> text);
             //Чтобы санкт-петербург не сливался в одно слово
             $this -> text = str_replace('-',' ',$this -> text);
             //Оставляем только буквы, пробелы и точки
@@ -38,7 +39,7 @@ class textString {
                 if ($t) {
                     $this -> sentences [] = new wordSet($t);
                 }
-            },explode('.', $this -> text));
+            },explode(". " , $this -> text));
             $this -> prepared = true;
         }
     }
