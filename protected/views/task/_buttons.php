@@ -12,13 +12,13 @@
 if ($buttons) {
     Yii::app()->getClientScript()->registerScript('redirectScript', "
         $('#redirectToKeywords').click(function(){
-            location.href=".Yii::app() -> createUrl('cabinet/loadKeywords',['arg' => $task -> id]).";
+            location.href='".Yii::app() -> createUrl('cabinet/loadKeywords',['arg' => $task -> id])."';
         });
         $('#redirectToEditTask').click(function(){
-            location.href=".Yii::app() -> createUrl('task/edit',['arg' => $task -> id]).";
+            location.href='".Yii::app() -> createUrl('task/edit',['arg' => $task -> id])."';
         });
         $('#redirectToShowTask').click(function(){
-            location.href=".Yii::app() -> createUrl('task/view',['arg' => $task -> id]).";
+            location.href='".Yii::app() -> createUrl('task/view',['arg' => $task -> id])."';
         });
     ", CClientScript::POS_END);
 }

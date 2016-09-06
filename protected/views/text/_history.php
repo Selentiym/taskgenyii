@@ -15,6 +15,10 @@
         <span class="<? echo $model -> QHandedIn ? 'tick' : 'cross' ?>">Просьба проверить</span>,
         <span class="<? echo $model -> accepted ? 'tick' : 'cross' ?>">Принят</span>
     </div>
+
+    <?php if (Yii::app()-> user -> checkAccess('editor')) :
+        $this -> renderPartial ('//task/_buttons', ['task' => $model -> task, 'buttons' => true]);
+    endif; ?>
     <div class="body">
         <?php echo $model -> text; ?>
     </div>

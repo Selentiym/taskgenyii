@@ -44,6 +44,10 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
         <span class="<?php echo $model -> QHandedIn ? 'tick' : 'cross' ?>">Просьба проверить</span>,
         <span class="<?php if ($model -> accepted === null) echo 'time'; else echo $model -> accepted ? 'tick' : 'cross' ?>">Принят</span>
         </span>
+
+        <?php if (Yii::app()-> user -> checkAccess('editor')) :
+            $this -> renderPartial ('//task/_buttons', ['task' => $model -> task, 'buttons' => true]);
+        endif; ?>
         <div id="editorBlock">
         <?php
         $this->widget('application.extensions.tinymce.TinyMce',

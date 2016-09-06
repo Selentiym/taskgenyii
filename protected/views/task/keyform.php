@@ -22,7 +22,10 @@ $data = $_POST;
 <form method="post">
     <textarea name="Task[input_search]"><?php echo $data['Task[input_search]']; ?></textarea>
     <textarea name="Task[keystring]"><?php echo $data['Task[keystring]']; ?></textarea>
-    <input type="submit" value="Сохранить и перейти в кабинет" name="toCabinet"/>
-    <input type="submit" value="Сохранить и составить ТЗ" name="editTask"/>
+    <div>
+        <?php $this -> renderPartial("//task/_buttons",['task' => $model]); ?>
+    </div>
+    <!--<input type="submit" value="Сохранить и перейти в кабинет" name="toCabinet"/>
+    <input type="submit" value="Сохранить и составить ТЗ" name="editTask"/>-->
 </form>
 
