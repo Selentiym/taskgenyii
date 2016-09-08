@@ -37,6 +37,14 @@ class TaskController extends Controller {
                     return ($task -> author == User::logged());
                 }
             ),
+            'createFast' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'createDescendantFast',
+                'ignore' => true,
+                'modelClass' => 'Task',
+                'scenario' => 'createDescendant',
+                'access' => true
+            ),
             'deleteGroup' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'modelClass' => 'Task',

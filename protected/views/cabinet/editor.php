@@ -43,7 +43,11 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     new ControlButton("","edit",function(el){location.href = baseUrl + "/task/edit/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
     new ControlButton("","keys",function(el){location.href = baseUrl + "/cabinet/loadKeywords/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
     new ControlButton("","look",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree,{}, ControlButton.prototype.actionForOneCountChecks);
-    new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
+    //new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
+    new ControlButton("","plus",function(el){$.post(
+        baseUrl + "/Task/createFast/" + el.id,
+        {name:prompt("Введите имя объекта","Новая статья")}, null,"json"
+    ); return true;},tree);
     new ControlButton("&#9745;","font20",function(el){el.iterateOverDescendants(function(child){child.setSelected(true);
     child.parent.childrenContainer.show(500);
 

@@ -469,4 +469,19 @@ class Task extends Commentable {
 		}
 		return parent::beforeDelete();
 	}
+	public function createDescendantFast(){
+		$task = new Task();
+		$task -> attributes = $this -> attributes;
+		$task -> created = null;
+		$task -> name = $_POST["name"];
+		$task -> id_parent = $this -> id;
+		$task -> id = null;
+		if (!$task -> save()) {
+			$rez['success'] = false;
+		} else {
+			$rez['success'] = true;
+			$rez['id'] = $task -> id;
+		}
+		echo json_encode($rez);
+	}
 }

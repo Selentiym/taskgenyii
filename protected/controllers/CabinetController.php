@@ -151,4 +151,7 @@ class CabinetController extends Controller {
             echo "No log for today yet.";
         }
     }
+    public function actionTaskCreateFast($arg){
+
+    }
 }
