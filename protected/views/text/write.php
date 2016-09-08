@@ -28,9 +28,9 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
 
         <?php if (!Yii::app()-> user -> checkAccess('editor')) :?>
         <input type="button" value="Сдать" id="send"/>
-        <?php if ($handInErr) : ?>
+
         <input type="button" value="Попросить принять" id="sendWithMistakes"/>
-        <?php endif; ?>
+
         <?php endif; ?>
 
         <?php if (Yii::app()-> user -> checkAccess('editor')) : ?>
