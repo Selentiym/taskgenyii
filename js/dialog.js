@@ -158,6 +158,16 @@ function Dialog(container, idSender, idReceiver, date) {
     me.loadNewLetters();
     me.newInterval = 10000;
     me.newIntervalID = false;
+    me.destroy = function(){
+        //Перестаем посылать запросы.
+        clearTimeout(me.newIntervalID);
+        delete Dialog.prototype.opened[me.container.attr('id')];
+        me.container.remove();
+        if (me.shortcut) {
+            me.shortcut.remove();
+        }
+    };
+    me.closeButton.click(me.destroy);
     //Сохранили диалог в массив.
     if (!Dialog.prototype.opened) {
         Dialog.prototype.opened = {};
