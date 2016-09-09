@@ -432,15 +432,31 @@ class Task extends Commentable {
 	 *
 	 */
 	public function deleteGroup($post){
+		$arr = [];
 		if (count($post['ids']) > 0) {
 			$models = $this->findAllByPk($post['ids']);;
 			$rez = '';
+			$reload = false;
 			foreach ($models as $model) {
+				if ($post["forced"] == 1) {
+					$model -> setScenario("ignoreTexts");
+				}
 				if (!$model -> delete()) {
 					$rez .= 'При удалении задания '.$model -> name.' возникла ошибка.';
-					$rez .= $model -> getError('id');
-					$rez .= $model -> getError('id_parent');
+					$hasTexts = $model -> getError('id');
+					$rez .= $hasTexts;
+					$hasChildren = $model -> getError('id_parent');
+					$rez .= $hasChildren;
 					$rez .= PHP_EOL;
+					if (($hasTexts)&&(!$hasChildren)) {
+						$temp = [
+							'id' => $model -> id,
+							'mes' => 'Задание '.$model -> name.' имеет текст(ы). Точно удалить?'
+						];
+						$forcedDel[] = $temp;
+					}
+				} else {
+					$reload = true;
 				}
 			}
 			if (!$rez) {
@@ -449,20 +465,26 @@ class Task extends Commentable {
 		} else {
 			$rez = false;
 		}
-		echo json_encode($rez);
+		$arr['commonMess'] = $rez;
+		$arr['forcedDel'] = $forcedDel;
+		$arr['reload'] = $reload;
+		echo json_encode($arr);
 	}
 	public function beforeDelete() {
+
 		if (count($this -> children) > 0) {
 			$this -> addError('id_parent','У задания есть потомки.');
 			return false;
 		}
-		if (count($this -> texts)>1) {
-			$this -> addError('id','К заданию написаны несколько текстов.');
-			return false;
-		}
-		if ($this -> currentText -> length > 1000) {
-			$this -> addError('id','Текущий текст длинее 1000 символов.');
-			return false;
+		if ($this -> getScenario() != "ignoreTexts") {
+			if (count($this->texts) > 1) {
+				$this->addError('id', 'К заданию написаны несколько текстов.');
+				return false;
+			}
+			if ($this->currentText->length > 1000) {
+				$this->addError('id', 'Текущий текст длинее 1000 символов.');
+				return false;
+			}
 		}
 		foreach ($this -> texts as $text) {
 			$text -> delete();

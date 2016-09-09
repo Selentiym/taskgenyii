@@ -422,7 +422,9 @@ class Text extends Commentable {
 				if ($report === true) {
 					$this -> handedIn = true;
 					$task = $this -> task;
-					$this -> task -> editor -> notify('Текст по заданию '.$task -> show().' сдан.');
+					if ($this -> task -> editor) {
+						$this->task->editor->notify('Текст по заданию ' . $task->show() . ' сдан.');
+					}
 					Yii::app() -> user -> setFlash('textHandIn',$report);
 				} else {
 					Yii::app() -> user -> setFlash('textHandIn',$report);
@@ -458,7 +460,9 @@ class Text extends Commentable {
 				}*/
 				$this -> QHandedIn = 1;
 				$task = $this -> task;
-				$this -> task -> editor -> notify('Поступила просьба рассмотреть текст по заданию '.$task -> show().'.');
+				if ($this->task->editor) {
+					$this->task->editor->notify('Поступила просьба рассмотреть текст по заданию ' . $task->show() . '.');
+				}
 				break;
 			case 'accept':
 				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
@@ -467,7 +471,9 @@ class Text extends Commentable {
 					$task = $this -> task;
 					$task -> id_text = $this -> id;
 					$task -> save();
-					$task -> author -> notify('Текст по заданию '.$task -> show().' принят!');
+					if ($this -> author) {
+						$task->author->notify('Текст по заданию ' . $task->show() . ' принят!');
+					}
 				} else {
 					return false;
 				}
@@ -479,7 +485,9 @@ class Text extends Commentable {
 					if (!$text -> save()) {
 						$ar = $text -> getErrors();
 					}
-					$this -> task -> author -> notify('Текст по заданию '.$this -> task -> show().' отклонен. Более подробную информацию ищите в комментариях.');
+					if ($this -> task -> author) {
+						$this->task->author->notify('Текст по заданию ' . $this->task->show() . ' отклонен. Более подробную информацию ищите в комментариях.');
+					}
 				} else {
 					return false;
 				}

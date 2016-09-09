@@ -915,7 +915,7 @@ function TreeStructure(url, param){
         }
         //Сохраняем результат
         $.cookie(me.cookieName, JSON.stringify(me.expandedIds));
-        console.log(me.expandedIds);
+        //console.log(me.expandedIds);
     };
     me.setExpanded = function(id, val){
         var state = me.expandedIds.indexOf(id) != -1;
@@ -995,7 +995,7 @@ function addButtons(branch){
     var status = branch.extra;
     var imageName = '';
     var imageAlt = '';
-    console.log(branch.extra);
+    //console.log(branch.extra);
     if (status.accepted == 1) {
         imageName = 'tick_small.png';
         imageAlt = 'Принято';

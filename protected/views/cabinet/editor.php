@@ -78,11 +78,32 @@ Yii::app() -> getClientScript() -> registerScript('structure','
                 toDel = [el.id];
             }
         }
-        console.log(toDel);
-        $.post(baseUrl+"/task/deleteGroup",{ids:toDel},function(){},"JSON").done(function(data){
-            alert(data);
-            location.reload();
-        });
+        function sendDeleteRequest(toDel, forced){
+            if (forced) {
+                forced = 1;
+            } else {
+                forced = 0;
+            }
+            $.post(baseUrl+"/task/deleteGroup",{ids:toDel, forced: forced},function(){},"JSON").done(function(data){
+                alert(data.commonMess);
+                console.log(data);
+                var toDelSecond = [];
+                if (data.forcedDel) {
+                    _.each(data.forcedDel, function(elem){
+                        if (confirm(elem.mes)) {
+                            toDelSecond.push(elem.id);
+                        }
+                    });
+                }
+                if (toDelSecond.length) {
+                    sendDeleteRequest(toDelSecond, true);
+                }
+                if (data.reload) {
+                    location.reload();
+                }
+            });
+        }
+        sendDeleteRequest(toDel);
         //Не продолжаем потом прбегать по элементам
         return true;
     },tree,{title:"Снять выделение с потомков"}, true);
