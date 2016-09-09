@@ -37,9 +37,21 @@ class TaskController extends Controller {
                     return ($task -> author == User::logged());
                 }
             ),
+            'rename' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'renameJS',
+                'ignore' => true,
+                'modelClass' => 'Task',
+                'scenario' => 'renameJS',
+                'ajax' => true,
+                'access' => function($task){
+                    return Yii::app() -> user -> checkAccess('editor');
+                }
+            ),
             'createFast' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'method' => 'createDescendantFast',
+                'ajax' => true,
                 'ignore' => true,
                 'modelClass' => 'Task',
                 'scenario' => 'createDescendant',
@@ -110,18 +122,10 @@ class TaskController extends Controller {
             $models = array_merge(Task::model() -> root() -> findAll(), Task::model() -> uncategorized() -> findAll());
         }
         echo json_encode(UHtml::giveArrayFromModels($models,function($el){
-            $text = $el -> currentText;
             /**
-             * @type Text $text
+             * @type Task $el
              */
-            return array('id' => $el -> id, 'name' => $el -> name, 'extra' => [
-                'handedIn' => $text -> handedIn,
-                'QHandedIn' => $text -> QHandedIn,
-                'accepted' => $text -> accepted,
-                'noAuthor' => (!$el -> author),
-                'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $el -> id]) > 0),
-                'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10)
-            ]);
+            return $el -> dumpForProject();
         }), JSON_PRETTY_PRINT);
     }
 }

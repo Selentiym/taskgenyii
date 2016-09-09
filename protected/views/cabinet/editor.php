@@ -46,8 +46,14 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     //new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
     new ControlButton("","plus",function(el){$.post(
         baseUrl + "/Task/createFast/" + el.id,
-        {name:prompt("Введите имя объекта","Новая статья")}, null,"json"
-    ); return true;},tree);
+        {name:"Новая статья"}, null,"json"
+    ).done(function(data){
+        if (data.success) {
+            el.createChild(data.dump);
+        } else {
+            alert("Ошибка при создании!");
+        }
+    }); return true;},tree);
     new ControlButton("&#9745;","font20",function(el){el.iterateOverDescendants(function(child){child.setSelected(true);
     child.parent.childrenContainer.show(500);
 

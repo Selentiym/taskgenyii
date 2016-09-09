@@ -482,6 +482,27 @@ class Task extends Commentable {
 			$rez['success'] = true;
 			$rez['id'] = $task -> id;
 		}
+		$rez["dump"] = $task -> dumpForProject();
 		echo json_encode($rez);
+	}
+	public function renameJS(){
+		$this -> name = $_POST["entered"];
+		$this -> save();
+		$rez["toShow"] = $this -> findByPk($this -> id) -> name;
+		echo json_encode($rez);
+	}
+	public function dumpForProject(){
+		$text = $this -> currentText;
+		/**
+		 * @type Text $text
+		 */
+		return array('id' => $this -> id, 'name' => $this -> name, 'extra' => [
+				'handedIn' => $text -> handedIn,
+				'QHandedIn' => $text -> QHandedIn,
+				'accepted' => $text -> accepted,
+				'noAuthor' => (!$this -> author),
+				'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $this -> id]) > 0),
+				'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10)
+		]);
 	}
 }

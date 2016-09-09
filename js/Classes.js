@@ -5,6 +5,7 @@
  * @require jQuery-ui.js
  * @require jquery.cookie.js
  */
+var body = $("body");
 var phrasesCount = {};
 Lexical.prototype.wordsPool = [];
 Lexical.prototype.phrasesPool = [];
@@ -616,6 +617,7 @@ function TreeBranch(parent, param){
         "class":"branchName"
     });
     me.link = $('<span>',{href: me.toHref()});
+    toEdit(me.link,baseUrl + '/task/rename/'+me.id);
     me.textEl.html(me.link.append(param.name));
     me.textEl.click(function(e){
         //Если нажат shift
@@ -678,8 +680,8 @@ function TreeBranch(parent, param){
         if (typeof callback == 'function') {
             me.iterateOverChildren(function (a) {
                 callback(a);
-                console.log(a);
-                console.log(obtainChildren);
+                //console.log(a);
+                //console.log(obtainChildren);
                 a.iterateOverDescendants(callback, obtainChildren);
             }, obtainChildren);
         }
@@ -703,6 +705,19 @@ function TreeBranch(parent, param){
      * Отвечает за создание детей. Обращается на сервер и получает своих потомков,
      * затем инициализирует их
      */
+    //Вынесено для использования в дальнейшем
+    //вне рамок массового обращения на сервер.
+    me.createChild = function(el){
+        var child = me.childFunc(me, el);
+        me.children.push(child);
+        if (me.tree.expandedIdsInitial.indexOf(child.id) != -1) {
+            child.toggle();
+        }
+        if (typeof callback == 'function') {
+            callback(child);
+        }
+        return child;
+    };
     me.getChildren = function(noExpandedChange, callback){
         me.childrenContainer.toggle(noExpandedChange);
         me.childrenContainer.html(loadingImage.clone());
@@ -718,14 +733,8 @@ function TreeBranch(parent, param){
         }).done(function (data) {
             me.childrenContainer.html('');
             _.each(data, function(el){
-                var child = me.childFunc(me, el);
-                me.children.push(child);
-                if (me.tree.expandedIdsInitial.indexOf(child.id) != -1) {
-                    child.toggle();
-                }
-                if (typeof callback == 'function') {
-                    callback(child);
-                }
+                var child = me.createChild(el);
+                //console.log(el);
             });
             /*if (data.length == 0) {
                 me.childrenContainer.append('Низший уровень вложенности');
@@ -1021,5 +1030,67 @@ function addButtons(branch){
             }
         }));
         branch.element.addClass('noAuthor');
+    }
+}
+function toEdit($el, url, defText, callback) {
+    if ($el) {
+        $el.dblclick(function () {
+            $el.hide();
+            var val = defText;
+            var saveVal = $el.html();
+            if (!val) {
+                val = saveVal;
+            }
+
+            var form = $("<form>",{
+                css:{margin:0}
+            });
+            var inp = $("<input>", {
+                type: "text",
+                value: val
+            });
+            form.append(inp);
+            $el.after(form);
+            if (typeof url == 'function') {
+                url = url.call($el);
+            }
+            function sendRequest(){
+                var repl = $("<span>...</span>");
+                form.replaceWith(repl);
+                form = repl;
+                var toSetVal = inp.val();
+                function showName() {
+                    form.remove();
+                    $el.show();
+                }
+                if (saveVal != toSetVal) {
+                    $.post(url, {
+                        entered: toSetVal
+                    }, null, "JSON").done(function (data) {
+                        $el.html(data.toShow);
+                        if (typeof callback == 'function') {
+                            callback.call($el, data);
+                        }
+                        showName();
+                    }).fail(function () {
+                        showName();
+                        alert('Ошибка!');
+                    });
+                } else {
+                    showName();
+                }
+                return false;
+            }
+            var tempId = "handler" + Math.round(Math.random()*100000) + 1;
+            inp.attr("data-handler",tempId);
+            body.on("click."+tempId, function(event){
+                console.log(event.target);
+                if ($(event.target).attr("data-handler") != tempId) {
+                    sendRequest();
+                    body.off("click."+tempId);
+                }
+            });
+            form.submit(sendRequest);
+        });
     }
 }
