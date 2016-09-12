@@ -121,7 +121,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
                  * @type SearchPhrase $sp
                  */
                 $stems = json_encode($sp -> giveStems(),JSON_PRETTY_PRINT);
-                $freq = $sp -> directFreq;
+                $freq = $sp -> phraseFreq;
                 echo "new Phrase('$sp->phrase',{stems:$stems, initial:true, freq:'$freq',id:$sp->id})".PHP_EOL;
                 //break;
             }

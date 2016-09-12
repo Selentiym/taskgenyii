@@ -19,6 +19,7 @@
  * The followings are the available model relations:
  * @property Keyphrase[] $keyphrases
  * @property SearchPhrase[] $searchphrases
+ * @property int $searchphrasesCount
  * @property Keyword[] $keywords
  * @property Text[] $texts
  * @property Text $currentText
@@ -91,6 +92,7 @@ class Task extends Commentable {
 		return array(
 			'keyphrases' => array(self::HAS_MANY, 'Keyphrase', 'id_task'),
 			'searchphrases' => array(self::HAS_MANY, 'SearchPhrase', 'id_task'),
+			'searchphrasesCount' => array(self::STAT, 'SearchPhrase', 'id_task'),
 			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task', 'order' => 'updated DESC'),
 			//'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1', 'order' => 'updated DESC'),
@@ -518,13 +520,15 @@ class Task extends Commentable {
 		/**
 		 * @type Text $text
 		 */
-		return array('id' => $this -> id, 'name' => $this -> name, 'extra' => [
+		$arr = array('id' => $this -> id, 'name' => $this -> name, 'extra' => [
 				'handedIn' => $text -> handedIn,
 				'QHandedIn' => $text -> QHandedIn,
 				'accepted' => $text -> accepted,
 				'noAuthor' => (!$this -> author),
+				'hasKeys' => $this -> searchphrasesCount,
 				'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $this -> id]) > 0),
 				'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10)
 		]);
+		return $arr;
 	}
 }
