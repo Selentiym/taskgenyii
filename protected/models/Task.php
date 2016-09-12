@@ -480,6 +480,7 @@ class Task extends Commentable {
 	public function deleteKeys(){
 		SearchPhrase::model() -> deleteAllByAttributes(['id_task' => $this -> id]);
 		Keyword::model() -> deleteAllByAttributes(['id_task' => $this -> id]);
+		Keyphrase::model() -> deleteAllByAttributes(['id_task' => $this -> id]);
 	}
 	public function beforeDelete() {
 
