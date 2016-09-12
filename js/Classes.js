@@ -1008,12 +1008,12 @@ function addButtons(branch){
     } else if (status.notEmpty == 1){
         imageName = 'writing.png';
         imageAlt = 'Текст в разработке';
-    } else if (status.hasKeys > 0) {
-        imageName = 'keys_loaded.png';
-        imageAlt = 'Ключи загружены';
     } else if (status.keysGenerated > 0) {
         imageName = 'empty.png';
         imageAlt = 'Ожидает начала работы автора';
+    } else if (status.hasKeys > 0) {
+        imageName = 'keys_loaded.png';
+        imageAlt = 'Ключи загружены';
     } else {
         imageName = 'new.png';
         imageAlt = 'Задание пустое';
