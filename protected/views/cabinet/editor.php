@@ -43,6 +43,8 @@ Yii::app() -> getClientScript() -> registerScript('structure','
     new ControlButton("","edit",function(el){location.href = baseUrl + "/task/edit/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
     new ControlButton("","keys",function(el){location.href = baseUrl + "/cabinet/loadKeywords/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
     new ControlButton("","look",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree,{}, ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","delete_keys",function(el){$.post(baseUrl+"/Task/deleteKeys/"+el.id).done(function(){location.reload();});},tree,{},
+    function (coll) {if (coll.length) {return confirm("Вы собираетесь удалить поисковые фразы и ключевые слова у " + coll.length + " заданий. Это действие необратимо. Продолжить все равно?");} else {return false;}});
     //new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
     new ControlButton("","plus",function(el){$.post(
         baseUrl + "/Task/createFast/" + el.id,

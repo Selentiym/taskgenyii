@@ -472,6 +472,15 @@ class Task extends Commentable {
 		$arr['reload'] = $reload;
 		echo json_encode($arr);
 	}
+
+	/**
+	 * Удаляем все поисковые фразы и все клчевые слова задания.
+	 * Ключевые фразы, составленные редактором, не затрагиваются!
+	 */
+	public function deleteKeys(){
+		SearchPhrase::model() -> deleteAllByAttributes(['id_task' => $this -> id]);
+		Keyword::model() -> deleteAllByAttributes(['id_task' => $this -> id]);
+	}
 	public function beforeDelete() {
 
 		if (count($this -> children) > 0) {

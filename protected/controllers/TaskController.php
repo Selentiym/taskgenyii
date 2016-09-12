@@ -69,6 +69,17 @@ class TaskController extends Controller {
                     return Yii::app() -> user -> checkAccess('editor');
                 }
             ),
+            'deleteKeys' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'modelClass' => 'Task',
+                'method' => 'deleteKeys',
+                'ignore' => true,
+                'ajax' => true,
+                'scenario' => 'deleteKeys',
+                'access' => function(){
+                    return Yii::app() -> user -> checkAccess('editor');
+                }
+            ),
             'edit' => array(
                 'class' => 'application.controllers.actions.ModelUpdateAction',
                 'modelClass' => 'Task',
