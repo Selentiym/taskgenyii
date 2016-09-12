@@ -537,6 +537,7 @@ class Task extends Commentable {
 				'noAuthor' => (!$this -> author),
 				'hasKeys' => $this -> searchphrasesCount,
 				'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $this -> id]) > 0),
+				'keysGenerated' => (Keyphrase::model() -> countByAttributes(['id_task' => $this -> id]) > 0),
 				'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10)
 		]);
 		return $arr;
