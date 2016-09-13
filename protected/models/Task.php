@@ -555,4 +555,11 @@ class Task extends Commentable {
 		});
 		return $keyPhrasesSorted;
 	}
+	public function assignAuthor(){
+		$author = Author::model() -> findByPk($_POST["author"]);
+		if ($author) {
+			$this -> id_author = $author -> id;
+			$this -> save();
+		}
+	}
 }
