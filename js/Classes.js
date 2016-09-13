@@ -35,7 +35,7 @@ Phrase.prototype.completeSet = function(){
                     }
                 });
                 if (toUse) {
-                    new Phrase(toUse.text, {fromDb: false, stems: toUse.stems });
+                    new Phrase(toUse.text, {fromDb: false, stems: toUse.stems, freq:toUse.freq });
                 }
             }
         }
@@ -118,6 +118,16 @@ function Phrase(text, param){
     me.initial = param.initial === true;
     //Изначальные фразы не должны отобржаться на странице.
     if (!me.initial) {
+        if (!param.strict) {
+            param.strict = null;
+
+            if (!param.morph) {
+                param.morph = 1;
+            }
+        }
+        if (!param.morph) {
+            param.morph = null;
+        }
         me.element = new LinkedDom('div', {'class': 'phrase'}, me);
         me.inputEl = $('<input>', {
             type: 'text',
@@ -129,17 +139,28 @@ function Phrase(text, param){
             type: 'text',
             name: baseFormInputName + '[phrases][strict][]',
             placeholder: 'Прямое',
-            value: '',
+            value: param.strict,
             "class": "strict"
         }));
         me.element.append($('<input>', {
             type: 'text',
             name: baseFormInputName + '[phrases][morph][]',
             placeholder: 'Морфология',
-            value: 1,
+            value: param.morph,
             "class": "morph"
         }));
         me.element.append(me.inputEl);
+        me.freqEl = $("<input>",{
+            "class":"freq",
+            name: baseFormInputName + '[phrases][freq][]',
+            value:param.freq,
+            placeholder:"Частотность"
+        });
+        me.element.append(me.freqEl);
+        me.setFreq = function(val){
+            me.freq = val;
+            me.freqEl.val(val);
+        };
         me.element.append($('<span>',{
             "class": "deletePhraseInput"
         }).click(function(){

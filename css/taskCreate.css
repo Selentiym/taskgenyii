@@ -7,12 +7,14 @@
     height:80%;
 }
 #phrasesCont div input {
-    width: 80%;
+    width: 75%;
     margin-top:10px;
     border-radius:5px;
     padding:3px;
+    vertical-align: middle;
+    display:inline-block;
 }
-#phrasesCont div input.strict, #phrasesCont div input.morph {
+#phrasesCont div input.strict, #phrasesCont div input.morph, #phrasesCont div input.freq {
     width:30px;
 }
 
@@ -27,7 +29,6 @@
 #keywords td {
     padding:5px;
     text-align: center;
-    vertical-align: middle;
 }
 #keywords td.counter span{
     padding:0 3px;
@@ -67,6 +68,7 @@
 
 .deletePhraseInput {
     display: inline-block;
+    vertical-align: middle;
     width:20px;
     height:20px;
     background: url('../images/cross_small.png');

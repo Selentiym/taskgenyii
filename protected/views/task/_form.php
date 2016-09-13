@@ -122,13 +122,23 @@ Yii::app() -> getClientScript() -> registerScript('structure','
                  */
                 $stems = json_encode($sp -> giveStems(),JSON_PRETTY_PRINT);
                 $freq = $sp -> phraseFreq;
-                echo "new Phrase('$sp->phrase',{stems:$stems, initial:true, freq:'$freq',id:$sp->id})".PHP_EOL;
+                echo "new Phrase('$sp->phrase',".json_encode([
+                    "stems" => $stems,
+                    "initial" => true,
+                    "freq" => $freq,
+                    "id" => $sp -> id,
+                ]).")".PHP_EOL;
                 //break;
             }
             foreach ($model -> keyphrases as $kp) {
-                $stems = json_encode($kp -> giveStems(),JSON_PRETTY_PRINT);
-                $id = $kp -> id;
-                echo "new Phrase('$kp->phrase',{stems:$stems, fromDb: true, dbId:'$id'})".PHP_EOL;
+                echo "new Phrase('$kp->phrase',".json_encode([
+                    "stems" => json_encode($kp -> giveStems(),JSON_PRETTY_PRINT),
+                    "fromDb" => true,
+                    "dbId" => $kp -> id,
+                    "strict" => $kp -> direct,
+                    "morph" => $kp -> morph,
+                    "freq" => $kp -> freq
+                ]).")".PHP_EOL;
             }
         ?>
     });

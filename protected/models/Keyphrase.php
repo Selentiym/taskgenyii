@@ -8,6 +8,7 @@
  * @property integer $id_task
  * @property integer $direct
  * @property integer $morph
+ * @property integer $freq
  * @property string $phrase
  *
  * The followings are the available model relations:
