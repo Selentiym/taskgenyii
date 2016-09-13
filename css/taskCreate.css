@@ -59,6 +59,18 @@
     overflow:auto;
     background:lightgreen;
 }
+.phrase {
+    text-align:center;
+    border-radius: 5px;
+    margin-top:5px;
+    padding:3px 0;
+}
+#phrasesCont div.phrase input {
+    margin:0;
+}
+.phrase.highlighted {
+    background: rgba(255, 208, 0, 0.41);
+}
 .phraseShortCut {
     margin-bottom:3px;
 }

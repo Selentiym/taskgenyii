@@ -179,6 +179,29 @@ function Phrase(text, param){
             name:baseFormInputName + '[phrases][changed][]'
         });
         me.element.append(me.changeElement);
+        me.linked = [];
+        me.highlight = function(phr){
+            me.linked.push(phr);
+            me.element.addClass("highlighted");
+        };
+        me.clearHighlight = function(){
+            if (me.linked.length) {
+                _.each(me.linked, function(el){
+                    el.removeHightlight(me);
+                });
+            }
+            me.linked = [];
+            me.element.removeClass("highlighted");
+        };
+        me.removeHightlight = function(phr){
+            var ind = me.linked.indexOf(phr);
+            if (ind != -1) {
+                me.linked.splice(ind, 1);
+            }
+            if (!me.linked.length){
+                me.element.removeClass("highlighted");
+            }
+        };
         //Контейнер для элеентов данного типа должен быть задан в прототипе.
         Phrase.prototype.container.append(me.element);
     } else {
@@ -252,6 +275,7 @@ function Phrase(text, param){
     me.refresh = function() {
 
         me.somethingChanged();
+        me.clearHighlight();
         if (me.used) {
             _.each(me.words, function(word) {
                 word.getUnused(me, me.initial);
@@ -334,6 +358,7 @@ function Phrase(text, param){
             return (me.stems.indexOf(word.stem) > -1);
         }
     };
+
     me.onAfterAnalyze = function(){
         //Проверяем, нет ли такой же фразы, но занятой.
         _.each(Lexical.prototype.phrasesPool,function(phrase, key){
@@ -348,7 +373,9 @@ function Phrase(text, param){
                 }
                 var intersect = _.intersection(longer.stems, shorter.stems);
                 if (intersect.length == shorter.stems.length) {
-                    alert('Фраза "' + shorter.text + '" морфологически включена в фразу "' + longer.text+'"');
+                    longer.highlight(shorter);
+                    shorter.highlight(longer);
+                    //alert('Фраза "' + shorter.text + '" морфологически включена в фразу "' + longer.text+'"');
                 }
             }
         });
