@@ -148,7 +148,8 @@ class Text extends Commentable {
 		$text = new textString(strip_tags($text));
 
 		$i = -1;
-		foreach($this -> task -> keyphrases as $phr){
+		$keyPhrasesSorted = $this -> task -> getKeyphrasesSorted();
+		foreach($keyPhrasesSorted as $phr){
 			if ($phr -> direct > 0) {
 				++$i;
 				$temp = $text->lookForLiteral($phr -> phrase);
@@ -159,7 +160,7 @@ class Text extends Commentable {
 			}
 		}
 		$i = -1;
-		foreach($this -> task -> keyphrases as $phr){
+		foreach($keyPhrasesSorted as $phr){
 			if ($phr -> morph > 0) {
 				//$i Является параметром, отделяющим разные фразы. Важно для морфовхождения,
 				// так как слова могут быть раскиданы по предложению и фразы могут пересекаться.

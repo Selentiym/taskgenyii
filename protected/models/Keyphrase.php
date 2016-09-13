@@ -15,6 +15,7 @@
  * @property Task $idTask
  */
 class Keyphrase extends StringModel {
+	public $meaningfulWordsCount;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -105,5 +106,15 @@ class Keyphrase extends StringModel {
 	 */
 	public function stringAttribute() {
 		return 'phrase';
+	}
+
+	/**
+	 * @return integer how many non-stop words there are in the phrase
+	 */
+	public function getMeaningfulWordsCount(){
+		if (!$this -> meaningfulWordsCount) {
+			$this -> meaningfulWordsCount = str_word_count(arrayString::removeRubbishFromString($this -> phrase));
+		}
+		return $this -> meaningfulWordsCount;
 	}
 }

@@ -83,7 +83,7 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
         </div>
         <div id="seoData"></div>
         <div>
-            <?php $this -> renderPartial('//pattern/keys', array('data' => $model -> task -> keyphrases)); ?>
+            <?php $this -> renderPartial('//pattern/keys', array('data' => $model -> task -> getKeyphrasesSorted())); ?>
         </div>
         <div id="rezultDiv">Текст с подсвеченными ключевыми словами: <br/></div>
     </div>

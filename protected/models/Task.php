@@ -543,4 +543,16 @@ class Task extends Commentable {
 		]);
 		return $arr;
 	}
+	public function getKeyphrasesSorted(){
+		$keyPhrasesSorted = $this -> keyphrases;
+		usort($keyPhrasesSorted, function($k1, $k2){
+			if ($k1 -> getMeaningfulWordsCount() > $k2 -> getMeaningfulWordsCount()) {
+				return 1;
+			} elseif ($k1 -> getMeaningfulWordsCount() < $k2 -> getMeaningfulWordsCount()) {
+				return -1;
+			}
+			return 0;
+		});
+		return $keyPhrasesSorted;
+	}
 }
