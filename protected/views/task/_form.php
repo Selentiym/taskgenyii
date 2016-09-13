@@ -133,8 +133,9 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         ?>
     });
 </script>
+<form  method="post">
 <div id="phrasesWrapper">
-    <form method="post" id="phrasesCont">
+    <div id="phrasesCont">
         <div class="well">
             <input type="text" name="Task[name]" placeholder="Название" value="<?php echo $model -> name; ?>"/>
         </div>
@@ -170,11 +171,11 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         </div>
         <input type="submit" value="Сохранить"/>
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
-        <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
+
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
         <?php $this -> renderPartial('//task/_buttons',['task' => $model]); ?>
         <div>Всего фраз: <span id="phraseCount"></span></div>
-    </form>
+    </div>
     <div id="TreeContainer">
 
     </div>
@@ -191,3 +192,11 @@ Yii::app() -> getClientScript() -> registerScript('structure','
 
     </tbody>
 </table>
+<div id="rightPaneButtons">
+    <input type="button" onClick="Word.prototype.showAll()" value="Показать все слова" />
+    <p>Чтобы удалить слово, нажмите Shift+ЛКМ.</p>
+    <p>Чтобы скрыть слово, нажмите Ctrl+ЛКМ.</p>
+    <p>Чтобы посмотреть фразы, содержащие слово, Alt+ЛКМ.</p>
+    <p>Слова можно перетаскивать в инпуты слева.</p>
+</div>
+</form>

@@ -1,7 +1,7 @@
 #phrasesWrapper {
     position:fixed;
     display:inline-block;
-    width:45%;
+    width:40%;
     vertical-align: top;
     overflow:auto;
     height:80%;
@@ -18,10 +18,10 @@
 
 #keywords {
     position:absolute;
-    left:45%;
+    left:40%;
     top:50px;
     display: inline-block;
-    width:45%;
+    width:40%;
     vertical-align: top;
 }
 #keywords td {
@@ -70,4 +70,10 @@
     width:20px;
     height:20px;
     background: url('../images/cross_small.png');
+}
+
+#rightPaneButtons {
+    width:18%;
+    position:fixed;
+    left:80%;
 }
