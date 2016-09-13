@@ -519,6 +519,8 @@ class Text extends Commentable {
 		 * Считаем длину
 		 */
 		$this -> length = $this -> countLength(false);
+		//Обновляем время обновления
+		$this -> updated = new CDbExpression("CURRENT_TIMESTAMP");
 		return parent::beforeSave();
 	}
 

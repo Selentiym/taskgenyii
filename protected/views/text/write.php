@@ -33,17 +33,13 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
 
         <?php endif; ?>
 
+        <?php $this -> renderPartial("//text/_infrobar", ['model' => $text]); ?>
         <?php if (Yii::app()-> user -> checkAccess('editor')) : ?>
-        <input type="button" value="Принять" id="accept"/>
-        <input type="button" value="Отклонить" id="decline"/>
+            <input type="button" value="Принять" id="accept"/>
+            <input type="button" value="Отклонить" id="decline"/>
         <?php endif; ?>
         <input type="button" value="Проверить seo, keys" id="check"/>
         <input type="button" value="Проверить уникальность" id="uniqueButton"/>
-        <span class="highlightTicksAndCrosses">
-        <span class="<?php echo $model -> handedIn ? 'tick' : 'cross' ?>">Сдан</span>,
-        <span class="<?php echo $model -> QHandedIn ? 'tick' : 'cross' ?>">Просьба проверить</span>,
-        <span class="<?php if ($model -> accepted === null) echo 'time'; else echo $model -> accepted ? 'tick' : 'cross' ?>">Принят</span>
-        </span>
 
         <?php if (Yii::app()-> user -> checkAccess('editor')) :
             $this -> renderPartial ('//task/_buttons', ['task' => $model -> task, 'buttons' => true]);
