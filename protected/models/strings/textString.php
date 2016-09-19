@@ -53,6 +53,12 @@ class textString {
         }
         return $rez;
     }
+
+    /**
+     * Ищет как угодно разбитые фразы в пределах одного предложения.
+     * @param wordSet $needle
+     * @return int
+     */
     public function lookForSentenced(wordSet $needle){
         $this -> prepare();
         $count = 0;
@@ -61,6 +67,24 @@ class textString {
         }
         return $count;
     }
+    /**
+     * Ищет фразы, разбитые только лишь предлогами.
+     * @param wordSet $needle
+     * @return int
+     */
+    public function lookForSentencedGlued(wordSet $needle){
+        $this -> prepareGlued();
+        $count = 0;
+        foreach ($this -> sentences as $sent) {
+            $count += $sent -> lookForGlued($needle);
+        }
+        return $count;
+    }
+    /**
+     * Ищет полное вхождение
+     * @param $string
+     * @return int
+     */
     public function lookForLiteral($string){
         //Это должно делаться до начала поиска
         if ($this -> prepared) {

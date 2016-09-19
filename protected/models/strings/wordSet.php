@@ -24,11 +24,13 @@ class wordSet {
             }
             return $temp;
         },explode(' ', $string));
+        //Понадобится, когда будем считать знаки препинания тоже словами.
+        //[^a-zA-Z\d "']
     }
     public function getToPrint(){
         return implode(' ', array_map(function($w){ return $w -> getToPrint();},$this -> words));
     }
-    public function lookFor($needle){
+    public function lookFor(wordSet $needle){
         $intersect = array_unique(array_intersect($this ->stems, $needle -> stems));
         $amount = count($intersect);
 
@@ -56,5 +58,13 @@ class wordSet {
             return 1;
         }
         return 0;
+    }
+    public function lookForGlued(wordSet $needle){
+        $intersect = array_unique(array_intersect($this ->stems, $needle -> stems));
+        $amount = count($intersect);
+        //Если не хватает корней, то и говорить не о чем.
+        if ($amount == count($needle -> stems)) {
+
+        }
     }
 }
