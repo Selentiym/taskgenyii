@@ -10,7 +10,7 @@
  */
 ?>
 <table border="1">
-    <tr><td>Фраза</td><td>Прямое</td><td>Морфология</td></tr>
+    <tr><td>Фраза</td><td>Тег</td><td>Прямое</td><td>Морфология</td></tr>
     <?php
     $directCount = -1;
     $morphCount = -1;
@@ -33,7 +33,8 @@
         }
         $phrase_text = $phrase -> phrase;
         $trstyle = ($phrase -> direct > 0) ? 'background:#c6efce' : '' ;
-        echo "<tr><td style='padding:5px;vertical-align:middle;text-align:left;$trstyle'>$phrase_text</td><td $idDirect data-mustHave='$strict' style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$strict</td><td $idMorph data-mustHave='$morph' style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$morph</td></tr>";
+        $tagName = $phrase -> tag;
+        echo "<tr><td style='padding:5px;vertical-align:middle;text-align:left;$trstyle'>$phrase_text</td><td style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$tagName</td></td><td $idDirect data-mustHave='$strict' style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$strict</td><td $idMorph data-mustHave='$morph' style='padding:5px;vertical-align:middle;text-align:center;$trstyle'>$morph</td></tr>";
     }
     ?>
 </table>

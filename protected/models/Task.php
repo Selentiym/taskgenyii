@@ -215,6 +215,7 @@ class Task extends Commentable {
 				$kp->direct = $this->phrases ['strict'][$key];
 				$kp->morph = $this->phrases ['morph'][$key];
 				$kp->freq = $this->phrases ['freq'][$key];
+				$kp->tag = $this->phrases ['tag'][$key];
 				if (!$kp->save()) {
 					$temp = $kp->getErrors();
 				}

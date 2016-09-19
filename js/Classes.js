@@ -149,6 +149,15 @@ function Phrase(text, param){
             value: param.morph,
             "class": "morph"
         }));
+        me.tagSelect = $("<select></select>",{
+            name: baseFormInputName + '[phrases][tag][]',
+            "class":"tagSelect"
+        });
+        me.tagSelect.append("<option></option>");
+        me.tagSelect.append("<option>h1</option>");
+        me.tagSelect.append("<option>h2</option>");
+        me.tagSelect.val(param.tag);
+        me.element.append(me.tagSelect);
         me.element.append(me.inputEl);
         me.freqEl = $("<input>",{
             "class":"freq",

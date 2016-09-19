@@ -7,7 +7,7 @@
     height:80%;
 }
 #phrasesCont div input {
-    width: 75%;
+    width: 70%;
     margin-top:10px;
     border-radius:5px;
     padding:3px;
@@ -17,7 +17,11 @@
 #phrasesCont div input.strict, #phrasesCont div input.morph, #phrasesCont div input.freq {
     width:30px;
 }
-
+#phrasesCont select {
+    width:40px;
+    border-radius:5px;
+    overflow:hidden;
+}
 #keywords {
     position:absolute;
     left:40%;

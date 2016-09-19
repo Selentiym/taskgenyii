@@ -137,7 +137,8 @@ Yii::app() -> getClientScript() -> registerScript('structure','
                     "dbId" => $kp -> id,
                     "strict" => $kp -> direct,
                     "morph" => $kp -> morph,
-                    "freq" => $kp -> freq
+                    "freq" => $kp -> freq,
+                    "tag" => $kp -> tag
                 ]).")".PHP_EOL;
             }
         ?>
