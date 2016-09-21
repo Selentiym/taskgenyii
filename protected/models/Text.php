@@ -473,7 +473,7 @@ class Text extends Commentable {
 					$task = $this -> task;
 					$task -> id_text = $this -> id;
 					$task -> save();
-					if ($this -> author) {
+					if ($task->author) {
 						$task->author->notify('Текст по заданию ' . $task->show() . ' принят!');
 					}
 				} else {
