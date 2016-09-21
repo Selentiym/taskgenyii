@@ -466,7 +466,8 @@ class Text extends Commentable {
 				}
 				break;
 			case 'accept':
-				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
+				//if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
+				if (Yii::app() -> user -> checkAccess('editor')) {
 					$this -> accepted = 1;
 					$this -> shingles = $this -> fastShingles() -> archive();
 					$task = $this -> task;
@@ -480,7 +481,8 @@ class Text extends Commentable {
 				}
 				break;
 			case 'decline':
-				if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
+				//if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
+				if (Yii::app() -> user -> checkAccess('editor')) {
 					$this -> accepted = 0;
 					$text = $this -> task -> createText($this);
 					if (!$text -> save()) {

@@ -19,11 +19,28 @@ class textString {
     public $prepared = false;
 
     public function __construct($text){
+        $this -> text = $text;
+    }
+    public function getSentenceTexts(){
+        //Убрали теги
+        $this -> text = trim(strip_tags($this -> text));
         //очищаем от непонятных спецсимволов
-        $this -> text = preg_replace('/\&[a-zA-Z]+\;/u', ' ', $text);
-        //$this -> text = preg_replace('/\n?\r?/u', '', $this -> text);
+        $this -> text = trim(preg_replace('/\&[a-zA-Z]+\;/u', ' ', $this -> text));
+        //Перенос строки - вообще-то тоже конец предложения.
+        $this -> text = trim(preg_replace('/\n+/u', '. ', $this -> text));
         //Удаляем лишние пробелы и переносы строк
-        $this -> text = preg_replace ("/(?<=\w)\s+(?=\w)/u", " ", $this -> text);
+        $this -> text = trim(preg_replace ("/(?<=\S)\s+(?=\S)/u", " ", $this -> text));
+
+        //короткие слова чаще всего являются сокращениями.
+        //$this -> text = trim(preg_replace ("/\W\w{,2}\./iu", "тк", $this -> text));
+        //знаки препинания. Разделителеми предложений будут только ?! и точка
+        $this -> text = trim(preg_replace ("/[\.?!]+/u", ".", $this -> text));
+        return array_map("trim",explode(". " , $this -> text));
+    }
+    public function addNewSentence($text){
+        if ($text) {
+            $this -> sentences [] = new wordSet($text);
+        }
     }
     public function prepare(){
         if (!$this -> prepared) {
@@ -31,15 +48,12 @@ class textString {
             //Чтобы санкт-петербург не сливался в одно слово
             $this -> text = str_replace('-',' ',$this -> text);
             //Оставляем только буквы, пробелы и точки
-            $this -> text = preg_replace('/[^\s\w\.]/u', '', $this -> text);
+            $this -> text = trim(preg_replace('/[^\s\w\.]/u', '', $this -> text));
 
 
             $this -> sentences = array();
-            array_map(function($t){
-                if ($t) {
-                    $this -> sentences [] = new wordSet($t);
-                }
-            },explode(". " , $this -> text));
+            $sentences = $this -> getSentenceTexts();
+            array_map([$this,"addNewSentence"], $sentences);
             $this -> prepared = true;
         }
     }
