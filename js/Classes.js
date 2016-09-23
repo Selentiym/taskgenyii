@@ -889,9 +889,14 @@ function ControlButton(value, className, callback, tree, param, preValidator){
     } else{
         me.preValidator = preValidator;
     }
-
+    var tag;
+    if (!param.tag) {
+        tag = 'span';
+    } else {
+        tag = param.tag;
+    }
     //Создаем элемент кнопки. Все стили накладываются внешне.
-    me.element = $('<span>', $.extend({
+    me.element = $('<' + tag + '>', $.extend({
         "class":"button " + className
     },param)).append(value);
     //Вешаем действие кнопки.
@@ -1103,9 +1108,9 @@ function genControlPanel (tree) {
 
     console.log(authorList);
 
-    new ControlButton("","edit",function(el){location.href = baseUrl + "/task/edit/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
-    new ControlButton("","keys",function(el){location.href = baseUrl + "/cabinet/loadKeywords/" + el.id; return true;},tree, {},ControlButton.prototype.actionForOneCountChecks);
-    new ControlButton("","look",function(el){location.href = baseUrl + "/task/" + el.id; return true;},tree,{}, ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","edit",function(el, event){$(event.target).attr("href", baseUrl + "/task/edit/" + el.id); return true;},tree, {tag:"a"},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","keys",function(el, event){$(event.target).attr("href", baseUrl + "/cabinet/loadKeywords/" + el.id); return true;},tree, {tag:"a"},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","look",function(el, event){$(event.target).attr("href", baseUrl + "/task/" + el.id); return true;},tree, {tag:"a"},ControlButton.prototype.actionForOneCountChecks);
     var authorSelector = $("#authorForAssignSelect");
     new ControlButton("","assign_author",function(el){
         $.post(baseUrl + "/Task/assignAuthor/" + el.id, {
