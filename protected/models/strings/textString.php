@@ -8,6 +8,8 @@
 class textString {
     public $initial;
     public $text;
+    public $cachedText;
+
     /**
      * @var wordSet[] $sentences
      */
@@ -18,24 +20,48 @@ class textString {
     public $subs = array();
     public $prepared = false;
 
+    const END_SENTENCE = 'endl';
     public function __construct($text){
+        $this -> cachedText = $text;
         $this -> text = $text;
-    }
-    public function getSentenceTexts(){
+        //Заменяем переносы строк и концы параграфа концами предложений.
+        //Специально делаем это до каких-либо проверок.
+        $this -> text = trim(preg_replace('/<p[^<>]*>/u', self::END_SENTENCE, $this -> text));
+        $this -> text = trim(preg_replace('|<\/p[^<>]*>|u', self::END_SENTENCE, $this -> text));
+        $this -> text = trim(preg_replace('/<(\/?)br[^<>]*>/u', self::END_SENTENCE, $this -> text));
         //Убрали теги
         $this -> text = trim(strip_tags($this -> text));
+    }
+    public function getSentenceTexts(){
+        $t = $this -> text;
+        //$this -> text = $this -> cachedText;
+
         //очищаем от непонятных спецсимволов
         $this -> text = trim(preg_replace('/\&[a-zA-Z]+\;/u', ' ', $this -> text));
         //Перенос строки - вообще-то тоже конец предложения.
-        $this -> text = trim(preg_replace('/\n+/u', '. ', $this -> text));
+        $this -> text = trim(preg_replace('/\n+/u', self::END_SENTENCE, $this -> text));
         //Удаляем лишние пробелы и переносы строк
-        $this -> text = trim(preg_replace ("/(?<=\S)\s+(?=\S)/u", " ", $this -> text));
+        $this -> text = trim(preg_replace("/(?<=\S)\s+(?=\S)/u", " ", $this -> text));
 
+        //Удалили все внутренние точки
+        $this -> text = preg_replace("/\.(?=\w)/u","",$this -> text);
         //короткие слова чаще всего являются сокращениями.
-        //$this -> text = trim(preg_replace ("/\W\w{,2}\./iu", "тк", $this -> text));
+        $this -> text = preg_replace("/(?<=\s(\w){1})\./u","",$this -> text);
+        $this -> text = preg_replace("/(?<=\s(\w){2})\./u","",$this -> text);
+        /**
+         * блок частых сокращений
+         */
+        $replace = [
+            "корп." => "корп",
+            "лит." => "лит"
+        ];
+        str_replace(array_keys($replace), array_values($replace), $this -> text);
         //знаки препинания. Разделителеми предложений будут только ?! и точка
-        $this -> text = trim(preg_replace ("/[\.?!]+/u", ".", $this -> text));
-        return array_map("trim",explode(". " , $this -> text));
+        $this -> text = trim(preg_replace ("/[.?!]+/u", self::END_SENTENCE, $this -> text));
+        //Добавляем основной разделитель предложения.
+        $this -> text = str_replace(". ",self::END_SENTENCE, $this -> text);
+        $this -> text = trim(preg_replace("/(\s*".self::END_SENTENCE."\s*)+/u",self::END_SENTENCE,$this -> text));
+        return array_map("trim",explode(self::END_SENTENCE, $this -> text));
     }
     public function addNewSentence($text){
         if ($text) {

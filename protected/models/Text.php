@@ -145,7 +145,7 @@ class Text extends Commentable {
 		if (!$post['not_save']) {
 			$this -> save(false, array('text'));
 		}
-		$text = new textString(strip_tags($text));
+		$text = new textString($text);
 
 		$i = -1;
 		$keyPhrasesSorted = $this -> task -> getKeyphrasesSorted();
