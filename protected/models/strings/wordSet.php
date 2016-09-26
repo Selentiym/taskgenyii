@@ -59,12 +59,4 @@ class wordSet {
         }
         return 0;
     }
-    public function lookForGlued(wordSet $needle){
-        $intersect = array_unique(array_intersect($this ->stems, $needle -> stems));
-        $amount = count($intersect);
-        //Если не хватает корней, то и говорить не о чем.
-        if ($amount == count($needle -> stems)) {
-
-        }
-    }
 }

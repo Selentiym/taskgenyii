@@ -14,11 +14,18 @@ class word {
     public $used = false;
     public function __construct($word) {
         $this -> toPrint = $word;
-        if (strlen($word) > 1) {
-            //удаляем стоп-слова
-            $word = preg_replace(word::stopsPattern, '', $word);
-            if ($word) {
-                $this->stem = Stemmer::getInstance()->stem_word($word);
+        $word = trim($word);
+        if ($word) {
+            if (preg_match("/" . textString::quatation . "/ui", $word)) {
+                $this->stem = $word;
+                return;
+            }
+            if (strlen($word) > 1) {
+                //удаляем стоп-слова
+                $word = preg_replace(word::stopsPattern, '', $word);
+                if ($word) {
+                    $this->stem = Stemmer::getInstance()->stem_word($word);
+                }
             }
         }
     }

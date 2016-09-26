@@ -6,6 +6,9 @@
  * Time: 10:23
  */
 class textString {
+
+    const quatation = "[^а-яa-z\d\s\"\']+";
+
     public $initial;
     public $text;
     public $cachedText;
@@ -20,7 +23,7 @@ class textString {
     public $subs = array();
     public $prepared = false;
 
-    const END_SENTENCE = 'endl';
+    const END_SENTENCE = 'ends';
     public function __construct($text){
         $this -> cachedText = $text;
         $this -> text = $text;
@@ -40,6 +43,10 @@ class textString {
         $this -> text = trim(preg_replace('/\&[a-zA-Z]+\;/u', ' ', $this -> text));
         //Перенос строки - вообще-то тоже конец предложения.
         $this -> text = trim(preg_replace('/\n+/u', self::END_SENTENCE, $this -> text));
+        //Чтобы санкт-петербург не сливался в одно слово
+        $this -> text = str_replace('-',' ',$this -> text);
+        //Ковычки нам не важны
+        $this -> text = preg_replace("/[\"\'\`]/iu"," ",$this -> text);
         //Удаляем лишние пробелы и переносы строк
         $this -> text = trim(preg_replace("/(?<=\S)\s+(?=\S)/u", " ", $this -> text));
 
@@ -61,6 +68,9 @@ class textString {
         //Добавляем основной разделитель предложения.
         $this -> text = str_replace(". ",self::END_SENTENCE, $this -> text);
         $this -> text = trim(preg_replace("/(\s*".self::END_SENTENCE."\s*)+/u",self::END_SENTENCE,$this -> text));
+
+        //Делаем знаки препинания отдельными словами
+        $this -> text = preg_replace("/(".self::quatation.")/iu"," $1 ",$this -> text);
         return array_map("trim",explode(self::END_SENTENCE, $this -> text));
     }
     public function addNewSentence($text){
@@ -70,11 +80,7 @@ class textString {
     }
     public function prepare(){
         if (!$this -> prepared) {
-            $this -> text = str_replace(["!","?"],".",$this -> text);
-            //Чтобы санкт-петербург не сливался в одно слово
-            $this -> text = str_replace('-',' ',$this -> text);
-            //Оставляем только буквы, пробелы и точки
-            $this -> text = trim(preg_replace('/[^\s\w\.]/u', '', $this -> text));
+
 
 
             $this -> sentences = array();
