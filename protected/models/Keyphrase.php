@@ -114,7 +114,7 @@ class Keyphrase extends StringModel {
 	 */
 	public function getMeaningfulWordsCount(){
 		if (!$this -> meaningfulWordsCount) {
-			$this -> meaningfulWordsCount = str_word_count(arrayString::removeRubbishFromString($this -> phrase));
+			$this -> meaningfulWordsCount = count(array_filter($this -> giveStems()));;
 		}
 		return $this -> meaningfulWordsCount;
 	}

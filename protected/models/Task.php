@@ -547,13 +547,17 @@ class Task extends Commentable {
 	public function getKeyphrasesSorted(){
 		$keyPhrasesSorted = $this -> keyphrases;
 		usort($keyPhrasesSorted, function($k1, $k2){
+			/**
+			 * @type KeyPhrase $k1
+			 */
 			if ($k1 -> getMeaningfulWordsCount() > $k2 -> getMeaningfulWordsCount()) {
-				return 1;
-			} elseif ($k1 -> getMeaningfulWordsCount() < $k2 -> getMeaningfulWordsCount()) {
 				return -1;
+			} elseif ($k1 -> getMeaningfulWordsCount() < $k2 -> getMeaningfulWordsCount()) {
+				return 1;
 			}
 			return 0;
 		});
+
 		return $keyPhrasesSorted;
 	}
 	public function assignAuthor(){

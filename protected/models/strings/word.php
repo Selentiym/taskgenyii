@@ -20,6 +20,10 @@ class word {
                 $this->stem = $word;
                 return;
             }
+            if (preg_match("/^(и|но|а|или)$/ui",$word)) {
+                $this->stem = $word;
+                return;
+            }
             if (strlen($word) > 1) {
                 //удаляем стоп-слова
                 $word = preg_replace(word::stopsPattern, '', $word);
