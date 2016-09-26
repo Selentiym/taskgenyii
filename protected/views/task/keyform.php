@@ -23,7 +23,8 @@ $data = $_POST;
     <textarea name="Task[input_search]"><?php echo $data['Task[input_search]']; ?></textarea>
     <textarea name="Task[keystring]"><?php echo $data['Task[keystring]']; ?></textarea>
     <div>
-        <?php $this -> renderPartial("//task/_buttons",['task' => $model]); ?>
+        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToShowTask" id="redirectToShowTask" value="Сохранить и перейти к просмотру текста" />
+        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToEditTask" id="redirectToEditTask" value="Сохранить и вернуться к редактированию" />
     </div>
     <!--<input type="submit" value="Сохранить и перейти в кабинет" name="toCabinet"/>
     <input type="submit" value="Сохранить и составить ТЗ" name="editTask"/>-->

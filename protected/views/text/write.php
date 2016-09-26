@@ -42,7 +42,20 @@ $handInErr = Yii::app() -> user -> getFlash('textHandIn');
         <input type="button" value="Проверить уникальность" id="uniqueButton"/>
 
         <?php if (Yii::app()-> user -> checkAccess('editor')) :
-            $this -> renderPartial ('//task/_buttons', ['task' => $model -> task, 'buttons' => true]);
+            $task = $model -> task;
+            $buttons = true;
+            Yii::app()->getClientScript()->registerScript('redirectScript', "
+                $('#redirectToKeywords').click(function(){
+                    location.href='".Yii::app() -> createUrl('cabinet/loadKeywords',['arg' => $task -> id])."';
+                });
+                $('#redirectToEditTask').click(function(){
+                    location.href='".Yii::app() -> createUrl('task/edit',['arg' => $task -> id])."';
+                });
+            ", CClientScript::POS_END);
+            ?>
+            <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToEditTask" id="redirectToEditTask" value="Редактировать задание" />
+            <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToKeywords" id="redirectToKeywords" value="Загрузить данные из KeyCollector" />
+            <?php
         endif; ?>
         <div id="editorBlock">
         <?php

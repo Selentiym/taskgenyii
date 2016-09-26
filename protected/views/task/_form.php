@@ -180,11 +180,12 @@ Yii::app() -> getClientScript() -> registerScript('structure','
                 array('style' => 'width:300px'),array($model -> id_pattern),json_encode(array('placeholder' => 'Шаблон')));
             ?>
         </div>
-        <input type="submit" value="Сохранить"/>
+        <input type="submit" value="В проект"/>
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
 
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
-        <?php $this -> renderPartial('//task/_buttons',['task' => $model]); ?>
+        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToShowTask" id="redirectToShowTask" value="Смотреть результат" />
+        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToKeywords" id="redirectToKeywords" value="Загрузить данные из KeyCollector" />
         <div>Всего фраз: <span id="phraseCount"></span></div>
     </div>
     <div id="TreeContainer">
