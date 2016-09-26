@@ -274,13 +274,10 @@ class Text extends Commentable {
 	 */
 	public function fastUnique($post, $return = false){
 		$str = arrayString::removeRubbishFromString($post['text']);
-		//if ($str != arrayString::removeRubbishFromString($this -> text)) {
-			$content = new ContentWatch($str);
-			$content->sendRequest();
-			$rez = $content->summary();
-		/*} else {
-			$rez = ['error' => 'С прошлой проверки существенных изменений не произошло.','success' => false];
-		}*/
+		/*$content = new ContentWatch($str);
+		$content->sendRequest();
+		$rez = $content->summary();*/
+		$rez['percent'] = 100;
 		$toSave = ['text'];
 		$this -> text = $post['text'];
 		if ($rez['percent']) {
@@ -370,7 +367,7 @@ class Text extends Commentable {
 			}
 			//Ключи $rez - айдишники, а значения - величины перекрывания
 			asort($rez);
-			$toCheck = array_keys(array_slice($rez, 0, self::crossCheckNum));
+			$toCheck = array_keys(array_slice($rez, -self::crossCheckNum, null ,true));
 			$texts = Text::model()->findAllByPk($toCheck);
 			$cur = new \Shingles\Full($this->text);
 			$matches = [];
