@@ -274,10 +274,9 @@ class Text extends Commentable {
 	 */
 	public function fastUnique($post, $return = false){
 		$str = arrayString::removeRubbishFromString($post['text']);
-		/*$content = new ContentWatch($str);
+		$content = new ContentWatch($str);
 		$content->sendRequest();
-		$rez = $content->summary();*/
-		$rez['percent'] = 100;
+		$rez = $content->summary();
 		$toSave = ['text'];
 		$this -> text = $post['text'];
 		if ($rez['percent']) {
