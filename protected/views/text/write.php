@@ -19,7 +19,8 @@ Yii::app() -> getClientScript() -> registerScript('check',"
 ", CClientScript::POS_READY);
 
 $text = $model;
-$handInErr = Yii::app() -> user -> getFlash('textHandIn');
+$handInErr = Yii::app() -> user -> getState('textHandIn');
+Yii::app() -> user -> setState('textHandIn',false,false);
 ?>
 
 

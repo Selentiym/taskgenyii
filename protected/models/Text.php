@@ -143,7 +143,9 @@ class Text extends Commentable {
 		$this -> text = $text;
 		//Сохраняем только текст
 		if (!$post['not_save']) {
-			$this -> save(false, array('text'));
+			$this -> handedIn = 0;
+			$this -> QHandedIn = 0;
+			$this -> save(false, array('text',"handedIn","QHandedIn"));
 		}
 		$text = new textStringGlued($text);
 
@@ -414,6 +416,7 @@ class Text extends Commentable {
 		}
 	}
 	protected function beforeSave() {
+		$nullStatus = true;
 		switch ($this -> scenario) {
 			case 'noBeforeSave' :
 				return true;
@@ -426,17 +429,17 @@ class Text extends Commentable {
 					if ($this -> task -> editor) {
 						$this->task->editor->notify('Текст по заданию ' . $task->show() . ' сдан.');
 					}
-					Yii::app() -> user -> setFlash('textHandIn',$report);
+					Yii::app() -> user -> setState('textHandIn',$report);
 				} else {
-					Yii::app() -> user -> setFlash('textHandIn',$report);
+					Yii::app() -> user -> setState('textHandIn',$report);
 					$flashes = Yii::app() -> user -> getFlashes(false);
 					$this -> addError('text',$report);
 					return false;
 				}
+				$nullStatus = false;
 				break;
 			case 'handInWithMistakes':
 				$db = $this -> DBModel();
-
 				if (arrayString::leaveOnlyLetters($this -> text) != arrayString::leaveOnlyLetters($db -> text)) {
 					$this -> setScenario('checkMath');
 					$unique = $this -> fastUnique(['text' => $this -> text] , true);
@@ -444,22 +447,16 @@ class Text extends Commentable {
 					$this -> setScenario('handInWithMistakes');
 				}
 				if (!$this -> uniquePercent) {
-					Yii::app() -> user -> setFlash('textHandIn','Проверка на уникальность не проведена или завершена с ошибкой.');
+					Yii::app() -> user -> setState('textHandIn','Проверка на уникальность не проведена или завершена с ошибкой.');
 					return false;
 				} else {
 					if ($this -> uniquePercent < 80) {
-						Yii::app() -> user -> setFlash('textHandIn','Уникальность ниже 80%, что неприемлемо в любом случае.');
+						Yii::app() -> user -> setState('textHandIn','Уникальность ниже 80%, что неприемлемо в любом случае.');
 						return false;
 					}
 				}
-				/*if ((arrayString::removeRubbishFromString($this -> text) != arrayString::removeRubbishFromString($db -> text))) {
-					Yii::app() -> user -> setFlash('textHandIn','Проведите проверку на уникальность перед повторной просьбой рассмотреть статью.');
-					return false;
-				} elseif ($db -> uniquePercent < 80) {
-					Yii::app() -> user -> setFlash('textHandIn','Уникальность ниже 80%, что неприемлемо в любом случае.');
-					return false;
-				}*/
 				$this -> QHandedIn = 1;
+				$nullStatus = false;
 				$task = $this -> task;
 				if ($this->task->editor) {
 					$this->task->editor->notify('Поступила просьба рассмотреть текст по заданию ' . $task->show() . '.');
@@ -513,8 +510,10 @@ class Text extends Commentable {
 					$this->uniquePercent = new CDbExpression('NULL');
 					$this->uid = new CDbExpression('NULL');
 				}
-				$this -> handedIn = 0;
-				$this -> QHandedIn = 0;
+				if ($nullStatus) {
+					$this->handedIn = 0;
+					$this->QHandedIn = 0;
+				}
 			}
 		}
 		/**
@@ -523,6 +522,7 @@ class Text extends Commentable {
 		$this -> length = $this -> countLength(false);
 		//Обновляем время обновления
 		$this -> updated = new CDbExpression("CURRENT_TIMESTAMP");
+
 		return parent::beforeSave();
 	}
 
