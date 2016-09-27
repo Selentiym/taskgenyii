@@ -640,8 +640,8 @@ function Word(text,param) {
             me.phrases.every(function(toStrip){
                 if (!toStrip.initial) {
                     deleted = toStrip.deleteStem(me);
-                    return !deleted;
                 }
+                return !deleted;
             });
             if (!deleted) {
                 alert('Удаление корня '+me.stem+' не увенчалось успехом.');
