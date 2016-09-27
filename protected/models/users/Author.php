@@ -42,4 +42,21 @@ class Author extends User {
     public function symbols(){
         return reset(mysqli_fetch_assoc(mysqli_query($conn = MysqlConnect::getConnection(),"SELECT SUM(`tbl_text`.`length`) FROM `tbl_text`, `tbl_task` WHERE `tbl_text`.`id` = `tbl_task`.`id_text` AND `tbl_text`.`accepted` = '1' AND `tbl_task`.`id_author` = '$this->id'")));
     }
+
+    /**
+     * @return bool
+     */
+    protected function beforeSave() {
+        if (!$this -> id_type) {
+            $this->id_type = UserType::getIdByStr($this->view());
+        }
+        $scenario = $this -> getScenario();
+
+        switch($scenario) {
+            case 'create':
+
+                break;
+        }
+        return parent::beforeSave();
+    }
 }

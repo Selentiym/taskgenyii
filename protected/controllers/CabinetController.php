@@ -42,6 +42,16 @@ class CabinetController extends Controller {
                     return Yii::app() -> createUrl('cabinet/index');
                 }
             ),
+            'AuthorCreate' => array(
+                'class' => 'application.controllers.actions.ModelCreateAction',
+                'modelClass' => 'Author',
+                'view' => '//author/_form',
+                'scenario' => 'create',
+                'redirectUrl' => function($model){
+                    return Yii::app() -> createUrl('cabinet/index');
+                }
+            ),
+
             'loadKeywords' => array(
                 'class' => 'application.controllers.actions.ModelUpdateAction',
                 'modelClass' => 'Task',

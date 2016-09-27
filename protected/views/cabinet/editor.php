@@ -51,5 +51,5 @@ Yii::app() -> getClientScript() -> registerScript('structure','
 <div id="TreeContainer">
 
 </div>
-
+<?php echo CHtml::link("Создать автора",Yii::app() -> createUrl("cabinet/AuthorCreate")); ?>
 <?php //$this -> renderPartial('//cabinet/dialog', array('model' => User::model() -> findByPk(3))); ?>

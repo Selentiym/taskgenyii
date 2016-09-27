@@ -1184,15 +1184,15 @@ function genControlPanel (tree) {
 
     console.log(authorList);
 
-    new ControlButton("","edit",function(el, event){$(event.target).attr("href", baseUrl + "/task/edit/" + el.id); return true;},tree, {tag:"a"},ControlButton.prototype.actionForOneCountChecks);
-    new ControlButton("","keys",function(el, event){$(event.target).attr("href", baseUrl + "/cabinet/loadKeywords/" + el.id); return true;},tree, {tag:"a"},ControlButton.prototype.actionForOneCountChecks);
-    new ControlButton("","look",function(el, event){$(event.target).attr("href", baseUrl + "/task/" + el.id); return true;},tree, {tag:"a"},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","edit",function(el, event){$(event.target).attr("href", baseUrl + "/task/edit/" + el.id); return true;},tree, {tag:"a", title:"Редактировать задание"},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","keys",function(el, event){$(event.target).attr("href", baseUrl + "/cabinet/loadKeywords/" + el.id); return true;},tree, {tag:"a", title:"Загрузить слова"},ControlButton.prototype.actionForOneCountChecks);
+    new ControlButton("","look",function(el, event){$(event.target).attr("href", baseUrl + "/task/" + el.id); return true;},tree, {tag:"a", title:"Смотреть текст"},ControlButton.prototype.actionForOneCountChecks);
     var authorSelector = $("#authorForAssignSelect");
     new ControlButton("","assign_author",function(el){
         $.post(baseUrl + "/Task/assignAuthor/" + el.id, {
             author: authorList.val()
         },null, "JSON");
-    },tree,{}, function(coll){ if (!coll) {return false;} else if (coll.length > 0) {return confirm("Вы собираетесь присвоить "+coll.length+" заданий автору "+$(authorList).select2('data')[0].text)+". Ok?"; } else {return false;} });
+    },tree,{title:"Назначить автора"}, function(coll){ if (!coll) {return false;} else if (coll.length > 0) {return confirm("Вы собираетесь присвоить "+coll.length+" заданий автору "+$(authorList).select2('data')[0].text)+". Ok?"; } else {return false;} });
 
     //new ControlButton("","plus",function(el){location.href = baseUrl + "/TaskCreate/parent/" + el.id; return true;},tree);
     new ControlButton("","plus",function(el){$.post(
@@ -1204,7 +1204,7 @@ function genControlPanel (tree) {
         } else {
             alert("Ошибка при создании!");
         }
-    }); return true;},tree);
+    }); return true;},tree,{title:"Добавить потомка"});
     new ControlButton("&#9745;","font20",function(el){el.iterateOverDescendants(function(child){child.setSelected(true);
         child.parent.childrenContainer.show(500);
 
@@ -1257,7 +1257,7 @@ function genControlPanel (tree) {
         sendDeleteRequest(toDel);
         //Не продолжаем потом прбегать по элементам
         return true;
-    },tree,{title:"Снять выделение с потомков"}, true);
+    },tree,{title:"Удалить"}, true);
     new ControlButton("","delete_keys",function(el){$.post(baseUrl+"/Task/deleteKeys/"+el.id).done(function(){location.reload();});},tree,{},
         function (coll) {if (coll.length) {return confirm("Вы собираетесь удалить поисковые фразы и ключевые слова у " + coll.length + " заданий. Это действие необратимо. Продолжить все равно?");} else {return false;}});
     if (authorList) {

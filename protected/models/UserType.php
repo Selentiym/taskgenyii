@@ -89,4 +89,7 @@ class UserType extends UModel
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
+	public static function getIdByStr ($str){
+		return self::model() -> findByAttributes(['alias' => $str]) -> id;
+	}
 }
