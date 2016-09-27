@@ -116,11 +116,24 @@ function Phrase(text, param){
     //Если фраза исходная, то есть поисковая и подается на вход, то
     //в будущем не нужно считать ее вхождения
     me.initial = param.initial === true;
+    me.lock = false;
+    //Функции обработки закрытости фразы для изменений
+
+    me.setLockValue = function(newVal){
+        if (newVal) {
+            me.element.addClass("locked");
+        } else {
+            me.element.removeClass("locked");
+        }
+        me.lock = !(!newVal);
+    };
+    me.toggleLockValue = function(){
+        me.setLockValue(!me.lock);
+    };
     //Изначальные фразы не должны отобржаться на странице.
     if (!me.initial) {
         if (!param.strict) {
             param.strict = null;
-
             if (!param.morph) {
                 param.morph = 1;
             }
@@ -175,6 +188,12 @@ function Phrase(text, param){
         }).click(function(){
             me.removePhrase();
         }));
+
+        me.element.append($('<span>',{
+            "class": "lock"
+        }).click(function(){
+            me.toggleLockValue();
+        }));
         //Позволяем инпуту ловить ключевые слова
         me.inputEl.droppable({
             drop: function (e, ui) {
@@ -213,6 +232,9 @@ function Phrase(text, param){
         };
         //Контейнер для элеентов данного типа должен быть задан в прототипе.
         Phrase.prototype.container.append(me.element);
+
+        //Теперь, когда все элементы созданы, можно задавть значение.
+        me.setLockValue(param.lock);
     } else {
         me.element = new LinkedDom('div',{
             "class":"initialPhrase"
@@ -424,6 +446,27 @@ function Phrase(text, param){
         Lexical.prototype.phrasesPool.splice(Lexical.prototype.phrasesPool.indexOf(me),1);
         Phrase.prototype.countPhrases();
     };
+    me.deleteStem = function(word) {
+        if (!me.lock) {
+            var stem = word.stem;
+            if (stem) {
+                $.post(baseUrl + '/site/deleteStem', {text: me.text, stem: stem}, null, "JSON").done(function (data) {
+                    if (data.success) {
+                        me.inputEl.val(data.rezText);
+                        //word.getUnused(me, me.initial);
+                        me.refresh();
+                        return true;
+                    } else {
+                        me.setLockValue(true);
+                        alert('Возникла ошибка при удалении корня '+word.stem+'. Неудачно обработанная фраза отмечена замком.');
+                    }
+                });
+                return true;
+            }
+        }
+        return false;
+    };
+
     Phrase.prototype.countPhrases();
     return me;
 }
@@ -447,13 +490,17 @@ function Word(text,param) {
         }
     }).html(text);
     me.numCell = $('<td>').html(me.num);
+    me.counterElement = $('<span>');
+    me.removeWordElement = $('<span>',{
+        "class":"removeWord"
+    }).html("del");
     me.element = new LinkedDom('tr',{
         "class":"word"
     },me)
         .append($('<td>', {"class":"fulltext"})
             .append(me.textEl))
         .append(me.stemCell)
-        .append(me.counterCell)
+        .append(me.counterCell.append(me.counterElement).append(me.removeWordElement))
         .append(me.numCell);
     //Добавляем возможность скрыть слово
     me.hidden = false;
@@ -538,7 +585,12 @@ function Word(text,param) {
             className = 'ranOut';
         }
         //me.element.detach().prependTo(Word.prototype.container);
-        me.counterCell.html($('<span>',{"class":className}).append(newVal));
+        //me.counterCell.html($('<span>',{"class":className}).append(newVal));
+        me.counterElement
+            .removeClass('someLeft')
+            .removeClass('ranOut')
+            .addClass(className)
+            .html(newVal);
     };
     //Если не задано количество повторений слова, то считаем, что нужно всего одно.
     if (!param.counter) {
@@ -581,6 +633,22 @@ function Word(text,param) {
             }
         }
     };
+    me.removeWord = function (){
+        if (me.phrases.length) {
+            var deleted = false;
+
+            me.phrases.every(function(toStrip){
+                deleted = toStrip.deleteStem(me);
+                return !deleted;
+            });
+            if (!deleted) {
+                alert('Удаление корня '+me.stem+' не увенчалось успехом.');
+            }
+        } else {
+            alert('Слово нигде не использовано!');
+        }
+    };
+    me.removeWordElement.click(me.removeWord);
     //Если снаружи задан массив корней слова (должен иметь один элемент)
     if (param.stems) {
         me.stems = param.stems;

@@ -25,6 +25,13 @@ class SiteController extends Controller
 				'access' => true,
 				'partial' => true
 			),
+			'deleteStem' => array(
+				'class' => 'application.controllers.actions.FileViewAction',
+				'view' => '//site/deleteStem',
+				'ignore' => true,
+				'access' => true,
+				'partial' => true
+			),
 		);
 	}
 

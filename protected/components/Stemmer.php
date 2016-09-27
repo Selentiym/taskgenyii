@@ -26,7 +26,9 @@ class Stemmer {
 
     private static $rules = array('спб' => 'спб');
 
-
+    /**
+     * @return Stemmer
+     */
     public static function getInstance(){
         if (!self::$instance) {
             self::$instance = new self;

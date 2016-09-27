@@ -7,7 +7,7 @@
     height:80%;
 }
 #phrasesCont div input {
-    width: 70%;
+    width: 67%;
     margin-top:10px;
     border-radius:5px;
     padding:3px;
@@ -94,4 +94,15 @@
     width:18%;
     position:fixed;
     left:80%;
+}
+
+div.phrase .lock {
+    display: inline-block;
+    vertical-align:middle;
+    width:20px;
+    height:20px;
+    background:url('../images/unlocked_small.png') no-repeat;
+}
+div.phrase.locked .lock{
+    background:url('../images/locked_small.png') no-repeat;
 }
