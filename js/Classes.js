@@ -638,8 +638,10 @@ function Word(text,param) {
             var deleted = false;
 
             me.phrases.every(function(toStrip){
-                deleted = toStrip.deleteStem(me);
-                return !deleted;
+                if (!toStrip.initial) {
+                    deleted = toStrip.deleteStem(me);
+                    return !deleted;
+                }
             });
             if (!deleted) {
                 alert('Удаление корня '+me.stem+' не увенчалось успехом.');
