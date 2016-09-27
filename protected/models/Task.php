@@ -532,11 +532,17 @@ class Task extends Commentable {
 		/**
 		 * @type Text $text
 		 */
+		if ($this -> author) {
+			$name = $this -> author -> name;
+		} else {
+			$name = '';
+		}
 		$arr = array('id' => $this -> id, 'name' => $this -> name, 'extra' => [
 				'handedIn' => $text -> handedIn,
 				'QHandedIn' => $text -> QHandedIn,
 				'accepted' => $text -> accepted,
-				'noAuthor' => (!$this -> author),
+				'authorName' => $name,
+				'authorHtml' => $this -> id_author,
 				'hasKeys' => $this -> searchphrasesCount,
 				'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $this -> id]) > 0),
 				'keysGenerated' => (Keyphrase::model() -> countByAttributes(['id_task' => $this -> id]) > 0),

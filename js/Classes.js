@@ -1155,7 +1155,7 @@ function addButtons(branch){
             height:'20px'
         }
     }));
-    if (status.noAuthor == 1) {
+    if (!status.authorName) {
         branch.buttonContainer.append($('<img>',{
             src:baseUrl + '/images/missing.png',
             alt: 'Нет автора',
@@ -1165,6 +1165,12 @@ function addButtons(branch){
             }
         }));
         branch.element.addClass('noAuthor');
+    } else {
+        branch.buttonContainer.append($('<span>',{
+            "class":"author"+status.author,
+            title:status.authorName,
+            css:{width:"20px", height:"20px"}
+        }).html(status.authorHtml));
     }
 }
 function genControlPanel (tree) {
