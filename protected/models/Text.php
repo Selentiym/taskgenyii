@@ -147,7 +147,7 @@ class Text extends Commentable {
 			$this -> QHandedIn = 0;
 			$this -> save(false, array('text',"handedIn","QHandedIn"));
 		}
-		$text = new textStringGlued($text);
+		$text = new TextStringGlued($text);
 
 		$i = -1;
 		$keyPhrasesSorted = $this -> task -> getKeyphrasesSorted();
