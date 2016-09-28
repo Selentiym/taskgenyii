@@ -52,7 +52,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
 
 </div>
 <?php echo CHtml::link("Создать автора",Yii::app() -> createUrl("cabinet/AuthorCreate"), ['class' => 'buttonText']); ?>
-<?php UHtml::activeDropDownListChosen2(Author::model(),'id',UHtml::listData(User::model() -> author() -> findAll(),"id","name"),['id'=>'changeAuthor'],[],null);
+<?php UHtml::activeDropDownListChosen2(Author::model(),'id',UHtml::listData(User::model() -> author() -> findAll(),"id","name"),['id'=>'changeAuthor','empty_line' => true],[],json_encode(['placeholder' => 'Выберите автора']));
 Yii::app() -> getClientScript() -> registerScript('changeAuthorPage',"
     $('#changeAuthor').on('select2:select', function(e){
         location.href = baseUrl + '/cabinet/authorEdit/' +e.params.data.id;
@@ -60,7 +60,7 @@ Yii::app() -> getClientScript() -> registerScript('changeAuthorPage',"
 ",CClientScript::POS_READY);
 ?>
 <?php echo CHtml::link("Создать шаблон",Yii::app() -> createUrl("cabinet/PatternCreate"), ['class' => 'buttonText']); ?>
-<?php UHtml::activeDropDownListChosen2(Pattern::model(),'id',UHtml::listData(Pattern::model() -> findAll(),"id","name"),['id'=>'changePattern'],[],null);
+<?php UHtml::activeDropDownListChosen2(Pattern::model(),'id',UHtml::listData(Pattern::model() -> findAll(),"id","name"),['id'=>'changePattern','empty_line' => true],[],json_encode(['placeholder' => 'Выберите шаблон']));
 Yii::app() -> getClientScript() -> registerScript('changePatternPage',"
     $('#changePattern').on('select2:select', function(e){
         location.href = baseUrl + '/cabinet/patternEdit/' +e.params.data.id;
