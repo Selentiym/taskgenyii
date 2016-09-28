@@ -29,6 +29,13 @@ class CabinetController extends Controller {
                 'view' => '//cabinet/archive',
                 'layout' => 'cabinet'
             ),
+            'authorStat' => array(
+                'class' => 'application.controllers.actions.ModelViewAction',
+                'modelClass' => 'Author',
+                'scenario' => 'stat',
+                'view' => '//author/stat',
+                'layout' => 'cabinet'
+            ),
 
             'TaskCreate' => array(
                 'class' => 'application.controllers.actions.ModelCreateAction',
@@ -42,7 +49,7 @@ class CabinetController extends Controller {
                     return Yii::app() -> createUrl('cabinet/index');
                 }
             ),
-            'AuthorCreate' => array(
+            'authorCreate' => array(
                 'class' => 'application.controllers.actions.ModelCreateAction',
                 'modelClass' => 'Author',
                 'view' => '//author/_form',
@@ -54,6 +61,7 @@ class CabinetController extends Controller {
                     return false;
                 }
             ),
+
             'authorEdit' => array(
                 'class' => 'application.controllers.actions.ModelUpdateAction',
                 'modelClass' => 'Author',
@@ -64,6 +72,15 @@ class CabinetController extends Controller {
                 },
                 'redirect' => false,
                 'ignore' => false
+            ),
+            'authorPay' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'pay',
+                'redirectMethod' => 'redirectAfterPay',
+                'ignore' => true,
+                'modelClass' => 'Author',
+                'scenario' => 'pay',
+                'access' => Yii::app() -> user -> checkAccess('editor')
             ),
             'PatternCreate' => array(
                 'class' => 'application.controllers.actions.ModelCreateAction',

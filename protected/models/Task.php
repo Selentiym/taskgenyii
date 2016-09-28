@@ -93,6 +93,8 @@ class Task extends Commentable {
 			'keyphrases' => array(self::HAS_MANY, 'Keyphrase', 'id_task'),
 			'searchphrases' => array(self::HAS_MANY, 'SearchPhrase', 'id_task'),
 			'searchphrasesCount' => array(self::STAT, 'SearchPhrase', 'id_task'),
+			'notAcceptedTimes' => array(self::STAT, 'Text', 'id_task', 'condition' => 'accepted=0'),
+			'notAcceptedTexts' => array(self::HAS_MANY, 'Text', 'id_task', 'condition' => 'accepted=0'),
 			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task', 'order' => 'updated DESC'),
 			//'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1', 'order' => 'updated DESC'),

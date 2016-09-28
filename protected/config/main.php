@@ -56,6 +56,8 @@ return array(
 				'' => 'cabinet/index',
 				'stem' => 'site/stem',
 				'logout' => 'login/logout',
+				'author/<action:\w+>/<arg:\w+>' => 'cabinet/author<action>',
+				'author/<action:\w+>' => 'cabinet/author<action>',
 				'dialog/open/<arg:\w+>' => 'dialog/open',
 				'<action:(TaskCreate|TextCreate)>/parent/<parentId:\d+>' => 'cabinet/<action>',
 				'<action:(TaskCreate|TextCreate)>' => 'cabinet/<action>',
