@@ -59,4 +59,7 @@ class Author extends User {
         }
         return parent::beforeSave();
     }
+    public function customFind($arg){
+        return self::model() -> findByPk($arg);
+    }
 }

@@ -121,7 +121,13 @@ mso-add-space:auto;text-align:center"><b><span style="font-size:14.0pt;mso-bidi-
 
 <p class="MsoNormal">Статья должна содержать в себе следующие логические разделы:</p>
 
-<?php $this -> renderPartial('//pattern/'.$model -> pattern -> view, array('model' => $model)); ?>
+<?php
+if (!$model -> pattern -> byHtml) {
+    $this->renderPartial('//pattern/' . $model->pattern->view, array('model' => $model));
+} else {
+    echo $model -> pattern -> html;
+}
+?>
 
 <p class="MsoNormal">Наличие структуры призвано стандартизировать статьи данного
     типа для удобства пользователя. Поэтому если Вы чувствуете, что получается

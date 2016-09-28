@@ -37,3 +37,11 @@ body {margin: 0}
 .hidden {
     display:none;
 }
+a.buttonText {
+    text-decoration: none;
+    padding:5px;
+    background: #08dd66;
+    font-size:14px;
+    border-radius:5px;
+    margin: 0 5px;
+}

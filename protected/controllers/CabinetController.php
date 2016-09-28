@@ -48,8 +48,42 @@ class CabinetController extends Controller {
                 'view' => '//author/_form',
                 'scenario' => 'create',
                 'redirectUrl' => function($model){
+                    if (!$model -> getError('input_password')) {
+                        return Yii::app()->createUrl('cabinet/index');
+                    }
+                    return false;
+                }
+            ),
+            'authorEdit' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Author',
+                'scenario' => 'update',
+                'view' => '//author/_form',
+                'redirectUrl' => function($model){
+                    return Yii::app()->createUrl('cabinet/index');
+                },
+                'redirect' => false,
+                'ignore' => false
+            ),
+            'PatternCreate' => array(
+                'class' => 'application.controllers.actions.ModelCreateAction',
+                'modelClass' => 'Pattern',
+                'view' => '//pattern/_form',
+                'scenario' => 'create',
+                'redirectUrl' => function($model){
                     return Yii::app() -> createUrl('cabinet/index');
                 }
+            ),
+            'patternEdit' => array(
+                'class' => 'application.controllers.actions.ModelUpdateAction',
+                'modelClass' => 'Pattern',
+                'scenario' => 'update',
+                'view' => '//pattern/_form',
+                'redirectUrl' => function($model){
+                    return Yii::app()->createUrl('cabinet/index');
+                },
+                'redirect' => false,
+                'ignore' => false
             ),
 
             'loadKeywords' => array(

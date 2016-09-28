@@ -7,9 +7,11 @@
  * @property integer $id
  * @property string $name
  * @property string $view
+ * @property bool $byHtml
+ * @property string $html
  */
-class Pattern extends UModel
- {
+class Pattern extends UModel {
+	public $byHtml = 1;
 	/**
 	 * @return string the associated database table name
 	 */
@@ -24,12 +26,11 @@ class Pattern extends UModel
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-				array('name, view', 'required'),
+				array('name', 'required'),
+				array('view', 'match','pattern' => '/[a-z]+[a-z\d_-]*/i', 'allowEmpty' => true, 'message' => 'Имя файла должно содержать только латинские буквы, цифры и подчеркивания и начинаться с буквы.'),
 				array('name', 'length', 'max'=>1024),
 				array('view', 'length', 'max'=>256),
-				// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('id, name, view', 'safe', 'on'=>'search'),
+				array('id, name, view, html', 'safe'),
 		);
 	}
 
