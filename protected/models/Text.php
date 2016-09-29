@@ -476,8 +476,8 @@ class Text extends Commentable {
 			case 'decline':
 				//if (Yii::app() -> user -> checkAccess('administrateTask',['task' => $this -> task])) {
 				if (Yii::app() -> user -> checkAccess('editor')) {
-					$this -> accepted = 0;
 					$text = $this -> task -> createText($this);
+					$this -> accepted = 0;
 					if (!$text -> save()) {
 						$ar = $text -> getErrors();
 					}
@@ -517,8 +517,9 @@ class Text extends Commentable {
 		 */
 		$this -> length = $this -> countLength(false);
 		//Обновляем время обновления
-		$this -> updated = new CDbExpression("CURRENT_TIMESTAMP");
-
+		if (!is_a($this -> updated, 'CDbExpression')) {
+			$this->updated = new CDbExpression("CURRENT_TIMESTAMP");
+		}
 		return parent::beforeSave();
 	}
 

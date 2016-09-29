@@ -29,6 +29,13 @@ class CabinetController extends Controller {
                 'view' => '//cabinet/archive',
                 'layout' => 'cabinet'
             ),
+            'payView' => array(
+                'class' => 'application.controllers.actions.ModelViewAction',
+                'modelClass' => 'Payment',
+                'scenario' => 'cabinet',
+                'view' => '//pay/view',
+                'layout' => 'cabinet'
+            ),
             'authorStat' => array(
                 'class' => 'application.controllers.actions.ModelViewAction',
                 'modelClass' => 'Author',

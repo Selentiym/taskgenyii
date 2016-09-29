@@ -22,6 +22,7 @@
  * @property int $searchphrasesCount
  * @property Keyword[] $keywords
  * @property Text[] $texts
+ * @property Text[] $notAcceptedTexts
  * @property Text $currentText
  * @property Text $currentlyWrittenText
  * @property Text $rezult
@@ -95,6 +96,7 @@ class Task extends Commentable {
 			'searchphrasesCount' => array(self::STAT, 'SearchPhrase', 'id_task'),
 			'notAcceptedTimes' => array(self::STAT, 'Text', 'id_task', 'condition' => 'accepted=0'),
 			'notAcceptedTexts' => array(self::HAS_MANY, 'Text', 'id_task', 'condition' => 'accepted=0'),
+			'notAcceptedTextsNum' => array(self::STAT, 'Text', 'id_task', 'condition' => 'accepted=0'),
 			'keywords' => array(self::HAS_MANY, 'Keyword', 'id_task'),
 			'texts' => array(self::HAS_MANY, 'Text', 'id_task', 'order' => 'updated DESC'),
 			//'currentText' => array(self::HAS_ONE, 'Text', 'id_task', 'condition' => 'handedIn = 1', 'order' => 'updated DESC'),
@@ -106,6 +108,7 @@ class Task extends Commentable {
 			'pattern' => array(self::BELONGS_TO, 'Pattern', 'id_pattern'),
 			'author' => array(self::BELONGS_TO, 'Author', 'id_author'),
 			'editor' => array(self::BELONGS_TO, 'Editor', 'id_editor'),
+			'payments' => array(self::MANY_MANY, 'Payment', 'tbl_task_payment(id_task, id_payment)'),
 		) + parent::relations();
 		//Строчка +parent::relations() делает эту модель комментируемой.
 	}
@@ -298,7 +301,8 @@ class Task extends Commentable {
 			$text -> uid = $t -> uid;
 		}
 		$text -> id_task = $this -> id;
-		$text -> updated = new CDbExpression('CURRENT_TIMESTAMP');
+		//Прибавили единичку намеренно! Чтобы при отклонении последним был именно только что созданный текст, а не обновленный
+		$text -> updated = new CDbExpression('FROM_UNIXTIME(UNIX_TIMESTAMP() + 1)');
 		return $text;
 	}
 	/**

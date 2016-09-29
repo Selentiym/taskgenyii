@@ -11,9 +11,11 @@
  * @property Task[] $tasks
  * @property Task[] $activeTasks
  * @property Task[] $completedTasks
- * @property Task[] $notPayedTasks
  */
 class Author extends User {
+
+    public $idCreatedPay;
+
     public function view(){
         return 'author';
     }
@@ -32,9 +34,7 @@ class Author extends User {
             'tasks' => array(self::HAS_MANY, 'Task', 'id_author'),
             'activeTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NULL'),
             'completedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
-            'completedTasksNum' => array(self::STAT, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
-            'notPayedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL AND `payed`=0'),
-            'secondlyAccepted' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL', 'having'=>'COUNT(`notAcceptedTexts`.`id`) > 0','with' => ['notAcceptedTexts']),
+            'completedTasksNum' => array(self::STAT, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL')
         );
     }
 
@@ -52,12 +52,8 @@ class Author extends User {
      * @throws DatabaseException
      */
     public function symbolsNotPayed(){
-        /*$sum = 0;
-        foreach ($this -> notPayedTasks as $task) {
-            $sum += $task -> rezult -> length;
-        }
-        return $sum;*/
-        return reset(mysqli_fetch_assoc(mysqli_query($conn = MysqlConnect::getConnection(),"SELECT SUM(`tbl_text`.`length`) FROM `tbl_text`, `tbl_task` WHERE `tbl_text`.`id` = `tbl_task`.`id_text` AND `tbl_text`.`accepted` = '1' AND `tbl_task`.`id_author` = '$this->id' AND `tbl_task`.`payed`='0'")));
+        $rez = reset(mysqli_fetch_row(mysqli_query(MysqlConnect::getConnection(),"SELECT SUM(`te`.`length`) FROM `tbl_task` `t` INNER JOIN `tbl_text` `te` ON (`te`.`id` = `t`.`id_text`) WHERE (`t`.`id_author` = '".$this -> id."') AND (SELECT COUNT(`id`) FROM `tbl_task_payment` `tp` WHERE `tp`.`id_task` = `t`.`id`) = 0")));
+        return $rez > 0 ? $rez : 0;
     }
     /**
      * @return bool
@@ -83,20 +79,24 @@ class Author extends User {
      * Создает объект оплаты, добавляя в него все завершенные, но пока не оплаченные тексты.
      */
     public function pay(){
-        $tasks = $this -> notPayedTasks;
+        $tasks = $this -> notPayedTasks();
         if (count($tasks) == 0) {
+            Yii::app() -> user -> setFlash('noUnpayedTasks','Автор не имеет неоплаченных символов.');
             return;
         }
         $pay = new Payment();
         $pay -> id_author = $this -> id;
         $pay -> sum = $this -> CalculatePayment($tasks);
         if ($pay -> save()) {
+            $this -> idCreatedPay = $pay -> id;
             //После создания объекта оплаты, добавляем в него оплаченные тексты.
             foreach ($tasks as $task) {
                 $link = new TaskPayment();
                 $link->id_task = $task->id;
                 $link->id_payment = $pay->id;
-                $link->save();
+                if ($link->save()) {
+                    $task -> save();
+                }
             }
             $this -> notify('В ближайшее время Вам должен поступить платеж на сумму '.$pay -> sum.'. <a href="'.Yii::app() -> createUrl('payment/view',['arg' => $pay -> id]).'">Подробная информация</a>.');
         }
@@ -111,5 +111,29 @@ class Author extends User {
             return $text -> length;
         }, 0);
         return round($sum / 1000 * 65);
+    }
+    public function redirectAfterPay(){
+        if ($this -> idCreatedPay) {
+            return Yii::app()->createUrl('cabinet/payView', ['arg' => $this->idCreatedPay]);
+        }
+        return Yii::app()->createUrl('cabinet/authorStat', ['arg' => $this->id]);
+    }
+    /*
+     * @return int[] task ids that were accepted not from the first time
+     */
+    public function secondlyAcceptedIds() {
+        return array_map(function($el){return (int)$el[0];},mysqli_fetch_all(mysqli_query($conn = MysqlConnect::getConnection(),"SELECT `tbl_task`.`id` FROM `tbl_task` WHERE (`tbl_task`.`id_author` = '".$this -> id."')  AND  `tbl_task`.`id_text` IS NOT NULL AND (SELECT COUNT(`id`) FROM `tbl_text` WHERE `tbl_text`.`id_task` = `tbl_task`.`id` AND `tbl_text`.`accepted` = '0') > 0")));
+    }
+    /**
+     * @return Task[] tasks that were accepted not from the first time
+     */
+    public function secondlyAccepted(){
+        return Task::model() -> findAllByPk($this -> secondlyAcceptedIds());
+    }
+    public function notPayedTasksIds(){
+        return array_map(function($el){return (int)$el[0];},mysqli_fetch_all(mysqli_query($conn = MysqlConnect::getConnection(),"SELECT `t`.`id` FROM `tbl_task` `t` WHERE (`t`.`id_author` = '".$this -> id."')  AND  `t`.`id_text` IS NOT NULL AND (SELECT COUNT(`id`) FROM `tbl_task_payment` `tp` WHERE `tp`.`id_task` = `t`.`id`) = 0")));
+    }
+    public function notPayedTasks(){
+        return Task::model() -> findAllByPk($this -> notPayedTasksIds());
     }
 }

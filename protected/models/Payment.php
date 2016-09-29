@@ -10,6 +10,10 @@
  * @property string $comment
  * @property integer $id_author
  * @property integer $sum
+ *
+ * relations:
+ * @property Task[] $tasks
+ * @property Task[] $tasks_not_marked
  */
 class Payment extends UModel
  {
@@ -43,6 +47,7 @@ class Payment extends UModel
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+				'tasks' => array(self::MANY_MANY, 'Task', 'tbl_task_payment(id_payment, id_task)'),
 			);
 	}
 

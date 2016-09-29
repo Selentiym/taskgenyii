@@ -44,7 +44,7 @@ class CustomFlash
     }
     public function giveName()
     {
-        $name =  ''.(string)$types[$this -> _type] . (string)$this -> _modelname . (string)$this -> _topic;
+        $name =  ''.(string)self::$types[$this -> _type] . (string)$this -> _modelname . (string)$this -> _topic;
         return $name;
     }
     public function giveContent()
@@ -95,7 +95,11 @@ class CustomFlash
     public function showFlashes()
     {
         $flashes = Yii::app() -> user -> getFlashes();
-        CustomFlash::showAll($flashes, true);
+        if ($arr = CustomFlash::showAll($flashes, true)) {
+            return $arr;
+        } else {
+            return [];
+        }
     }
 }
 ?>
