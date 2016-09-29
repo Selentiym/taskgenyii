@@ -89,6 +89,19 @@ class CabinetController extends Controller {
                 'scenario' => 'pay',
                 'access' => Yii::app() -> user -> checkAccess('editor')
             ),
+            'payConfirm' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'confirm',
+                'redirectMethod' => function($model){
+                    return Yii::app() -> createUrl('cabinet/index');
+                },
+                'ignore' => true,
+                'modelClass' => 'Payment',
+                'scenario' => 'confirm',
+                'access' => function($model){
+                    return reset($model -> tasks) -> id_author == User::logged() -> id;
+                }
+            ),
             'PatternCreate' => array(
                 'class' => 'application.controllers.actions.ModelCreateAction',
                 'modelClass' => 'Pattern',

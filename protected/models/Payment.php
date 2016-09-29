@@ -103,4 +103,9 @@ class Payment extends UModel
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
 	}
+	public function confirm() {
+		$this -> confirmed = 1;
+
+		$this -> save();
+	}
 }

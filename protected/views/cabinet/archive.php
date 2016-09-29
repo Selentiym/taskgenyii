@@ -11,7 +11,7 @@
  */
 //$this -> renderPartial('//_navBar');
 foreach ($model -> completedTasks as  $task) {
-    $this -> renderPartial('//task/shortcut',['model' => $task]);
+    $this -> renderPartial('//task/shortcut',['task' => $task]);
 }
 ?>
 

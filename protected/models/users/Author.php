@@ -72,6 +72,12 @@ class Author extends User {
         return parent::beforeSave();
     }
     public function customFind($arg){
+        $s = $this -> getScenario();
+        switch($s){
+            case 'cabinet':
+                return User::logged();
+                break;
+        }
         return self::model() -> findByPk($arg);
     }
 
@@ -98,7 +104,7 @@ class Author extends User {
                     $task -> save();
                 }
             }
-            $this -> notify('В ближайшее время Вам должен поступить платеж на сумму '.$pay -> sum.'. <a href="'.Yii::app() -> createUrl('payment/view',['arg' => $pay -> id]).'">Подробная информация</a>.');
+            $this -> notify('В ближайшее время Вам должен поступить платеж на сумму '.$pay -> sum.'. <a href="'.Yii::app() -> createUrl('cabinet/payView',['arg' => $pay -> id]).'">Подробная информация</a>.');
         }
     }
 
@@ -107,8 +113,8 @@ class Author extends User {
      * @param Task[] $tasks - задания к оплате
      */
     public function CalculatePayment($tasks){
-        $sum = array_reduce($tasks, function($text){
-            return $text -> length;
+        $sum = array_reduce($tasks, function($task){
+            return $task -> rezult -> length;
         }, 0);
         return round($sum / 1000 * 65);
     }
