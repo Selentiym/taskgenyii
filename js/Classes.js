@@ -16,8 +16,8 @@ Word.prototype.showAll = function(){
     });
 };
 /**
- * Функция пробегает по всему словарю в возрастающем порядке, выцепляя наиболее популярные
- * фразы, содаржащие это слово
+ * Функция пробегает по всему словарю в порядке возрастания значимости слова, выцепляя наиболее
+ * популярные фразы, содаржащие это слово
  */
 Phrase.prototype.completeSet = function(){
     //Пробегаем по всем словам. порядок по .num должен быть по возрастанию
@@ -39,6 +39,15 @@ Phrase.prototype.completeSet = function(){
                 }
             }
         }
+    });
+};
+
+Phrase.prototype.reorderPhrases = function(){
+    var allPhrases = Lexical.prototype.phrasesPool;
+    var keys = _.where(allPhrases, {initial:false, lock:false});
+    var search = _.where(allPhrases, {initial:true});
+    _.each(keys, function(phr){
+        console.log(phr);
     });
 };
 function Lexical(text, param) {
@@ -390,26 +399,65 @@ function Phrase(text, param){
         }
     };
 
-    me.onAfterAnalyze = function(){
-        //Проверяем, нет ли такой же фразы, но занятой.
-        _.each(Lexical.prototype.phrasesPool,function(phrase, key){
+    /**
+     * Checks whether the phrase morphologically includes the given one
+     * Also checks the opposite if (bothSides == true)
+     * 1 means this pharse includes the other
+     * 2 means that the other phrase includes this one
+     * @param phrase
+     * @param {bool} bothSides
+     * @returns {number}
+     */
+    me.includes = function(phrase, bothSides){
+        var shorter = phrase;
+        var longer = me;
+        if (phrase.stems.length > me.stems.length) {
+            shorter = me;
+            longer = phrase;
+            if (!bothSides) {
+                return 0;
+            }
+        }
+        var intersect = _.intersection(longer.stems, shorter.stems);
+        if (intersect.length == shorter.stems.length) {
+            longer.highlight(shorter);
+            shorter.highlight(longer);
+            if (me.stems.length == longer.stems.length) {
+                return 1;
+            }
+            return 2;
+            //alert('Фраза "' + shorter.text + '" морфологически включена в фразу "' + longer.text+'"');
+        }
+    };
 
-            if ((phrase.analyzed)&&(!phrase.initial)&&(phrase)&&(phrase.stems.length)&&(me.stems.length)&&(me != phrase)) {
-                console.log(phrase);
-                var shorter = phrase;
-                var longer = me;
-                if (phrase.stems.length > me.stems.length) {
-                    shorter = me;
-                    longer = phrase;
-                }
-                var intersect = _.intersection(longer.stems, shorter.stems);
-                if (intersect.length == shorter.stems.length) {
-                    longer.highlight(shorter);
-                    shorter.highlight(longer);
-                    //alert('Фраза "' + shorter.text + '" морфологически включена в фразу "' + longer.text+'"');
+    /**
+     * Возвращает массив фраз, которые морфологически включены в данную, либо которые включают данную
+     * @param phrases
+     * @param additionalFilter
+     */
+    me.intersectsWith = function(phrases, additionalFilter){
+        return _.filter(phrases, function(phrase, bothSides){
+            if (typeof additionalFilter == 'function') {
+                if (!additionalFilter(phrase)) {
+                    return false;
                 }
             }
+            return me.includes(phrase, bothSides);
         });
+    };
+
+    me.onAfterAnalyze = function(){
+        //Проверяем, нет ли такой же фразы, но занятой.
+
+        var toHighlight = me.intersectsWith(Lexical.prototype.phrasesPool, function(phrase){return ((phrase.analyzed)&&(!phrase.initial)&&(phrase)&&(phrase.stems.length)&&(me.stems.length)&&(me != phrase));}, true);
+
+        if (toHighlight.length > 0) {
+            _.each(toHighlight, function(phrase){
+                phrase.highlight(me);
+                me.highlight(phrase);
+            });
+        }
+
         //Нам же интересно, чтобы фраза была использована
         me.use();
     };
@@ -1172,6 +1220,14 @@ function addButtons(branch){
             css:{width:"20px", height:"20px"}
         }).html(status.authorHtml));
     }
+    branch.buttonContainer.append($('<a>',{
+        href: baseUrl + '/task/' + branch.id,
+        css:{
+            width:'20px',
+            height:'20px',
+            "background": "url('" + baseUrl + '/images/view_small.png'+"')"
+        }
+    }));
 }
 function genControlPanel (tree) {
     if (!tree) {return;}

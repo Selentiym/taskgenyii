@@ -184,6 +184,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
 
         <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
+        <input type="button" onClick="Phrase.prototype.reorderPhrases();" value="Учесть пассажи" />
         <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToShowTask" id="redirectToShowTask" value="Смотреть результат" />
         <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToKeywords" id="redirectToKeywords" value="Загрузить данные из KeyCollector" />
         <div>Всего фраз: <span id="phraseCount"></span></div>
