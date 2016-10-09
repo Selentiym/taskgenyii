@@ -48,6 +48,17 @@ class TaskController extends Controller {
                     return Yii::app() -> user -> checkAccess('editor');
                 }
             ),
+            'editComment' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'editComment',
+                'ignore' => true,
+                'modelClass' => 'Task',
+                'scenario' => 'editComment',
+                'ajax' => true,
+                'access' => function($task){
+                    return Yii::app() -> user -> checkAccess('editor');
+                }
+            ),
             'assignAuthor' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'method' => 'assignAuthor',

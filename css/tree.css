@@ -114,3 +114,6 @@
 #TreeContainer .buttonContainer .dragButton{
     background: url('../images/expand_small.png');
 }
+#TreeContainer .comment.hidden {
+    display:none;
+}

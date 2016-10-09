@@ -552,7 +552,8 @@ class Task extends Commentable {
 				'hasKeys' => $this -> searchphrasesCount,
 				'hasChildren' => (Task::model() -> countByAttributes(['id_parent' => $this -> id]) > 0),
 				'keysGenerated' => (Keyphrase::model() -> countByAttributes(['id_task' => $this -> id]) > 0),
-				'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10)
+				'notEmpty' => (int)(mb_strlen(arrayString::leaveOnlyLetters($text -> text),"UTF-8") > 10),
+				'comment' => $this -> comment
 		]);
 		return $arr;
 	}
@@ -578,5 +579,11 @@ class Task extends Commentable {
 			$this -> id_author = $author -> id;
 			$this -> save();
 		}
+	}
+	public function editComment() {
+		$this -> comment = $_POST['entered'];
+		$this -> save(['comment']);
+		$rez["toShow"] = $this -> findByPk($this -> id) -> comment;
+		echo json_encode($rez);
 	}
 }

@@ -1228,6 +1228,21 @@ function addButtons(branch){
             "background": "url('" + baseUrl + '/images/view_small.png'+"')"
         }
     }));
+    var comment;
+    if (status.comment) {
+        comment = status.comment;
+    } else {
+        comment = 'Введите комментарий'
+    }
+    var visClass = 'hidden';
+    if (window.showComments) {
+        visClass = '';
+    }
+    var commentSpan = $('<span>',{
+        "class":"comment " + visClass
+    }).append(comment);
+    commentSpan = toEdit(commentSpan, baseUrl + '/task/editComment/' + branch.id);
+    branch.buttonContainer.append(commentSpan);
 }
 function genControlPanel (tree) {
     if (!tree) {return;}
@@ -1320,6 +1335,21 @@ function genControlPanel (tree) {
         tree.buttonContainer.append(authorList);
         authorList.select2();
     }
+    window.showComments = false;
+    var commentCheckbox = $('<input>',{
+        type:'checkbox',
+        title: 'Показать комментарии'
+    }).click(function(){
+        var comments = $('.comment');
+        var newStatus = $(this).prop('checked');
+        window.showComments = newStatus;
+        if (newStatus) {
+            comments.removeClass('hidden');
+        } else {
+            comments.addClass('hidden');
+        }
+    });
+    tree.buttonContainer.append(commentCheckbox);
 }
 function toEdit($el, url, defText, callback) {
     if ($el) {
@@ -1339,7 +1369,9 @@ function toEdit($el, url, defText, callback) {
                 value: val
             });
             form.append(inp);
+
             $el.after(form);
+            inp.select();
             if (typeof url == 'function') {
                 url = url.call($el);
             }
@@ -1373,7 +1405,7 @@ function toEdit($el, url, defText, callback) {
             var tempId = "handler" + Math.round(Math.random()*100000) + 1;
             inp.attr("data-handler",tempId);
             body.on("click."+tempId, function(event){
-                console.log(event.target);
+                //console.log(event.target);
                 if ($(event.target).attr("data-handler") != tempId) {
                     sendRequest();
                     body.off("click."+tempId);
@@ -1381,5 +1413,6 @@ function toEdit($el, url, defText, callback) {
             });
             form.submit(sendRequest);
         });
+        return $el;
     }
 }
