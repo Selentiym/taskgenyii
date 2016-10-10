@@ -123,4 +123,29 @@ class SiteController extends Controller
 		echo "working!";
 		//var_dump(array('abc' => array('d'),'bcd' => array('e')) + array('cde' => ['f'],'def' => ['g']));
 	}
+	public function actionAddAccounts () {
+		for ($i = 225; $i <= 245 ; $i++) {
+			$user = new User();
+			$user -> setScenario('create');
+			$user -> id = $i - 200;
+			$user -> username = 'Test'.$i;
+			$user -> name = $user -> username;
+			$user -> id_type = 3;
+			$user -> input_password_second = (2 + $i%10 + (floor(($i%100)/10))).'test';
+			$user -> input_password = $user -> input_password_second;
+			if (!$user -> save()) {
+				var_dump($user -> getErrors());
+				echo $i;
+			}
+			//var_dump($user);
+			//break;
+		}
+	}
+	public function actionCheckCopy() {
+		$author = Author::model() -> findByPk(25);
+		if ($author) {
+			$task = Task::model() -> findByPk(46);
+			$task -> copyToAuthor($author);
+		}
+	}
 }

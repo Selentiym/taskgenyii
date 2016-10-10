@@ -1331,10 +1331,17 @@ function genControlPanel (tree) {
     },tree,{title:"Удалить"}, true);
     new ControlButton("","delete_keys",function(el){$.post(baseUrl+"/Task/deleteKeys/"+el.id).done(function(){location.reload();});},tree,{},
         function (coll) {if (coll.length) {return confirm("Вы собираетесь удалить поисковые фразы и ключевые слова у " + coll.length + " заданий. Это действие необратимо. Продолжить все равно?");} else {return false;}});
+
+    new ControlButton("","copy_to_author",
+        function(el){$.post(baseUrl+"/Task/copyToAuthor/"+el.id, {author:authorList.val()}).done(function(){location.reload();});},
+        tree,
+        {title:"Скопировать задания автору"},
+        function (coll) {if (coll.length) {return confirm("Вы собираетесь скопировать " + coll.length + " заданий автору "+$(authorList).select2('data')[0].text+".");} else {return false;}});
     if (authorList) {
         tree.buttonContainer.append(authorList);
         authorList.select2();
     }
+
     window.showComments = false;
     var commentCheckbox = $('<input>',{
         type:'checkbox',

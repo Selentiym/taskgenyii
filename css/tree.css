@@ -114,6 +114,9 @@
 #TreeContainer .buttonContainer .dragButton{
     background: url('../images/expand_small.png');
 }
+#TreeContainer .buttonContainer .copy_to_author {
+    background: url('../images/copy_small.png');
+}
 #TreeContainer .comment.hidden {
     display:none;
 }

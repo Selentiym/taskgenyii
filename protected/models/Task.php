@@ -75,6 +75,7 @@ class Task extends Commentable {
 			array('id_author, id_pattern, phrases, name, min_length, max_length', 'safe', 'on'=>'create'),
 			array('id_author, id_pattern, phrases, name, min_length, max_length', 'safe', 'on'=>'generate'),
 			array('input_search, keystring', 'safe', 'on'=>'addKeywords'),
+			array('*', 'safe', 'on'=>'copyAll'),
 		);
 	}
 
@@ -585,5 +586,44 @@ class Task extends Commentable {
 		$this -> save(['comment']);
 		$rez["toShow"] = $this -> findByPk($this -> id) -> comment;
 		echo json_encode($rez);
+	}
+	public function copyToAuthorJS(){
+		$a = Author::model() -> findByPk($_POST["author"]);
+		if ($a) {
+			$this -> copyToAuthor($a);
+		}
+	}
+	public function copyToAuthor(Author $author){
+		$newTask = new Task();
+		$this -> setScenario('copyAll');
+		$newTask -> setScenario('copyAll');
+		$newTask -> attributes = $this -> attributes;
+		$newTask -> id_parent = $this -> id_parent;
+		$newTask -> id_text = NULL;
+		$newTask -> id = NULL;
+		//var_dump($newTask);
+		//return;
+		$newTask -> id_author = $author -> id;
+		if ($newTask -> save()) {
+			foreach ($this -> keyphrases as $key) {
+				$key -> setIsNewRecord(true);
+				$key -> id_task = $newTask -> id;
+				$key -> id = NULL;
+				$key -> save();
+			}
+			foreach ($this -> keywords as $keyw) {
+				$keyw -> setIsNewRecord(true);
+				$keyw -> id_task = $newTask -> id;
+				$keyw -> id = NULL;
+				$keyw -> save();
+			}
+			foreach ($this -> searchphrases as $s) {
+				$s -> setIsNewRecord(true);
+				$s -> id_task = $newTask -> id;
+				$s -> id = NULL;
+				$s -> save();
+			}
+			$newTask -> notifyAuthorAboutAssign();
+		}
 	}
 }
