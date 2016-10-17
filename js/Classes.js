@@ -134,9 +134,10 @@ Phrase.prototype.reorderPhrases = function(){
                 if (el.position) {
                     var savePos = el.position;
                     var lastTransportedStem = el.stem;
-                    //Если уже есть найденный корень, то нужно его совпадение обязательно с предыдущим.
-                    if ((prevStem)&&(ind > 0)) {
-                        if (tempRez[ind - 1].stem != prevStem) {
+                    //Если уже есть найденный корень и предыдущее слово входит в то же словосочетиние,
+                    // что и найденное, то нужно его совпадение обязательно с предыдущим.
+                    if ((jSp >= 1)&&(ind > 0)) {
+                        if (tempRez[ind - 1].stem != sp.stems[jSp - 1]) {
                             saveChanges = false;
                             break;
                         }
@@ -223,17 +224,29 @@ Phrase.prototype.reorderPhrases = function(){
         //alert('Результат: ');
         //showArray(eRez);
         var l = 0;
-        /* var newText = eRez[0].stem;
-        for (l = 1; l < eRez.length; l++) {
-            newText += ' ' + eRez[l].stem;
-        }*/
+        //Флаг, нужно ли спрашивать потом у пользователя.
+        var changed = (phr.stems[0] == eRez[0].stem);
         var newText = phr.stemsExtended[eRez[0].stem];
         for (l = 1; l < eRez.length; l++) {
             newText += ' ' + phr.stemsExtended[eRez[l].stem];
+            if (phr.stems[l] != eRez[1].stem) {
+                changed = true;
+            }
         }
-        alert('Было ' + phr.text + ' ' + phr.freq);
+        if (changed) {
+            if (!phr.freq) {
+                phr.setFreq(0);
+            }
+            if (confirm("Заменить: \"" + phr.text + "\", " + phr.freq + " на: \"" + newText + "\", " + newFreq)) {
+                alert('confirmed');
+                phr.inputEl.val(newText);
+                phr.setFreq(newFreq);
+            }
+        }
+        /*alert('Было ' + phr.text + ' ' + phr.freq);
         phr.text = newText;
         alert ('Стало ' + phr.text + ' ' + newFreq);
+        phr.setFreq(newFreq);*/
     });
 };
 
@@ -615,6 +628,9 @@ function Phrase(text, param){
      * @returns {number}
      */
     me.includes = function(phrase, bothSides){
+        if (!phrase) {
+            return false;
+        }
         var shorter = phrase;
         var longer = me;
         if (phrase.stems.length > me.stems.length) {
