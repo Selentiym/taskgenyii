@@ -16,6 +16,38 @@ Word.prototype.showAll = function(){
     });
 };
 /**
+ * Перемещает length элементов с индекса startInd в toBeInd
+ * @param array
+ * @param startInd
+ * @param toBeInd
+ * @param length
+ * @returns []
+ */
+function MoveElements(array, startInd, toBeInd, length) {
+    //Ничего не делаем, если длина меньше нуля.
+    if (length <= 0) {
+        alert('bad length!');
+        return array;
+    }
+    if ((toBeInd >= startInd)&&(toBeInd < startInd + length)) {
+        console.log('Unnessessary movement.');
+        return array;
+    }
+    var newArr = array;
+    if (! length) {
+        length = 1;
+    }
+    var extracted = newArr.splice(startInd, length);
+    if (toBeInd > startInd) {
+        //toBeInd = toBeInd - length + 1;
+        toBeInd = toBeInd - length;
+    }
+    for (var i = 0; i < extracted.length; i++) {
+        newArr.splice(toBeInd + i, 0, extracted[i]);
+    }
+    return newArr;
+}
+/**
  * Функция пробегает по всему словарю в порядке возрастания значимости слова, выцепляя наиболее
  * популярные фразы, содаржащие это слово
  */
@@ -46,10 +78,181 @@ Phrase.prototype.reorderPhrases = function(){
     var allPhrases = Lexical.prototype.phrasesPool;
     var keys = _.where(allPhrases, {initial:false, lock:false});
     var search = _.where(allPhrases, {initial:true});
+
+    /**
+     * Ищет вхождение корня в массив. Возвращает индекс.
+     */
+    function FindStemInArr(arr, stem){
+        var i;
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i].stem == stem) {
+                return i;
+            }
+        }
+        return false;
+    }
+    function showArray (arr) {
+        var str = '';
+        _.each(arr, function(el){
+            str += ' ' + el.stem;
+        });
+        alert(str);
+    }
     _.each(keys, function(phr){
-        console.log(phr);
+        //Содержит новую частоту ключевика
+        var newFreq = 0;
+        var toReorder = phr.intersectsWith(search);
+        toReorder.sort(function (p1,p2) {return p2.freq - p1.freq;});
+        //e <=> extended . All stems are replaced with their extended versions. all strings are replaced by arrays
+        var ePhraseStringInitial = [];
+        _.each (phr.stems, function(stem){
+            ePhraseStringInitial.push({stem: stem, position: false, extended: phr.stemsExtended[stem]});
+        });
+        //Хранит промежуточный результат. Превратится в конечную фразу.
+        var eRez = ePhraseStringInitial;
+        //Далее все манипуляции производим с корнями, без их расширений.
+        //Для присвоения разных позиций, хранит последнюю.
+        var nextGROUPPos = 1;
+        //Позиция слова в главной фразе
+        var nextPos = 0;
+        var nextStemNum = 0;
+        //var nextPos = 0;
+        _.each (toReorder, function(sp){
+            var tempRez = JSON.parse(JSON.stringify(eRez));
+            //Нужно ли сохранять изменения во фразе после проверки наличия последней фразы
+            var saveChanges = true;
+            //Ищем
+            var jSp = 0;
+            var prevStem = false;
+
+            while(jSp < sp.stems.length) {
+                //Нашли текущий корень
+                var lookForStem = sp.stems[jSp];
+                var ind = FindStemInArr(tempRez, lookForStem);
+                var el = tempRez[ind];
+
+                if (el.position) {
+                    var savePos = el.position;
+                    var lastTransportedStem = el.stem;
+                    //Если уже есть найденный корень, то нужно его совпадение обязательно с предыдущим.
+                    if ((prevStem)&&(ind > 0)) {
+                        if (tempRez[ind - 1].stem != prevStem) {
+                            saveChanges = false;
+                            break;
+                        }
+                    }
+                    //Нужно пробежать назад, меняя номера позиций
+                    var b = 0;
+                    while( ind - b >= 0) {
+                        //Если достигли момента смены позиции, то выходим из цикла
+                        if (tempRez[ind - b].position !== savePos) {
+                            break;
+                        }
+                        tempRez[ind - b].position = nextGROUPPos;
+                        b++;
+                    }
+                    //Переместим потом всю фразу вместе! Иначе будет ахтунг.
+
+
+                    //Если мы нашли слово в составе фразы, то начинаем по очереди бежать по фразе и по массиву
+                    //, пока не дойдем до обрыва.
+                    if (tempRez.length - ind < sp.stems.length - jSp) {
+                        //Выходим из цилка, тк нереально.
+                        saveChanges = false;
+                        break;
+                    }
+                    //curPos = nextPos;
+                    var delta = 0;
+                    //Будет нумеровать индекс слова в группе
+                    var jGr = 0;
+                    //Пробегаем по остатку фразы или до конца группы
+
+                    while(ind + jGr < tempRez.length){
+                        jGr ++;
+                        jSp ++;
+
+                        //Если следующее слово имеет другую позицию, то заканчиваем цикл
+                        if (tempRez[ind + jGr].position != savePos) {
+                            break;
+                        }
+                        lastTransportedStem = tempRez[ind + jGr].stem;
+                        if (tempRez[ind + jGr].stem == sp.stems[jSp]) {
+                            //Перезаписываем позицию
+                            tempRez[ind + jGr].position = nextGROUPPos;
+                        } else {
+                            //Если отличается корень, то выходим из ЦИКЛА ПО СЛОВАМ ПОИСКОВОЙ ФРАЗЫ \1
+                            saveChanges = false;
+                            break;
+                        }
+                    }
+                    //Вспоминаем, что нужно бы выйти. В \1 должен был быть осуществлен выход.
+                    if (saveChanges === false) {
+                        break;
+                    }
+                    b--;
+                    //Перемещаем помеченные фразы, если все ок (все ок <=> мы досюда добрались)
+                    var toMove = jGr + b;
+                    //Теперь перемещаем все измененные элементы, и слева, и справа - тоже.
+                    MoveElements(tempRez, ind - b, nextPos, toMove);
+                    //Чтобы не париться, можно просто найти последний корень
+                    nextPos = FindStemInArr(tempRez, lastTransportedStem) + 1;
+                    //jSp += jGr;
+                    //Не забываем нарастить счетчик слов
+                    /*for (delta = 1; delta <= sp.stems.length - jSp; delta ++) {
+                        //Если все ок, то перемещаем
+                        if (tempRez[ind + delta].stem == lookForStem) {
+                            MoveElements(tempRez, ind + delta, nextStemNum);
+                        }
+                    }*/
+                } else {
+                    tempRez[ind].position = nextGROUPPos;
+                    //Если не было позиции, то просто перемещаем на нужное место.
+                    MoveElements(tempRez, ind, nextPos);
+                    nextPos++;
+                    jSp ++;
+                }
+            }
+            //По выходу из цикла мы либо сохраняем изменения, либо сбрасываем
+            if (saveChanges){
+                eRez = tempRez;
+                nextGROUPPos ++;
+                newFreq = newFreq + parseInt(sp.freq);
+            }
+            //showArray(eRez);
+        });
+        //alert('Результат: ');
+        //showArray(eRez);
+        var l = 0;
+        /* var newText = eRez[0].stem;
+        for (l = 1; l < eRez.length; l++) {
+            newText += ' ' + eRez[l].stem;
+        }*/
+        var newText = phr.stemsExtended[eRez[0].stem];
+        for (l = 1; l < eRez.length; l++) {
+            newText += ' ' + phr.stemsExtended[eRez[l].stem];
+        }
+        alert('Было ' + phr.text + ' ' + phr.freq);
+        phr.text = newText;
+        alert ('Стало ' + phr.text + ' ' + newFreq);
     });
 };
+
+/**
+ * Создаем класс для одного корня. Необходимо для сохранения полной его формы в том числе, а также для
+ * возможности добавлять некоторые переменные
+ */
+function StemString (str, fullStr) {
+    this.str = str;
+    this.fullStr = fullStr;
+    this.order = false;
+}
+StemString.prototype.valueOf = function () {
+    return this.str;
+};
+StemString.prototype.toString = function () {
+    return this.str;
+};
+
 function Lexical(text, param) {
     var me = {};
     //Чтобы лишний раз не дергать сервер, анализировать будем только если флаг false
@@ -67,7 +270,10 @@ function Lexical(text, param) {
                 }
             }).done(function (data) {
                 me.stems = data.stems;
+                me.stemsExtended = data.eStems;
                 console.log(data);
+                console.log(me.stemsExtended);
+                //console.log(data);
                 me.analyzed = true;
                 me.onAfterAnalyze();
             });
@@ -249,7 +455,7 @@ function Phrase(text, param){
             "class":"initialPhrase"
         }, me);
         me.element.attr('data-id',me.id);
-        me.element.append(me.text);
+        me.element.append(me.text + ', ' + me.freq);
         Phrase.prototype.InitialPhrasesContainer.append(me.element);
         me.element.dblclick(function(){
             new Phrase(me.text, {fromDb: false, stems: me.stems });
@@ -420,8 +626,8 @@ function Phrase(text, param){
         }
         var intersect = _.intersection(longer.stems, shorter.stems);
         if (intersect.length == shorter.stems.length) {
-            longer.highlight(shorter);
-            shorter.highlight(longer);
+            //longer.highlight(shorter);
+            //shorter.highlight(longer);
             if (me.stems.length == longer.stems.length) {
                 return 1;
             }

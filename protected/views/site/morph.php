@@ -6,7 +6,7 @@
  * Time: 12:29
  */
 $data = $_GET;
-$word = new arrayString($data['text']);
+$word = new eArrayString($data['text']);
 $word -> prepare();
-$rez = json_encode(array('stems' => $word -> stems));
+$rez = json_encode(array('stems' => $word -> stems, 'eStems' => $word -> eStems));
 echo $rez;
