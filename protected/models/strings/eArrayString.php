@@ -5,7 +5,7 @@
  * Date: 14.10.2016
  * Time: 19:48
  */
-class eArrayString extends ArrayString {
+class eArrayString extends arrayString {
     public $eStems = [];
     public function findStems(){
         $this -> stems = [];
