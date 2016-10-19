@@ -106,7 +106,10 @@ Phrase.prototype.reorderPhrases = function(){
         //e <=> extended . All stems are replaced with their extended versions. all strings are replaced by arrays
         var ePhraseStringInitial = [];
         _.each (phr.stems, function(stem){
-            ePhraseStringInitial.push({stem: stem, position: false, extended: phr.stemsExtended[stem]});
+            //смотрим только нетривиальные корни!
+            if (stem) {
+                ePhraseStringInitial.push({stem: stem, position: false, extended: phr.stemsExtended[stem]});
+            }
         });
         //Хранит промежуточный результат. Превратится в конечную фразу.
         var eRez = ePhraseStringInitial;
@@ -118,6 +121,9 @@ Phrase.prototype.reorderPhrases = function(){
         var nextStemNum = 0;
         //var nextPos = 0;
         _.each (toReorder, function(sp){
+
+            //Чистим корни. Нужно только нетривиальные
+            sp.stems = _.filter(sp.stems, function (stem) { return (!(!stem));});
             var tempRez = JSON.parse(JSON.stringify(eRez));
             //Нужно ли сохранять изменения во фразе после проверки наличия последней фразы
             var saveChanges = true;
@@ -130,6 +136,11 @@ Phrase.prototype.reorderPhrases = function(){
                 var lookForStem = sp.stems[jSp];
                 var ind = FindStemInArr(tempRez, lookForStem);
                 var el = tempRez[ind];
+                //Если не нашли следующего корня, то выходим.
+                if (!el) {
+                    saveChanges = false;
+                    break;
+                }
 
                 if (el.position) {
                     var savePos = el.position;
