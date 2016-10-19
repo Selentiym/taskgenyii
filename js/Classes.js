@@ -238,7 +238,6 @@ Phrase.prototype.reorderPhrases = function(){
                 phr.setFreq(0);
             }
             if (confirm("Заменить: \"" + phr.text + "\", " + phr.freq + " на: \"" + newText + "\", " + newFreq)) {
-                alert('confirmed');
                 phr.inputEl.val(newText);
                 phr.setFreq(newFreq);
             }
@@ -340,6 +339,7 @@ function Phrase(text, param){
     if (param.stems instanceof Array) {
         me.analyzed = true;
         me.stems = param.stems;
+        me.stemsExtended = param.stemsExtended;
     }
     //Если фраза исходная, то есть поисковая и подается на вход, то
     //в будущем не нужно считать ее вхождения
@@ -471,7 +471,7 @@ function Phrase(text, param){
         me.element.append(me.text + ', ' + me.freq);
         Phrase.prototype.InitialPhrasesContainer.append(me.element);
         me.element.dblclick(function(){
-            new Phrase(me.text, {fromDb: false, stems: me.stems });
+            new Phrase(me.text, {fromDb: false, stems: me.stems, stemsExtended: me.stemsExtended });
         });
         me.element.draggable({
             helper:"clone",
