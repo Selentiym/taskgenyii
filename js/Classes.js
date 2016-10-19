@@ -168,10 +168,9 @@ Phrase.prototype.reorderPhrases = function(){
                     var jGr = 0;
                     //Пробегаем по остатку фразы или до конца группы
 
-                    while(ind + jGr < tempRez.length){
+                    while(ind + jGr < tempRez.length - 1){
                         jGr ++;
                         jSp ++;
-
                         //Если следующее слово имеет другую позицию, то заканчиваем цикл
                         if (tempRez[ind + jGr].position != savePos) {
                             break;
