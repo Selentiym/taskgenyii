@@ -67,7 +67,7 @@ Phrase.prototype.completeSet = function(){
                     }
                 });
                 if (toUse) {
-                    new Phrase(toUse.text, {fromDb: false, stems: toUse.stems, freq:toUse.freq });
+                    new Phrase(toUse.text, {fromDb: false, stems: toUse.stems, freq:toUse.freq, stemsExtended: toUse.stemsExtended });
                 }
             }
         }
