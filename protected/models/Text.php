@@ -273,6 +273,7 @@ class Text extends Commentable {
 	 * @return mixed[]
 	 */
 	public function fastUnique($post, $return = false){
+		return;
 		$str = arrayString::removeRubbishFromString($post['text']);
 		$content = new ContentWatch($str);
 		$content->sendRequest();
@@ -373,11 +374,31 @@ class Text extends Commentable {
 			$t = false;
 			$max = -1;
 			foreach ($texts as $text) {
-				$compare = $cur->compare(new \Shingles\Full($text->text));
+				$shingle = new \Shingles\Full($text->text);
+				$compare = $cur->compare($shingle);
 				if ($compare > $max) {
 					$max = $compare;
 					$matches = $cur->dump;
 					$t = $text;
+					$sh = $shingle;
+				}
+			}
+			$bold = (bool) $matches[0];
+			//Собираем обратно текст
+			$shinglesToShow = $sh -> giveShingles();
+			$words = [];
+			foreach ($shinglesToShow as $i => $s ) {
+				$curWs = explode(' ',$s[1]);
+				foreach ($curWs as $j => $w) {
+					$words [$i + $j] = [$w, (bool)$matches[$i]];
+				}
+			}
+			$rezT = '';
+			foreach ($words as $word) {
+				if ($word[1]) {
+					$rezT .= ' <b>'. $word[0].'</b>';
+				} else {
+					$rezT .=' '. $word[0];
 				}
 			}
 		}
@@ -386,7 +407,7 @@ class Text extends Commentable {
 		 */
 		if ($t) {
 			$rez = [
-					'text' => $t->text,
+					'text' => $rezT,
 					'matches' => array_values($matches),
 					'percent' => $max
 			];

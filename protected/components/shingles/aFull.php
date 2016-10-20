@@ -50,7 +50,7 @@ abstract class aFull
          */
         for ($i = 0; $i <=  $countWords-self::shingleLength; $i++) {
             $string = implode(' ', array_slice($words, $i, self::shingleLength));
-            $shingles[] = [$this->makeHash($string),$string];
+            $shingles[] = [$this->makeHash($string),$string, $i];
         }
 
         return $shingles;
@@ -81,10 +81,14 @@ abstract class aFull
         });
         //$diff = array_diff($shingle1, $shingle2);
         $count_shingle = count($shingle1);
-        $dump = array_map(function($el){
+        $dump = [];
+        /*$dump = array_map(function($el){
             return trim($el[1]);
-        }, $common);
-        $this -> dump = array_unique($dump);
+        }, $common);*/
+        foreach ($common as $el) {
+            $dump [$el[2]] = $el[1];
+        }
+        $this -> dump = $dump;
         $shingle -> dump = $this -> dump;
         return (count($common))/$count_shingle*100;
     }
