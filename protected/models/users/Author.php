@@ -34,7 +34,8 @@ class Author extends User {
             'tasks' => array(self::HAS_MANY, 'Task', 'id_author'),
             'activeTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NULL'),
             'completedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
-            'completedTasksNum' => array(self::STAT, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL')
+            'completedTasksNum' => array(self::STAT, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
+            'completedNotPayedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL AND (SELECT COUNT(`id`) FROM `tbl_task_payment` `tp` WHERE `tp`.`id_task` = completedNotPayedTasks.`id`) = 0')
         );
     }
 
