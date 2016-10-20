@@ -20,6 +20,7 @@ echo Yii::app() -> user -> getFlash('noUnpayedTasks');
     <tr><td>Завершенных заданий</td><td><?php echo $model -> completedTasksNum; ?></td></tr>
     <tr><td>Принятых не с первого раза заданий</td><td><?php echo count($model -> secondlyAcceptedIds()); ?></td></tr>
 </table>
+<h3>Задания к оплате</h3>
 <?php
 if (Yii::app() -> user -> checkAccess('editor')) {
     echo CHtml::link("Уведомить об оплате", Yii::app()->createUrl("cabinet/authorPay", ['arg' => $model->id]), ['class' => 'buttonText']);

@@ -35,7 +35,8 @@ echo "</ul>";
 if (count($model -> completedTasks) >  completedAmount):
 ?>
 <div><a href="<?php echo Yii::app() -> createUrl('cabinet/archive'); ?>">Показать все</a></div>
+<h3>Статистика</h3>
 <?php endif;
-//$this -> renderPartial('//cabinet/_notifications');
+$this -> renderPartial('//author/stat',['model' => $model]);
 //$this -> renderPartial('//cabinet/dialog', array('model' => User::model() -> findByPk(2)));
 ?>
