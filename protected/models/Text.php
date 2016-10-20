@@ -273,7 +273,6 @@ class Text extends Commentable {
 	 * @return mixed[]
 	 */
 	public function fastUnique($post, $return = false){
-		return;
 		$str = arrayString::removeRubbishFromString($post['text']);
 		$content = new ContentWatch($str);
 		$content->sendRequest();
