@@ -74,30 +74,48 @@ Phrase.prototype.completeSet = function(){
     });
 };
 
+Phrase.prototype.countFreq = function() {
+    var allPhrases = Lexical.prototype.phrasesPool;
+    var keys = _.where(allPhrases, {initial:false, lock:false});
+    var search = _.where(allPhrases, {initial:true});
+    //Содержит новую частоту ключевика
+    var newFreq = 0;
+    _.each (keys, function(phr){
+        var newFreq = phr.reCountFreq();
+        phr.setFreq(newFreq);
+    });
+};
+/**
+ * Ищет вхождение корня в массив. Возвращает индекс.
+ */
+function FindStemInArr(arr, stem){
+    var i;
+    for (i = 0; i < arr.length; i++) {
+        if (arr[i].stem == stem) {
+            return i;
+        }
+    }
+    return false;
+}
+function showArray (arr) {
+    var str = '';
+    _.each(arr, function(el){
+        str += ' ' + el.stem;
+    });
+    alert(str);
+}
+Phrase.prototype.giveSearchPhrases = function(cond){
+    if (!cond) {
+        cond = {};
+    }
+    return _.where(Lexical.prototype.phrasesPool, $.extend(cond,{initial:true}));
+};
 Phrase.prototype.reorderPhrases = function(){
     var allPhrases = Lexical.prototype.phrasesPool;
     var keys = _.where(allPhrases, {initial:false, lock:false});
     var search = _.where(allPhrases, {initial:true});
 
-    /**
-     * Ищет вхождение корня в массив. Возвращает индекс.
-     */
-    function FindStemInArr(arr, stem){
-        var i;
-        for (i = 0; i < arr.length; i++) {
-            if (arr[i].stem == stem) {
-                return i;
-            }
-        }
-        return false;
-    }
-    function showArray (arr) {
-        var str = '';
-        _.each(arr, function(el){
-            str += ' ' + el.stem;
-        });
-        alert(str);
-    }
+
     _.each(keys, function(phr){
         //Содержит новую частоту ключевика
         var newFreq = 0;
@@ -250,6 +268,9 @@ Phrase.prototype.reorderPhrases = function(){
             if (confirm("Заменить: \"" + phr.text + "\", " + phr.freq + " на: \"" + newText + "\", " + newFreq)) {
                 phr.inputEl.val(newText);
                 phr.setFreq(newFreq);
+                phr.text = newText;
+                phr.analyzed = false;
+                phr.analyze();
             }
         }
         /*alert('Было ' + phr.text + ' ' + phr.freq);
@@ -279,6 +300,7 @@ function Lexical(text, param) {
     var me = {};
     //Чтобы лишний раз не дергать сервер, анализировать будем только если флаг false
     me.analyzed = false;
+    me.timesAnalyzed = 0;
     me.text = text;
     me.onAfterAnalyze = function () { return; };
     me.analyze = function(){
@@ -557,6 +579,7 @@ function Phrase(text, param){
         me.used = false;
         me.analyzed = false;
         me.text = me.inputEl.val();
+        me.freq = me.freqEl.val();
 
         me.analyze();
     };
@@ -661,6 +684,54 @@ function Phrase(text, param){
             //alert('Фраза "' + shorter.text + '" морфологически включена в фразу "' + longer.text+'"');
         }
     };
+    /**
+     * Returns frequency of the phrase based on the globally created searchphrases.
+     * @returns {number}
+     */
+    me.reCountFreq = function(){
+        var toCount = me.intersectsWith(Phrase.prototype.giveSearchPhrases());
+        var i;
+        var newFreq = 0;
+        for(i = 0; i < toCount.length; i++) {
+            var toCheck = toCount[i];
+            if (me.includesOrdered(toCheck)) {
+                newFreq += parseInt(toCheck.freq);
+            }
+        }
+        return newFreq;
+    };
+    /**
+     * returns whether the given phrase is included in this one morphologically,
+     * with the order being counted
+     * @param phr
+     * @returns {boolean}
+     */
+    me.includesOrdered = function (phr) {
+        if (!phr.stems) {
+            return false;
+        }
+        if (phr.stems.length == 0) {
+            return true;
+        }
+        var i = 0;
+        var stemInd = 0;
+        var ok = true;
+        while (i < me.stems.length) {
+            if (me.stems[i] == phr.stems[stemInd]) {
+                stemInd ++;
+                if (stemInd == phr.stems.length) {
+                    break;
+                }
+            } else {
+                if (stemInd > 0) {
+                    ok = false;
+                    break;
+                }
+            }
+            i++;
+        }
+        return (ok&&(stemInd == phr.stems.length));
+    };
 
     /**
      * Возвращает массив фраз, которые морфологически включены в данную, либо которые включают данную
@@ -689,9 +760,14 @@ function Phrase(text, param){
                 me.highlight(phrase);
             });
         }
-
+        if (me.timesAnalyzed) {
+            if ((!me.lock)&&(!me.initial)) {
+                me.setFreq(me.reCountFreq());
+            }
+        }
         //Нам же интересно, чтобы фраза была использована
         me.use();
+        me.timesAnalyzed ++;
     };
     me.analyze();
     if (!me.initial) {
@@ -916,7 +992,9 @@ function Word(text,param) {
     me.removeWord = function (){
         if (me.phrases.length) {
             var deleted = false;
-
+            me.phrases.sort(function(p1, p2){
+                return p1.freq - p2.freq;
+            });
             me.phrases.every(function(toStrip){
                 if (!toStrip.initial) {
                     deleted = toStrip.deleteStem(me);
