@@ -1526,9 +1526,8 @@ function addButtons(branch){
     } else {
         branch.buttonContainer.append($('<span>',{
             "class":"author"+status.author,
-            title:status.authorName,
             css:{width:"20px", height:"20px"}
-        }).html(status.authorHtml));
+        }).html(:status.authorName));
     }
     branch.buttonContainer.append($('<a>',{
         href: baseUrl + '/task/' + branch.id,
