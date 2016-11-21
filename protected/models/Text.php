@@ -212,54 +212,57 @@ class Text extends Commentable {
 		return $rez;
 	}
 
+	public function evalSickness() {
+		$text = arrayString::removeRubbishFromString($this -> text);
+		$words = preg_split('/\W+/ui',$text);
+		$counted = [];
+		$null = 0;
+		foreach ($words as $word) {
+			$stem = Stemmer::getInstance() -> stem_word_initial($word);
+			if ($stem) {
+				$counted[$stem]++;
+			} else {
+				$null++;
+			}
+		}
+		$total = array_sum($counted);
+		$numerator = pow(array_reduce($counted, function($prev, $el) {
+			if ($el > 1) {
+				$prev += pow($el,2);
+			}
+			return $prev;
+		}, 0),0.5);
+		$rez = [];
+		if ($total < 1) {
+			$total = 1;
+		}
+		$rez['sick'] = $numerator/$total;
+		$rez['first_word_num'] = -1;
+		foreach($counted as $stem => $num){
+			if ($rez['first_word_num'] < $num) {
+				$rez['first_word_num'] = $num;
+				$rez['first_word'] = $stem;
+			}
+		}
+		$rez['first_word_num'] /= $total;
+		$rez['total'] = $total;
+		$rez['words'] = $words;
+		return $rez;
+	}
 	/**
 	 * Возвращает параметры текста, которые нужно контролировать по ТЗ.
 	 * Академическая тошнота, первая строка в семантическом ядре и словах.
 	 * @param mixed[] $post
 	 * @param bool $return
+	 * @return mixed[]
 	 */
 	public function seoStat($post, $return = false) {
-		$out = '';
-		 //очищаем от непонятных спецсимволов и тегов
-		$post['text'] = preg_replace('/\&[a-zA-Z]+\;/u', ' ', strip_tags($post['text']));
-		//Обращаемся на advego/text/seo/ с просьбой проанализировать текст
-		if ($curl = curl_init()) {
-			curl_setopt($curl, CURLOPT_URL, 'http://advego.ru/text/seo/');
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($curl, CURLOPT_POST, true);
-			$query = http_build_query(array(
-					'job_text' => $post['text']
-			));
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $query);
-			$out = curl_exec($curl);
-			curl_close($curl);
-		}
-		//Удаляем кучу лишнего и делаем то, что осталось, валидным
-		$out = substr($out, strpos($out, 'text_check_results'));
-		$out = substr($out, strpos($out, '>') + 1);
-		$out = substr($out, 0, strpos($out, 'job_desc'));
-		$out = substr($out, 0, strrpos($out, '<'));
-		$out = substr($out, 0, strrpos($out, '>') + 1);
-
-		$out = '<xml>' . $out;
-		$out .= '</xml>';
-
-		//Создали xml структуру, которую теперь можно рапарсить
-		$xml = new SimpleXMLElement($out);
-
-		//Тошнотность
-		$temp = $xml->table->tr[10]->td[1];
-		$rez['sick'] = preg_replace('/[^\d\.\,]/', '', $temp);
-		if ($xml->div[0]->table->tr[1]) {
-			//Первый показатель в семнатическом ядре
-			$rez['first_nucl_num'] = preg_replace('/[^\d\.\,]/', '', $xml->div[0]->table->tr[1]->td[2]);
-			$rez['first_nucl'] = "<table>" . $xml->div[0]->table->tr[1]->asXML() . "</table>";
-		}
-		if ($xml->div[1]->table->tr[1]) {
-			//Первый показатель в словах
-			$rez['first_word_num'] = preg_replace('/[^\d\.\,]/', '', $xml->div[1]->table->tr[1]->td[2]);
-			$rez['first_word'] = "<table>" . $xml->div[1]->table->tr[1]->asXML() . "</table>";
-		}
+		$t = new Text();
+		$t -> text = $post['text'];
+		$temp = $t -> evalSickness();
+		$rez['sick'] = round($temp['sick']*1000)/10;
+		$rez['first_word_num'] = round($temp['first_word_num']*10000)/100;
+		$rez['first_word'] = $temp['first_word'];
 		if ($return) {
 			return $rez;
 		}

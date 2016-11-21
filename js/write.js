@@ -193,8 +193,8 @@ function text(id) {
         me.checks.firstWordCheck = data.first_word_num <= 4;
 
         me.seoInfo.append($('<div>').html('Тошнотность: '+data.sick));
-        me.seoInfo.append($('<div>').html('Первый показатель в семантическом ядре: '+data.first_nucl_num).append(data.first_nucl));
-        me.seoInfo.append($('<div>').html('Первый показатель в словах: '+data.first_word_num).append(data.first_word));
+        //me.seoInfo.append($('<div>').html('Первый показатель в семантическом ядре: '+data.first_nucl_num).append(data.first_nucl));
+        me.seoInfo.append($('<div>').html('Первый показатель в словах: '+data.first_word_num + ', ').append('<b>'+data.first_word+'</b>'));
     };
     me.crossUniqueCheck = function(){
         $.post(baseUrl + '/text/giveCrossUnique/' + me.id,{
