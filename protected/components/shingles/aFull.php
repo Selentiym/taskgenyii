@@ -27,7 +27,7 @@ abstract class aFull
     {
         if (!is_array($this -> _shingles)) {
             $this -> clearText();
-            $this -> _shingles = $this -> splitShingles(explode(' ', $this -> _text));
+            $this -> _shingles = $this -> splitShingles(array_filter(explode(' ', $this -> _text)));
         }
         return $this -> _shingles;
     }
@@ -81,6 +81,7 @@ abstract class aFull
         });
         //$diff = array_diff($shingle1, $shingle2);
         $count_shingle = count($shingle1);
+        $thisCount = count($shingle2);
         $dump = [];
         /*$dump = array_map(function($el){
             return trim($el[1]);
@@ -90,6 +91,6 @@ abstract class aFull
         }
         $this -> dump = $dump;
         $shingle -> dump = $this -> dump;
-        return (count($common))/$count_shingle*100;
+        return (count($common))/min($count_shingle, $thisCount)*100;
     }
 }

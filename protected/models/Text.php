@@ -377,10 +377,10 @@ class Text extends Commentable {
 			$max = -1;
 			foreach ($texts as $text) {
 				$shingle = new \Shingles\Full($text->text);
-				$compare = $cur->compare($shingle);
+				$compare = $shingle->compare($cur);
 				if ($compare > $max) {
 					$max = $compare;
-					$matches = $cur->dump;
+					$matches = $shingle->dump;
 					$t = $text;
 					$sh = $shingle;
 				}
@@ -392,9 +392,20 @@ class Text extends Commentable {
 			foreach ($shinglesToShow as $i => $s ) {
 				$curWs = explode(' ',$s[1]);
 				foreach ($curWs as $j => $w) {
-					$words [$i + $j] = [$w, (bool)$matches[$i]];
+					$ind = $i + $j;
+					if ((!$words[$ind])||($words[$ind]==$w)) {
+						$words [$i + $j] = [$w, (bool)$matches[$i]];
+					}
 				}
 			}
+			/*
+			$words = [];
+			$first = current($shinglesToShow);
+
+			foreach ($shinglesToShow as $s) {
+				$curWs = explode(' ', $s[1]);
+
+			}*/
 			$rezT = '';
 			foreach ($words as $word) {
 				if ($word[1]) {
@@ -411,7 +422,7 @@ class Text extends Commentable {
 			$rez = [
 					'text' => $rezT,
 					'matches' => array_values($matches),
-					'percent' => $max
+					'percent' => round($max * 10)/10
 			];
 		} else {
 			$rez = [
