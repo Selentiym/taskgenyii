@@ -2,6 +2,10 @@
 
 class SiteController extends Controller
 {
+	public function onBeforeAction(){
+		$u = Yii::app() -> user;
+		return true;
+	}
 	/**
 	 * Declares class-based actions.
 	 */

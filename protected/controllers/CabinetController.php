@@ -9,6 +9,11 @@ class CabinetController extends Controller {
     public $defaultAction = 'authenticate';
     public $layout = 'cabinet';
 
+    public function beforeAction(){
+        $u = Yii::app() -> user;
+        return true;
+    }
+
     /**
      * Declares class-based actions.
      */
@@ -234,5 +239,10 @@ class CabinetController extends Controller {
     }
     public function actionTaskCreateFast($arg){
 
+    }
+    public function actionCheckAcc() {
+        $u = Yii::app() -> user;
+        //$rez = $u -> checkAccess('editor');
+        var_dump($u);
     }
 }
