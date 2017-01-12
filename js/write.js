@@ -106,7 +106,7 @@ function text(id) {
         if (me.checks.toSubmit) {
             var submit = true;
             if (!me.checks.sickCheck) {
-                me.log('Проверьте тошностность!');
+                me.log('Проверьте академическую тошноту!');
                 submit = false;
             }
             if (!me.checks.firstNuclCheck) {
@@ -192,7 +192,7 @@ function text(id) {
         me.checks.firstNuclCheck = data.first_nucl_num <= 4;
         me.checks.firstWordCheck = data.first_word_num <= 4;
 
-        me.seoInfo.append($('<div>').html('Тошнотность: '+data.sick));
+        me.seoInfo.append($('<div>').html('Тошнота: '+data.sick));
         //me.seoInfo.append($('<div>').html('Первый показатель в семантическом ядре: '+data.first_nucl_num).append(data.first_nucl));
         me.seoInfo.append($('<div>').html('Первый показатель в словах: '+data.first_word_num + ', ').append('<b>'+data.first_word+'</b>'));
     };

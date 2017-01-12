@@ -21,7 +21,7 @@
  * @property Task $task
  */
 class Text extends Commentable {
-
+	const crossCheckNum = 5;
 	private $temp = '';
 	/**
 	 * @return string the associated database table name

@@ -29,7 +29,7 @@ $form=$this->beginWidget('CActiveForm', array(
                 <?php echo $form->numberField($model, 'minUnique',array('size'=>60,'maxlength'=>255)); ?>
             </div>
             <div class="form-group">
-                <label for="maxSickness">Максимальная тошнотность</label>
+                <label for="maxSickness">Максимальная академическая тошнота</label>
                 <?php echo $form->numberField($model, 'maxSickness',array('size'=>60,'maxlength'=>255)); ?>
             </div>
             <div class="form-group">
