@@ -442,6 +442,10 @@ class Text extends Commentable {
 	}
 	protected function beforeSave() {
 		$nullStatus = true;
+		//Не обнуляем статус, если зашел редактор
+		if (Yii::app() -> user -> checkAccess('editor')) {
+			$nullStatus = false;
+		}
 		/**
 		 * Считаем длину
 		 */

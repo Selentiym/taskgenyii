@@ -18,13 +18,24 @@ if ($t = $model -> prepareTextModel()) {
 	$model -> currentText = $t;
 	array_unshift($texts, $t);
 }
+$editor = Yii::app() -> user -> checkAccess('editor');
 foreach ($texts as $text) {
-	if (($text -> id == $model -> currentText -> id)&&(!$model -> rezult)) {
-		$view = '//text/write';
-	} else {
+
+	if ($text -> id != $model -> currentText -> id) {
 		$view = '//text/_history';
+	} elseif ($model -> rezult) {
+		if ($editor) {
+			echo "<h1>Текст принят! Только для небольших правок!</h1>";
+			$this -> renderPartial('//text/write', ['model' => $text]);
+			$this -> renderPartial('//text/_history', ['model' => $text]);
+			$view = false;
+		} else {
+			$view = '//text/_history';
+		}
 	}
-	$this -> renderPartial($view,['model' => $text]);
+	if ($view) {
+		$this->renderPartial($view, ['model' => $text]);
+	}
 }
 $this -> renderPartial('//pattern/common',['model' => $model]);
 ?>
