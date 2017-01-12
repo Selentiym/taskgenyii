@@ -34,6 +34,12 @@
  * @property Editor $editor
  */
 class Task extends Commentable {
+	const MIN_UNIQUE = 90;
+	const MAX_NOSEA = 9;
+	//const MAX_NUCL_WORD = 4;
+	const MAX_WORD = 4;
+	const crossCheckNum = 3;
+
 	/**
 	 * @var array[] $phrases массив ключевых фраз при создании/изменении модели
 	 */
@@ -645,5 +651,23 @@ class Task extends Commentable {
 			return $pay;
 		}
 		return 0;
+	}
+	public function getCheckParams(){
+		$temp = [];
+		if ($pattern = $this -> pattern) {
+			$temp =  array_filter([
+					'sick' => $pattern -> maxSickness,
+					'word' => $pattern -> maxWord,
+					'unique' => $pattern -> minUnique,
+					'cross' => $pattern -> maxCross,
+			]);
+		}
+
+		return array_merge([
+				'sick' => self::MAX_NOSEA,
+				'word' => self::MAX_WORD,
+				'unique' => self::MIN_UNIQUE,
+				'cross' => self::crossCheckNum,
+		], $temp);
 	}
 }

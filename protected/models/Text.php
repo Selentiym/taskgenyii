@@ -21,12 +21,7 @@
  * @property Task $task
  */
 class Text extends Commentable {
-	const MIN_UNIQUE = 97;
-	const MAX_NOSEA = 9;
-	const MAX_NUCL_WORD = 4;
-	const MAX_WORD = 4;
 
-	const crossCheckNum = 3;
 	private $temp = '';
 	/**
 	 * @return string the associated database table name
@@ -558,6 +553,7 @@ class Text extends Commentable {
 		return parent::beforeSave();
 	}
 
+
 	/**
 	 * @return bool|string Текст ошибки или true
 	 */
@@ -574,6 +570,7 @@ class Text extends Commentable {
 		$str2 = arrayString::leaveOnlyLetters($this -> DBModel() -> text);
 		$len1 = strlen($str1);
 		$len2 = strlen($str2);
+		$params = $this -> task -> getCheckParams();
 		if ($str1 != $str2) {
 			$unique = $this -> fastUnique(['text' => $this -> text], true);
 			if ($unique['success']) {
@@ -581,8 +578,8 @@ class Text extends Commentable {
 			}
 		}
 		if ($this -> uniquePercent) {
-			if ($this -> uniquePercent < self::MIN_UNIQUE) {
-				$log('Уникальность ниже '.self::MIN_UNIQUE.'%, пожалуйста, исправьте.');
+			if ($this -> uniquePercent < $params["unique"]) {
+				$log('Уникальность ниже '.$params["unique"].'%, пожалуйста, исправьте.');
 			}
 		} else {
 			$log('Проверка на уникальность не проводилась или выполнена с ошибкой.');
@@ -616,14 +613,11 @@ class Text extends Commentable {
 		 * Проверка на seo параметры
 		 */
 		$seo = $this -> seoStat(['text' => $this -> text], true);
-		if ($seo['first_nucl_num'] > self::MAX_NUCL_WORD) {
-			$log('Первый показатель в семантическом ядре превышает '.self::MAX_NUCL_WORD.'.');
+		if ($seo['first_word_num'] > $params["word"]) {
+			$log('Первый показатель в словах превышает '.$params["word"].".");
 		}
-		if ($seo['first_word_num'] > self::MAX_WORD) {
-			$log('Первый показатель в словах превышает '.self::MAX_WORD.".");
-		}
-		if ($seo['sick'] > self::MAX_NOSEA) {
-			$log('Тошнотность превышает '.self::MAX_NOSEA.".");
+		if ($seo['sick'] > $params["sick"]) {
+			$log('Тошнотность превышает '.$params["sick"].".");
 		}
 		$keys = $this -> analyze(['text' => $this -> text], true);
 		if (!empty($keys['failed']['direct'])) {

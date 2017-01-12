@@ -362,7 +362,7 @@ function text(id) {
                         me.obtainUnique();
                     }, 10000);
                 } else {
-                    alert('Не удалось получить уникальность.');
+                    //alert('Не удалось получить уникальность.');
                     me.renderUnique();
                     me.obtainInterval = false;
                 }

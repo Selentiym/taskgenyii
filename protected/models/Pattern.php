@@ -9,6 +9,10 @@
  * @property string $view
  * @property bool $byHtml
  * @property string $html
+ * @property integer $minUnique
+ * @property integer $maxWord
+ * @property integer $maxSickness
+ * @property integer $maxCross
  */
 class Pattern extends UModel {
 	public $byHtml = 1;
@@ -30,7 +34,7 @@ class Pattern extends UModel {
 				array('view', 'match','pattern' => '/[a-z]+[a-z\d_-]*/i', 'allowEmpty' => true, 'message' => 'Имя файла должно содержать только латинские буквы, цифры и подчеркивания и начинаться с буквы.'),
 				array('name', 'length', 'max'=>1024),
 				array('view', 'length', 'max'=>256),
-				array('id, name, view, html', 'safe'),
+				array('id, name, view, html, minUnique, maxWord, maxSickness, maxCross', 'safe'),
 		);
 	}
 
@@ -89,5 +93,22 @@ class Pattern extends UModel {
 	 */
 	public static function model($className=__CLASS__) {
 		return parent::model($className);
+	}
+	public function renderOneself(Controller $controller,Task $model) {
+
+		if (!$this -> byHtml) {
+			return $controller->renderPartial('//pattern/' . $this->view, array('model' => $model), true);
+		} else {
+			$rez = preg_replace_callback('/renderPattern:(\w+)/ui', function ($matches) use ($controller, $model) {
+				if ($p = Pattern::model() -> findByAttributes(['view' => end($matches)])) {
+					/**
+					 * @type Pattern $p
+					 */
+					return $p -> renderOneself($controller, $model);
+				}
+				return '';
+			}, $this -> html);
+			return $rez;
+		}
 	}
 }

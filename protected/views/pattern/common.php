@@ -33,23 +33,5 @@ $data = $model -> keyphrases;
 
 <div><strong>Тема статьи: </strong> <?php echo $model -> name; ?></div>
 <?php
-
-if (!$model -> pattern -> byHtml) {
-    $this->renderPartial('//pattern/' . $model->pattern->view, array('model' => $model));
-} else {
-    echo $model -> pattern -> html;
-}
-$common = Pattern::model() -> findByAttributes(['view' => 'common']);
-if ($common instanceof Pattern) {
-    echo $common -> html;
-}
+echo $model -> pattern -> renderOneself($this, $model);
 ?>
-<!--
-<p class="MsoNormal">Наличие структуры призвано стандартизировать статьи данного
-    типа для удобства пользователя. Поэтому если Вы чувствуете, что получается
-    неинтересно/неинформативно/некрасиво и вообще как-то не так с точки зрения
-    человека, зашедшего на сайт в поисках информации, не стесняйтесь прерваться и
-    обсудить свои вопросы или предложения с нами, особенно на первых этапах. Все вопросы можно
-    писать во встроенный чат или скайп.
-</p>
--->

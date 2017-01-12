@@ -25,6 +25,22 @@ $form=$this->beginWidget('CActiveForm', array(
 
         <div class="well">
             <div class="form-group">
+                <label for="minUnique">Минимальная уникальность</label>
+                <?php echo $form->numberField($model, 'minUnique',array('size'=>60,'maxlength'=>255)); ?>
+            </div>
+            <div class="form-group">
+                <label for="maxSickness">Максимальная тошнотность</label>
+                <?php echo $form->numberField($model, 'maxSickness',array('size'=>60,'maxlength'=>255)); ?>
+            </div>
+            <div class="form-group">
+                <label for="maxCross">Максимальный процент совпадений в системе</label>
+                <?php echo $form->numberField($model, 'maxCross',array('size'=>60,'maxlength'=>255)); ?>
+            </div>
+            <div class="form-group">
+                <label for="maxSickness">Максимальный процент вхождения самого частого слова</label>
+                <?php echo $form->numberField($model, 'maxWord',array('size'=>60,'maxlength'=>255)); ?>
+            </div>
+            <div class="form-group">
                 <label for="name">Отображаемое имя</label>
                 <?php echo $form->textField($model, 'name',array('size'=>60,'maxlength'=>255,'placeholder'=>'Имя')); ?>
             </div>
