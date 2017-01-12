@@ -19,9 +19,10 @@ if ($t = $model -> prepareTextModel()) {
 	array_unshift($texts, $t);
 }
 $editor = Yii::app() -> user -> checkAccess('editor');
+$cur = $model -> getRelated('currentText', true);
 foreach ($texts as $text) {
 
-	if ($text -> id != $model -> currentText -> id) {
+	if ($text -> id != $cur -> id) {
 		$view = '//text/_history';
 	} elseif ($model -> rezult) {
 		if ($editor) {
@@ -32,6 +33,8 @@ foreach ($texts as $text) {
 		} else {
 			$view = '//text/_history';
 		}
+	} else {
+		$view = '//text/write';
 	}
 	if ($view) {
 		$this->renderPartial($view, ['model' => $text]);
