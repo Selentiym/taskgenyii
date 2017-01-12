@@ -10,7 +10,7 @@
  */
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/history.css');
 //$this -> renderPartial('//_navBar');
-$texts = $model -> texts;
+$texts = $model -> getRelated('texts',true);
 if (empty($texts)) {
 	$texts = [];
 }
@@ -21,7 +21,7 @@ if ($t = $model -> prepareTextModel()) {
 $editor = Yii::app() -> user -> checkAccess('editor');
 $cur = $model -> getRelated('currentText', true);
 foreach ($texts as $text) {
-
+	$view = '//text/write';
 	if ($text -> id != $cur -> id) {
 		$view = '//text/_history';
 	} elseif ($model -> rezult) {
