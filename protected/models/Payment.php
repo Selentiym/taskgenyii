@@ -9,6 +9,7 @@
  * @property integer $confirmed
  * @property string $comment
  * @property integer $id_author
+ * @property integer $prepayWas
  * @property integer $sum
  *
  * relations:

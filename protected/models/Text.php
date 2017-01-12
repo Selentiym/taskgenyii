@@ -447,6 +447,10 @@ class Text extends Commentable {
 	}
 	protected function beforeSave() {
 		$nullStatus = true;
+		/**
+		 * Считаем длину
+		 */
+		$this -> length = $this -> countLength(false);
 		switch ($this -> scenario) {
 			case 'noBeforeSave' :
 				return true;
@@ -499,9 +503,10 @@ class Text extends Commentable {
 					$this -> shingles = $this -> fastShingles() -> archive();
 					$task = $this -> task;
 					$task -> id_text = $this -> id;
-					$task -> save();
-					if ($task->author) {
-						$task->author->notify('Текст по заданию ' . $task->show() . ' принят!');
+					$length = $this -> length;
+					$task -> toPay = $task -> calculatePayment($this);
+					if (($task -> save())&&($task->author)) {
+						$task->author->notify('Текст по заданию ' . $task->show() . ' принят! По тарифу '.$this -> task -> author -> tax."руб/1000 символов начислено {$task->toPay}руб, длина текста без пробелов $length");
 					}
 				} else {
 					return false;
@@ -546,10 +551,6 @@ class Text extends Commentable {
 				}
 			}
 		}
-		/**
-		 * Считаем длину
-		 */
-		$this -> length = $this -> countLength(false);
 		//Обновляем время обновления
 		if (!is_a($this -> updated, 'CDbExpression')) {
 			$this->updated = new CDbExpression("CURRENT_TIMESTAMP");

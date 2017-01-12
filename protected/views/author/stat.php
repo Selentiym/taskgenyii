@@ -8,6 +8,7 @@
 /**
  * @type Author $model
  */
+$editor = Yii::app() -> user -> checkAccess('editor');
 if (Yii::app() -> user -> checkAccess('editor')) {
     echo "<h2>$model->name</h2>";
     echo UHtml::link("Редактировать", Yii::app()->createUrl('cabinet/authorEdit', ['arg' => $model->id]), ['class' => 'buttonText']);
@@ -20,13 +21,40 @@ echo Yii::app() -> user -> getFlash('noUnpayedTasks');
     <tr><td>Завершенных заданий</td><td><?php echo $model -> completedTasksNum; ?></td></tr>
     <tr><td>Принятых не с первого раза заданий</td><td><?php echo count($model -> secondlyAcceptedIds()); ?></td></tr>
 </table>
+<h3>Тариф</h3>
+<div>Стоимость работ на данный момент <strong><?php echo $model -> tax; ?></strong>руб/1000 символов без пробелов</div>
+<?php if($editor): ?>
+    <p><?php echo Yii::app() -> user -> getFlash('tax'); ?></p>
+    <form method="post" action="<?php echo Yii::app() -> createUrl('cabinet/authorEditTax',['arg' => $model -> id]); ?>">
+        <label>
+            <span>Оплата за 1000 символов без пробелов</span><br/>
+            <input type="number" name="tax" placeholder="Тариф" value="<?php echo $model -> tax; ?>"/>
+        </label>
+        <input type="submit" name="Author" value="Сохранить">
+    </form>
+<?php endif; ?>
+<h3>Предоплата</h3>
+    <div>Уже начислена предоплата <strong><?php echo $model -> prepayed; ?> руб</strong></div>
+    <?php if($editor): ?>
+    <p><?php echo Yii::app() -> user -> getFlash('prepay'); ?></p>
+    <form method="post" action="<?php echo Yii::app() -> createUrl('cabinet/authorPrePay',['arg' => $model -> id]); ?>">
+        <label>
+            <span>Прибавится к уже имеющейся сумме. Учитывается при нажатии "Уведомить об оплате".</span><br/>
+            <input type="number" name="prepay" placeholder="предоплата"/>
+        </label>
+        <input type="submit" name="goPrepay" value="Начислить предоплату">
+    </form>
+    <?php endif; ?>
+
 <h3>Задания к оплате</h3>
+<?php $tasks = $model -> notPayedTasks(); ?>
+<div>К оплате (с учетом предоплаты в размере <strong><?php echo $model -> prepayed; ?></strong> руб) <strong><?php echo $model -> CalculatePayment($tasks); ?></strong> руб</div><p></p>
 <?php
 if (Yii::app() -> user -> checkAccess('editor')) {
     echo CHtml::link("Уведомить об оплате", Yii::app()->createUrl("cabinet/authorPay", ['arg' => $model->id]), ['class' => 'buttonText']);
 }
 //var_dump($model -> completedNotPayedTasks);
-foreach ($model -> completedNotPayedTasks as $t) {
+foreach ($tasks as $t) {
     $this -> renderPartial('//task/shortcutWithLength', array('task' => $t));
 }
 ?>

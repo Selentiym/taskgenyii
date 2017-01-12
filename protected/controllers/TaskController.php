@@ -172,4 +172,15 @@ class TaskController extends Controller {
             return $el -> dumpForProject();
         }), JSON_PRETTY_PRINT);
     }
+    public function actionRecalculatePayments() {
+        $tasks = Task::model() -> findAll('toPay IS NULL');
+        foreach($tasks as $t) {
+            /**
+             * @type Task $t
+             */
+            $p = $t -> calculatePayment();
+            $t -> toPay = $p;
+            $t -> save(false,['toPay']);
+        }
+    }
 }

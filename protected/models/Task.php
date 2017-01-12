@@ -12,6 +12,7 @@
  * @property integer $id_parent
  * @property string $created
  * @property integer $id_text
+ * @property integer $toPay
  * @property integer $min_length
  * @property integer $max_length
 
@@ -625,5 +626,24 @@ class Task extends Commentable {
 			}
 			$newTask -> notifyAuthorAboutAssign();
 		}
+	}
+
+	/**
+	 * @param Text|null $text
+	 * @return integer
+	 */
+	public function calculatePayment(Text $text = null) {
+		if (!$text) {
+			$rez = $this->rezult;
+		} else {
+			$rez = $text;
+		}
+		$author = $this -> author;
+		if (($author)&&($rez)) {
+			$length = $rez -> length;
+			$pay = ceil($length * $author -> tax / 1000);
+			return $pay;
+		}
+		return 0;
 	}
 }

@@ -36,6 +36,8 @@ class User extends UModel {
 			array('username', 'length', 'max'=>256),
 			array('password', 'length', 'max'=>60),
 			array('input_password, input_password_second', 'safe', 'on' => 'create, update'),
+			array('*', 'unsafe', 'on' => 'updateTax'),
+			array('tax', 'safe', 'on' => 'updateTax'),
 			array('name', 'length', 'max'=>512),
 		);
 	}

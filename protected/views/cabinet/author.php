@@ -28,7 +28,7 @@ echo "Общее число символов: ".$model -> symbols();
 <?php
 echo "<ul>";
 define('completedAmount', 5);
-foreach(array_slice($model -> completedTasks,0,completedAmount) as $task) {
+foreach(array_slice($model -> completedTasks,completedAmount) as $task) {
     $this -> renderPartial('//task/shortcut', array('task' => $task));
 }
 echo "</ul>";

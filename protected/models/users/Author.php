@@ -7,6 +7,8 @@
  */
 
 /**
+ * @property integer $tax
+ * @property integer $prepayed
  * The followings are the available model relations:
  * @property Task[] $tasks
  * @property Task[] $activeTasks
@@ -33,7 +35,7 @@ class Author extends User {
         return parent::relations() + array(
             'tasks' => array(self::HAS_MANY, 'Task', 'id_author'),
             'activeTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NULL'),
-            'completedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
+            'completedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL', 'order' => 'created DESC'),
             'completedTasksNum' => array(self::STAT, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL'),
             'completedNotPayedTasks' => array(self::HAS_MANY, 'Task', 'id_author', 'condition' => 'id_text IS NOT NULL AND (SELECT COUNT(`id`) FROM `tbl_task_payment` `tp` WHERE `tp`.`id_task` = completedNotPayedTasks.`id`) = 0')
         );
@@ -93,9 +95,16 @@ class Author extends User {
         }
         $pay = new Payment();
         $pay -> id_author = $this -> id;
+        $pay -> prepayWas = $this -> prepayed;
         $pay -> sum = $this -> CalculatePayment($tasks);
+        $remainsPrepayed = -1;
+        if ($pay -> sum < 0) {
+            $remainsPrepayed = - $pay -> sum;
+            $pay -> sum = 0;
+        }
         if ($pay -> save()) {
             $this -> idCreatedPay = $pay -> id;
+
             //После создания объекта оплаты, добавляем в него оплаченные тексты.
             foreach ($tasks as $task) {
                 $link = new TaskPayment();
@@ -105,19 +114,47 @@ class Author extends User {
                     $task -> save();
                 }
             }
-            $this -> notify('В ближайшее время Вам должен поступить платеж на сумму '.$pay -> sum.'. <a href="'.Yii::app() -> createUrl('cabinet/payView',['arg' => $pay -> id]).'">Подробная информация</a>.');
+            if ($remainsPrepayed < 0) {
+                $this->notify('В ближайшее время Вам должен поступить платеж на сумму ' . $pay->sum . ' руб. <a href="' . Yii::app()->createUrl('cabinet/payView', ['arg' => $pay->id]) . '">Подробная информация</a>. Была учтена предоплата в размере '. $pay -> prepayWas.' руб.');
+                $this -> prepayed = 0;
+            } else {
+                $this -> notify('<a href="' . Yii::app()->createUrl('cabinet/payView', ['arg' => $pay->id]) . '">Некоторые задания</a> были оплачены засчет предоплаты. Осталось предоплаты '.$remainsPrepayed.' руб.');
+                $this -> prepayed = $remainsPrepayed;
+            }
+
+            if (!$this -> save(false, ['prepayed'])) {
+                throw new Exception("Не удалось поменять предоплату!");
+            }
         }
     }
-
+    public function prePay() {
+        $data = $_POST;
+        if (($data["goPrepay"])&&($data["prepay"])) {
+            $was = $this -> prepayed;
+            $toPay = $data["prepay"];
+            $toBe = $toPay + $was;
+            $this -> prepayed = $toBe;
+            if ($this -> save(false, ['prepayed'])) {
+                Yii::app() -> user -> setFlash('prepay',"Предоплата в размере $toPay руб начислена автору ".$this -> show().".");
+                $this->notify("В ближайшее время Вам должна прийти предоплата в размере $toPay руб. Уже было $was руб, в сумме $toBe руб.");
+            } else {
+                Yii::app() -> user -> setFlash('prepay',"Не удалось начислить предоплату! Попробуйте еще раз.");
+            }
+        }
+    }
+    public function redirectToStat() {
+        return Yii::app() -> createUrl('cabinet/authorStat',['arg' => $this -> id]);
+    }
     /**
      * @return int
      * @param Task[] $tasks - задания к оплате
      */
     public function CalculatePayment($tasks){
-        $sum = array_reduce($tasks, function($task){
-            return $task -> rezult -> length;
-        }, 0);
-        return round($sum / 1000 * 65);
+        $sum = 0;
+        foreach ($tasks as $t) {
+            $sum += $t -> toPay;
+        }
+        return ($sum - $this -> prepayed);
     }
     public function redirectAfterPay(){
         if ($this -> idCreatedPay) {
@@ -142,5 +179,24 @@ class Author extends User {
     }
     public function notPayedTasks(){
         return Task::model() -> findAllByPk($this -> notPayedTasksIds());
+    }
+
+    /**
+     * @return bool
+     */
+    public function editTax() {
+        $data = $_POST;
+        if (($data["Author"])&&($data["tax"])) {
+            $was = $this -> tax;
+            $toBe = $data["tax"];
+            $this -> tax = $toBe;
+            if ($this -> save(false, ['tax'])) {
+                Yii::app() -> user -> setFlash('tax',"Тариф автору ".$this -> show()." изменен с $was руб на $toBe руб.");
+                $this->notify("Вам был изменен тариф с $was руб на $toBe руб. Он будет применен ко всем заданиям, принятым позже этого момента, даже если выдавались они при другом тарифе.");
+                return true;
+            }
+        }
+        Yii::app() -> user -> setFlash('tax',"Не удалось изменить тариф! Попробуйте еще раз.");
+        return false;
     }
 }

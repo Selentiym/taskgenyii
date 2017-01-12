@@ -94,6 +94,24 @@ class CabinetController extends Controller {
                 'scenario' => 'pay',
                 'access' => Yii::app() -> user -> checkAccess('editor')
             ),
+            'authorPrePay' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'prePay',
+                'redirectMethod' => 'redirectToStat',
+                'ignore' => true,
+                'modelClass' => 'Author',
+                'scenario' => 'prePay',
+                'access' => Yii::app() -> user -> checkAccess('editor')
+            ),
+            'authorEditTax' => array(
+                'class' => 'application.controllers.actions.ClassMethodAction',
+                'method' => 'editTax',
+                'redirectMethod' => 'redirectToStat',
+                'ignore' => true,
+                'modelClass' => 'Author',
+                'scenario' => 'updateTax',
+                'access' => Yii::app() -> user -> checkAccess('editor')
+            ),
             'payConfirm' => array(
                 'class' => 'application.controllers.actions.ClassMethodAction',
                 'method' => 'confirm',
