@@ -10,6 +10,6 @@
     <?php $params = $model -> getCheckParams(); ?>
 <p>Минимальная уникальность текста (в системе): <strong><?php echo $params['unique']; ?></strong></p>
 <p>Максимальный процент совпадений текста в сиситеме (перекрестная уникальность): <strong><?php echo $params['cross']; ?></strong></p>
-<p>Максимальная тошнотность: <strong><?php echo $params['sick']; ?></strong></p>
+<p>Максимальная академическая тошнота: <strong><?php echo $params['sick']; ?></strong></p>
 <p>Максимальный процент вхождения самого частого слова: <strong><?php echo $params['word']; ?></strong></p>
 </div>

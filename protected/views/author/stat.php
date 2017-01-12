@@ -47,14 +47,31 @@ echo Yii::app() -> user -> getFlash('noUnpayedTasks');
     <?php endif; ?>
 
 <h3>Задания к оплате</h3>
-<?php $tasks = $model -> notPayedTasks(); ?>
-<div>К оплате (с учетом предоплаты в размере <strong><?php echo $model -> prepayed; ?></strong> руб) <strong><?php echo $model -> CalculatePayment($tasks); ?></strong> руб</div><p></p>
+<?php
+    $tasks = $model -> notPayedTasks();
+    $pay = $model -> CalculatePayment($tasks);
+    $salary = $pay + $model -> prepayed;
+    if ($pay < 0) {
+        $prepayTaken = $salary;
+    } else {
+        $prepayTaken = $model -> prepayed;
+    }
+?>
+<div>Выполнено заданий на сумму (список ниже): <strong><?php echo $salary; ?></strong> руб</div>
+<div>Было оплачено заранее: <strong><?php echo $model -> prepayed; ?></strong> руб</div>
+<div>К оплате (с учетом предоплаты в размере <strong><?php echo $prepayTaken; ?></strong> руб): <strong><?php echo $pay < 0 ? 0 : $pay; ?></strong> руб</div>
+<div>Предоплаты останется: <strong><?php echo $model -> prepayed - $prepayTaken; ?></strong> руб</div>
+    <p></p>
 <?php
 if (Yii::app() -> user -> checkAccess('editor')) {
     echo CHtml::link("Уведомить об оплате", Yii::app()->createUrl("cabinet/authorPay", ['arg' => $model->id]), ['class' => 'buttonText']);
 }
 //var_dump($model -> completedNotPayedTasks);
-foreach ($tasks as $t) {
-    $this -> renderPartial('//task/shortcutWithLength', array('task' => $t));
+if (!empty($tasks)) {
+    foreach ($tasks as $t) {
+        $this->renderPartial('//task/shortcutWithLength', array('task' => $t));
+    }
+} else {
+    echo "<p></p><div>Нет <strong>принятых</strong> неоплаченных заданий.</div>";
 }
 ?>
