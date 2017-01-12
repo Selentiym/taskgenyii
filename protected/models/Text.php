@@ -506,7 +506,7 @@ class Text extends Commentable {
 					$length = $this -> length;
 					$task -> toPay = $task -> calculatePayment($this);
 					if (($task -> save())&&($task->author)) {
-						$task->author->notify('Текст по заданию ' . $task->show() . ' принят! По тарифу '.$this -> task -> author -> tax."руб/1000 символов начислено {$task->toPay}руб, длина текста без пробелов $length");
+						$task->author->notify('Текст по заданию ' . $task->show() . ' принят! По тарифу '.$this -> task -> author -> tax."руб/1000 символов стоимость задания {$task->toPay}руб, длина текста без пробелов $length");
 					}
 				} else {
 					return false;
