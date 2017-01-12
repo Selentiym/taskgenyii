@@ -166,7 +166,7 @@ Yii::app() -> getClientScript() -> registerScript('structure','
         </div>
         <div class="well">
             <?php
-                echo UHtml::activeNumberField($model,'min_length',['style' => 'width:40%','placeholder' => 'Минимальная длина текста','step' => 200]);
+                echo UHtml::activeNumberField($model,'min_length',['style' => 'width:40%','placeholder' => 'Минимальная длина текста','step' => 100]);
             ?>
             <?php
             echo UHtml::activeNumberField($model,'max_length',['style' => 'width:40%; margin-left:20px','placeholder' => 'Максимальная длина текста','step' => 200]);
