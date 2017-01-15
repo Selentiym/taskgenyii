@@ -120,3 +120,10 @@
 #TreeContainer .comment.hidden {
     display:none;
 }
+
+#TreeContainer .handedIn {
+    background-color: rgba(114, 255, 10, 0.56);
+}
+#TreeContainer .QHandedIn {
+    background-color: rgba(17, 85, 255, 0.56);
+}

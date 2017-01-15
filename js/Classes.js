@@ -1489,9 +1489,11 @@ function addButtons(branch){
     } else if (status.handedIn == 1) {
         imageName = 'handedIn.png';
         imageAlt = 'Задание сдано';
+        branch.element.addClass('handedIn');
     } else if (status.QHandedIn == 1) {
         imageName = 'QHandedIn.png';
         imageAlt = 'Просьба рассмотреть';
+        branch.element.addClass('QHandedIn');
     } else if (status.notEmpty == 1){
         imageName = 'writing.png';
         imageAlt = 'Текст в разработке';
