@@ -22,6 +22,6 @@ $('body').keyup(function(e){
 
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScript('draggable',"
-    $('.toDrag').draggable();
+    $('.toDrag').draggable({handle:'.head_panel'});
 ",CClientScript::POS_READY);
 ?>

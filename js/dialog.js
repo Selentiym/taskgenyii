@@ -187,7 +187,7 @@ function addNewDialog(id){
                 var created = new Dialog($('#' + id), data.idSender, data.idReceiver, data.date);
                 var parent = created.container.parent();
                 if (parent.filter('.toDrag').length) {
-                    parent.draggable();
+                    parent.draggable({handle:'.head_panel'});
                 }
             }
         });

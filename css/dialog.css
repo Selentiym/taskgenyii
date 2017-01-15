@@ -16,6 +16,7 @@
 .dialog_container .head_panel {
     height:20px;
     text-align:right;
+    background-color: rgba(216, 255, 8, 0.41);
 }
 .dialog_container .head_panel span{
     width:20px;

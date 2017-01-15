@@ -23,6 +23,7 @@ $this -> renderPartial('//cabinet/_newDialog');
 <div id="<?php echo $id; ?>_shortcut" class="dialog_shortcut"></div>
 <div class="toDrag" style="z-index:5;">
     <div id="<?php echo $id; ?>" class="dialog_container hidden">
+        <div class="head_panel"></div>
         <div><span class="talkerName">Уведомления</span>:</div>
         <div class="more"><span class="moreSpan">Больше сообщений</span></div>
         <div class="letters">
