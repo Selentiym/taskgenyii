@@ -78,15 +78,7 @@ return array(
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
-
-		'db'=>array(
-            'connectionString' => 'mysql:host=localhost;dbname=cq97848_taskgen',
-            'tablePrefix' => 'tbl_',
-            'emulatePrepare' => true,
-            'username' => 'cq97848_taskgen',
-            'password' => 'kicker',
-            'charset' => 'utf8',
-        ),
+		'db' => require(__DIR__ . '/database.config.pss.php'),
 		// uncomment the following to use a MySQL database
 		/*
 		'db'=>array(
