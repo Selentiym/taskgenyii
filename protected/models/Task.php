@@ -528,6 +528,7 @@ class Task extends Commentable {
 		$task -> id_parent = $this -> id;
 		$task -> id = null;
 		$task -> id_text = null;
+		$task -> id_editor = Yii::app() -> user -> getId();
 		if (!$task -> save()) {
 			$rez['success'] = false;
 		} else {
