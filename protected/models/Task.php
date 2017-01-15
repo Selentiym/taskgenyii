@@ -527,6 +527,7 @@ class Task extends Commentable {
 		$task -> name = $_POST["name"];
 		$task -> id_parent = $this -> id;
 		$task -> id = null;
+		$task -> id_text = null;
 		if (!$task -> save()) {
 			$rez['success'] = false;
 		} else {
