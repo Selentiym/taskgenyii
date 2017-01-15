@@ -307,6 +307,7 @@ class Task extends Commentable {
 			$text -> text = $t -> text;
 			$text -> uniquePercent = $t -> uniquePercent;
 			$text -> uid = $t -> uid;
+			$text -> description = $t -> description;
 		}
 		$text -> id_task = $this -> id;
 		//Прибавили единичку намеренно! Чтобы при отклонении последним был именно только что созданный текст, а не обновленный
