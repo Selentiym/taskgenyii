@@ -24,7 +24,8 @@ class Stemmer {
 
     private static $instance;
 
-    private static $rules = array('спб' => 'спб');
+    private static $rules = array('спб' => 'спб', 'мрт'=>'мрт', 'кт'=>'кт', 'скт' => 'скт',
+        'мскт'=>'мскт', 'мр' => 'мр');
 
     /**
      * @return Stemmer
