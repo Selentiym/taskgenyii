@@ -123,6 +123,13 @@ class Text extends Commentable {
 	}
 
 	/**
+	 * whether the text shall change its status
+	 * @return bool
+	 */
+	public function nullStatus(){
+		return !(Yii::app() -> user -> checkAccess('editor'));
+	}
+	/**
 	 * Основная функция интерфейса для авторов.
 	 * Считает ключевые слова, получает разные статистики из api, проверяет уникальность.
 	 * Попутно сохраняет временные изменения в тексте вместе с некоторыми параметрами.
@@ -137,7 +144,7 @@ class Text extends Commentable {
 		$text = $post['text'];
 		$this -> text = $text;
 		//Сохраняем только текст
-		if (!$post['not_save']) {
+		if ((!$post['not_save'])&&($this -> nullStatus())) {
 			$this -> handedIn = 0;
 			$this -> QHandedIn = 0;
 			$this -> save(false, array('text',"handedIn","QHandedIn"));
@@ -441,11 +448,7 @@ class Text extends Commentable {
 		}
 	}
 	protected function beforeSave() {
-		$nullStatus = true;
-		//Не обнуляем статус, если зашел редактор
-		if (Yii::app() -> user -> checkAccess('editor')) {
-			$nullStatus = false;
-		}
+		$nullStatus = $this -> nullStatus();
 		/**
 		 * Считаем длину
 		 */
