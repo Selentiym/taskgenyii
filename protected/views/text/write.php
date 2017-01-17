@@ -65,6 +65,7 @@ Yii::app() -> user -> setState('textHandIn',false,false);
             array(
                 'model'=>$model,
                 'attribute'=>'text',
+                'htmlOptions' => ['style' => 'height:300px'],
                 'settings' => array(
                     'entity_encoding' => 'raw',
                     'setup' => 'js:function(ed) {
@@ -80,6 +81,11 @@ Yii::app() -> user -> setState('textHandIn',false,false);
         ?>
         </div>
         </form>
+        <div>
+            <p style="font-style: italic">Уважаемые авторы, просим Вас набирать текст в окне редактора, т.к. копирование текста из Microsoft Word отражается на качестве html кода.</p>
+            <p style="font-style: italic">Обратите внимание, что на этапе проверки заказчик может вносить небольшие коррективы в Вашу статью. Все изменения отражаются в тексте в окне редактора после возвращения задания на доработку.</p>
+            <p style="font-style: italic; font-weight: bold">Доработка текста непосредственно в окне редактора гарантирует сохранение изменений, осуществляемых обеими сторонами!!!</p>
+        </div>
         <?php
         echo $handInErr;
         $this -> renderPartial('//comment/_comments',array('model' => $model));
