@@ -47,7 +47,7 @@ class LoginController extends Controller
         $this->redirect(Yii::app()->homeUrl);
     }
     public function actionpss(){
-        echo CPasswordHelper::hashPassword('919232');
+        echo CPasswordHelper::hashPassword('shubinsa777shubinsa');
     }
     public function actionAddRules() {
         //print_r(Yii::app() -> getAuthManager());
