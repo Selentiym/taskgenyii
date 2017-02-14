@@ -655,7 +655,7 @@ class Text extends Commentable {
 		if ($save) {
 			$old = $this -> getScenario();
 			$this -> length = $length;
-			$this -> setScenario('noBeforeSave');
+			$this -> setScenario('nullStatus');
 			$this -> save(['length']);
 			$this -> setScenario($old);
 		}
