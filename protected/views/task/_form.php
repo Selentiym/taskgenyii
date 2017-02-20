@@ -14,6 +14,11 @@ Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/
 //Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery-ui.min.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/Classes.js', CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerScriptFile(Yii::app() -> baseUrl . '/js/jquery.cookie.js',CClientScript::POS_END);
+Yii::app() -> getClientScript() -> registerScript("confirm exit",'
+$("#goToProject").click(function(){
+    return confirm("Все изменения будут потеряны. Вы, действительно, хотите выйти?");
+});
+',CClientScript::POS_END);
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/taskCreate.css');
 Yii::app() -> getClientScript() -> registerCssFile(Yii::app() -> baseUrl . '/css/tree.css');
 
@@ -180,14 +185,14 @@ Yii::app() -> getClientScript() -> registerScript('structure','
                 array('style' => 'width:300px'),array($model -> id_pattern),json_encode(array('placeholder' => 'Шаблон')));
             ?>
         </div>
-        <input type="submit" value="В проект"/>
+        <input type="submit" value="В проект" title="Перейти в меню проекта. Все изменения будут сохранены!"/>
         <input type="button" value="Еще фраза" title="Или нажмите Enter во время редактирования любой строки" onClick="new Phrase('',{})"/>
 
-        <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" />
-        <input type="button" onClick="Phrase.prototype.reorderPhrases();" value="Учесть пассажи" />
-        <input type="button" onClick="Phrase.prototype.countFreq();" value="Пересчитать частоты" />
-        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToShowTask" id="redirectToShowTask" value="Смотреть результат" />
-        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToKeywords" id="redirectToKeywords" value="Загрузить данные из KeyCollector" />
+        <input type="button" onClick="Phrase.prototype.completeSet();" value="Дополнить фразы до покрытия" title="Проходит снизу вверх по словам справа. Если слово еще не употреблено нужное количество раз, то ищется самая тяжелая поисковая фраза, содержащая это слово, и переводится в ключевую фразу (появляется ниже, где можно писать фразы вручную). Далее идет следующее слово. Таким образом, будут употреблены все ранее не употребленные слова. Замечу, что эту кнопку можно нажимать даже когда какое-то количество ключевых фраз уже создано. Уже имеющиеся фразы изменены не будут."/>
+        <input type="button" onClick="Phrase.prototype.reorderPhrases();" value="Учесть пассажи" title="Работает только для ключевых фраз, которые НЕ помечены замочком (красная иконка замка). Перемтавляет местами слова в ключевых фразах так, чтобы увеличить вес фразы. Под весом фразы понимается сумма частот по всем входящим в нее поисковым фразам с учетом порядка слов! Например, вес фразы 'мрт головного мозга цена' при наличии поисковых фраз 'цена мрт головного мозга', 10; 'цена мрт', 5; 'мрт головного мозга', 20 будет равна 20. Если же поместить слово 'цена' в начало, то вес станет 35. "/>
+        <input type="button" onClick="Phrase.prototype.countFreq();" value="Пересчитать частоты" title="Считает веса всех ключевых фраз и ставит их в окошко частоты. Часто запускается автоматически, но можно иногда запускать вручную." />
+        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToShowTask" id="redirectToShowTask" value="Смотреть результат" title="Переход к окну выполнения/контроля задания. Все изменения будут сохранены."/>
+        <input type="<?php echo $buttons ? 'button' : 'submit'; ?>" name="redirectToKeywords" id="redirectToKeywords" value="Загрузить данные из KeyCollector" title="Перейти к окну добавления поисковых фраз и ключевых слов. Все изменения будут сохранены."/>
         <div>Всего фраз: <span id="phraseCount"></span></div>
     </div>
     <div id="TreeContainer">

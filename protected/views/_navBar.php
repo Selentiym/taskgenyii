@@ -8,5 +8,5 @@
 $user = User::logged();
 ?>
 <div style="text-align:right;">
-    Вы вошли как <?php echo UHtml::link($user -> username, Yii::app() -> createUrl('cabinet/index')).'. '.UHtml::link('Выход', Yii::app() -> createUrl('login/logout')); ?>
+    Вы вошли как <?php echo UHtml::link($user -> username, Yii::app() -> createUrl('cabinet/index'),["id" => "goToProject"]).'. '.UHtml::link('Выход', Yii::app() -> createUrl('login/logout')); ?>
 </div>
